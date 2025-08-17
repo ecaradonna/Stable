@@ -1,8 +1,8 @@
 import os
 from typing import List, Dict, Any
 from datetime import datetime
-from ..models.ai_models import AIAlert, AIAlertCreate, AIAlertTrigger
-from ..mock.data import mockYieldData
+from models.ai_models import AIAlert, AIAlertCreate, AIAlertTrigger
+from mock.data import mockYieldData
 
 class AlertService:
     def __init__(self):
