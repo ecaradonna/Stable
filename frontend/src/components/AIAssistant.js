@@ -71,12 +71,22 @@ const AIAssistant = () => {
       };
 
       setMessages(prev => [...prev, aiMessage]);
+      
     } catch (error) {
       console.error("AI chat error:", error);
       
+      let errorContent = "I apologize, but I'm experiencing technical difficulties. Please try again later.";
+      
+      // Handle specific error cases
+      if (error.response?.status === 500 && error.response?.data?.detail?.includes('OpenAI API key')) {
+        errorContent = "🔑 The AI assistant is ready but needs an OpenAI API key to be configured by the administrator. Please contact support for assistance.";
+      } else if (error.response?.data?.detail) {
+        errorContent = error.response.data.detail;
+      }
+      
       const errorMessage = {
         type: "ai",
-        content: error.response?.data?.detail || "I apologize, but I'm experiencing technical difficulties. Please try again later.",
+        content: errorContent,
         timestamp: new Date(),
         isError: true
       };
