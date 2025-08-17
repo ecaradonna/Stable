@@ -264,14 +264,13 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Live Yields Integration"
-    - "Waitlist API Integration" 
-    - "Newsletter API Integration"
+    - "Waitlist API Integration"
     - "AI Assistant API Integration"
-    - "AI Alerts API Integration"
-  stuck_tasks: []
-  test_all: true
-  test_priority: "high_first"
+  stuck_tasks:
+    - "Waitlist API Integration"
+    - "AI Assistant API Integration"
+  test_all: false
+  test_priority: "stuck_first"
 
 agent_communication:
     - agent: "main"
