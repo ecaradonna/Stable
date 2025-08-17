@@ -60,6 +60,14 @@ async def create_alert(alert_data: AIAlertCreate):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to create alert: {str(e)}")
 
+@router.get("/alerts/conditions")
+async def get_alert_conditions():
+    """Get available alert conditions and stablecoins"""
+    return {
+        "conditions": alert_service.get_alert_conditions(),
+        "stablecoins": alert_service.get_available_stablecoins()
+    }
+
 @router.get("/alerts/{user_email}")
 async def get_user_alerts(user_email: str):
     """Get all alerts for a specific user"""
@@ -82,14 +90,6 @@ async def delete_alert(alert_id: str, user_email: str):
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to delete alert: {str(e)}")
-
-@router.get("/alerts/conditions")
-async def get_alert_conditions():
-    """Get available alert conditions and stablecoins"""
-    return {
-        "conditions": alert_service.get_alert_conditions(),
-        "stablecoins": alert_service.get_available_stablecoins()
-    }
 
 @router.post("/alerts/check")
 async def check_alerts():
