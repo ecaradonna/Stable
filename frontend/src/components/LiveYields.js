@@ -62,7 +62,7 @@ const LiveYields = () => {
 
         {/* Yields Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-          {yields.map((yieldItem, index) => (
+          {yieldsData.map((yieldItem, index) => (
             <div 
               key={yieldItem.id}
               className="group bg-gradient-to-br from-white to-gray-50 rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 hover:border-[#4CC1E9]/30 transform hover:-translate-y-1"
