@@ -4,8 +4,8 @@ from typing import List, Dict, Any, Optional
 from datetime import datetime
 from dotenv import load_dotenv
 from emergentintegrations.llm.chat import LlmChat, UserMessage
-from ..models.ai_models import ChatMessage, ChatResponse
-from ..mock.data import mockYieldData  # Import mock data
+from models.ai_models import ChatMessage, ChatResponse
+from mock.data import mockYieldData  # Import mock data
 
 load_dotenv()
 
