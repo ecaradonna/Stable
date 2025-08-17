@@ -109,6 +109,7 @@ const AIAssistant = () => {
         <Button
           onClick={() => setIsOpen(true)}
           className="h-14 w-14 rounded-full bg-gradient-to-r from-[#4CC1E9] to-[#007A99] hover:from-[#007A99] hover:to-[#4CC1E9] text-white shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-110"
+          aria-label="Open AI Assistant"
         >
           <MessageCircle className="h-6 w-6" />
         </Button>
