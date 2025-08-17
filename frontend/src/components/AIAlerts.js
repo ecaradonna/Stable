@@ -7,10 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { Alert, AlertDescription } from "./ui/alert";
 import { Bell, Plus, Trash2, AlertTriangle, CheckCircle, X } from "lucide-react";
 import { useToast } from "../hooks/use-toast";
-import axios from "axios";
-
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
+import { aiApi } from "../services/api";
 
 const AIAlerts = ({ userEmail = "demo@stableyield.com" }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -37,7 +34,7 @@ const AIAlerts = ({ userEmail = "demo@stableyield.com" }) => {
 
   const fetchAlerts = async () => {
     try {
-      const response = await axios.get(`${API}/ai/alerts/${userEmail}`);
+      const response = await aiApi.getUserAlerts(userEmail);
       setAlerts(response.data.alerts || []);
     } catch (error) {
       console.error("Failed to fetch alerts:", error);
@@ -51,10 +48,21 @@ const AIAlerts = ({ userEmail = "demo@stableyield.com" }) => {
 
   const fetchAvailableOptions = async () => {
     try {
-      const response = await axios.get(`${API}/ai/alerts/conditions`);
+      const response = await aiApi.getAlertConditions();
       setAvailableOptions(response.data);
     } catch (error) {
       console.error("Failed to fetch options:", error);
+      // Fallback options
+      setAvailableOptions({
+        conditions: [
+          { value: ">", label: "Greater than (>)" },
+          { value: ">=", label: "Greater than or equal (≥)" },
+          { value: "<", label: "Less than (<)" },
+          { value: "<=", label: "Less than or equal (≤)" },
+          { value: "=", label: "Equal to (=)" }
+        ],
+        stablecoins: ["USDT", "USDC", "DAI", "PYUSD", "TUSD"]
+      });
     }
   };
 
@@ -79,7 +87,7 @@ const AIAlerts = ({ userEmail = "demo@stableyield.com" }) => {
         alert_type: formData.alert_type
       };
 
-      await axios.post(`${API}/ai/alerts`, alertData);
+      await aiApi.createAlert(alertData);
       
       toast({
         title: "Alert Created!",
@@ -99,7 +107,7 @@ const AIAlerts = ({ userEmail = "demo@stableyield.com" }) => {
       console.error("Failed to create alert:", error);
       toast({
         title: "Error",
-        description: "Failed to create alert. Please try again.",
+        description: error.response?.data?.detail || "Failed to create alert. Please try again.",
         variant: "destructive"
       });
     } finally {
@@ -109,7 +117,7 @@ const AIAlerts = ({ userEmail = "demo@stableyield.com" }) => {
 
   const handleDeleteAlert = async (alertId) => {
     try {
-      await axios.delete(`${API}/ai/alerts/${alertId}?user_email=${userEmail}`);
+      await aiApi.deleteAlert(alertId, userEmail);
       
       toast({
         title: "Alert Deleted",
@@ -122,7 +130,7 @@ const AIAlerts = ({ userEmail = "demo@stableyield.com" }) => {
       console.error("Failed to delete alert:", error);
       toast({
         title: "Error",
-        description: "Failed to delete alert. Please try again.",
+        description: error.response?.data?.detail || "Failed to delete alert. Please try again.",
         variant: "destructive"
       });
     }
@@ -272,20 +280,20 @@ const AIAlerts = ({ userEmail = "demo@stableyield.com" }) => {
                             {alert.stablecoin}
                           </span>
                           <span className={`px-2 py-1 rounded-full text-xs ${
-                            alert.is_active 
+                            alert.is_active || alert.isActive
                               ? "bg-green-100 text-green-700" 
                               : "bg-gray-100 text-gray-700"
                           }`}>
-                            {alert.is_active ? "Active" : "Inactive"}
+                            {(alert.is_active || alert.isActive) ? "Active" : "Inactive"}
                           </span>
                         </div>
                         <p className="text-sm text-gray-600">
                           Notify when yield is <strong>{formatCondition(alert.condition)} {alert.threshold}%</strong>
                         </p>
                         <p className="text-xs text-gray-500 mt-1">
-                          Created {new Date(alert.created_at).toLocaleDateString()}
-                          {alert.last_triggered && (
-                            <span> • Last triggered {new Date(alert.last_triggered).toLocaleDateString()}</span>
+                          Created {new Date(alert.created_at || alert.createdAt).toLocaleDateString()}
+                          {(alert.last_triggered || alert.lastTriggered) && (
+                            <span> • Last triggered {new Date(alert.last_triggered || alert.lastTriggered).toLocaleDateString()}</span>
                           )}
                         </p>
                       </div>

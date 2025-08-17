@@ -3,10 +3,7 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
 import { MessageCircle, Send, Sparkles, X, Loader2, Bot, User } from "lucide-react";
-import axios from "axios";
-
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
+import { aiApi } from "../services/api";
 
 const AIAssistant = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -20,6 +17,7 @@ const AIAssistant = () => {
   const [currentMessage, setCurrentMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [sessionId] = useState(() => `session_${Date.now()}`);
+  const [sampleQueries, setSampleQueries] = useState([]);
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
@@ -30,12 +28,21 @@ const AIAssistant = () => {
     scrollToBottom();
   }, [messages]);
 
-  const sampleQueries = [
-    "What's the current top yield for USDT?",
-    "Compare USDC vs DAI yields today",
-    "Which platform offers the best USDT yield?",
-    "Show me all stablecoin yields above 6%"
-  ];
+  // Load sample queries when component mounts
+  useEffect(() => {
+    const loadSamples = async () => {
+      try {
+        const response = await aiApi.getSamples();
+        setSampleQueries(response.data.samples || []);
+      } catch (error) {
+        console.error("Failed to load sample queries:", error);
+      }
+    };
+    
+    if (isOpen) {
+      loadSamples();
+    }
+  }, [isOpen]);
 
   const handleSendMessage = async (message = currentMessage) => {
     if (!message.trim() || isLoading) return;
@@ -51,7 +58,7 @@ const AIAssistant = () => {
     setIsLoading(true);
 
     try {
-      const response = await axios.post(`${API}/ai/chat`, {
+      const response = await aiApi.chat({
         session_id: sessionId,
         message: message
       });
@@ -69,7 +76,7 @@ const AIAssistant = () => {
       
       const errorMessage = {
         type: "ai",
-        content: "I apologize, but I'm experiencing technical difficulties. Please try again later.",
+        content: error.response?.data?.detail || "I apologize, but I'm experiencing technical difficulties. Please try again later.",
         timestamp: new Date(),
         isError: true
       };
@@ -205,11 +212,11 @@ const AIAssistant = () => {
           </div>
 
           {/* Sample Queries */}
-          {messages.length === 1 && (
+          {messages.length === 1 && sampleQueries.length > 0 && (
             <div className="p-4 border-t bg-gray-50">
               <p className="text-sm font-medium text-[#0E1A2B] mb-2">Try asking:</p>
               <div className="grid grid-cols-1 gap-2">
-                {sampleQueries.map((query, index) => (
+                {sampleQueries.slice(0, 4).map((query, index) => (
                   <button
                     key={index}
                     onClick={() => handleSendMessage(query)}

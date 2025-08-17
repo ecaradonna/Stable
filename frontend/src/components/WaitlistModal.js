@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { X, CheckCircle } from "lucide-react";
 import { useToast } from "../hooks/use-toast";
+import { usersApi } from "../services/api";
 
 const WaitlistModal = ({ isOpen, onClose }) => {
   const [formData, setFormData] = useState({
@@ -28,33 +29,37 @@ const WaitlistModal = ({ isOpen, onClose }) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    try {
+      await usersApi.joinWaitlist({
+        name: formData.name,
+        email: formData.email,
+        interest: formData.interest
+      });
 
-    // Store in localStorage (mock database)
-    const existingSignups = JSON.parse(localStorage.getItem('waitlistSignups') || '[]');
-    const newSignup = {
-      ...formData,
-      id: Date.now(),
-      timestamp: new Date().toISOString()
-    };
-    existingSignups.push(newSignup);
-    localStorage.setItem('waitlistSignups', JSON.stringify(existingSignups));
+      setIsSuccess(true);
+      
+      toast({
+        title: "Successfully joined!",
+        description: "Welcome to StableYield waitlist. We'll notify you when we launch.",
+      });
 
-    setIsSubmitting(false);
-    setIsSuccess(true);
-    
-    toast({
-      title: "Successfully joined!",
-      description: "Welcome to StableYield waitlist. We'll notify you when we launch.",
-    });
+      // Reset form after 2 seconds
+      setTimeout(() => {
+        setIsSuccess(false);
+        setFormData({ name: "", email: "", interest: "" });
+        onClose();
+      }, 2000);
 
-    // Reset form after 2 seconds
-    setTimeout(() => {
-      setIsSuccess(false);
-      setFormData({ name: "", email: "", interest: "" });
-      onClose();
-    }, 2000);
+    } catch (error) {
+      console.error("Waitlist signup error:", error);
+      toast({
+        title: "Signup failed",
+        description: error.response?.data?.detail || "Something went wrong. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const isFormValid = formData.name && formData.email && formData.interest;

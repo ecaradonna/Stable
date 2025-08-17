@@ -4,6 +4,7 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Twitter, Linkedin, Github, Mail, ArrowRight } from "lucide-react";
 import { useToast } from "../hooks/use-toast";
+import { usersApi } from "../services/api";
 
 const Footer = () => {
   const [email, setEmail] = useState("");
@@ -16,26 +17,29 @@ const Footer = () => {
 
     setIsSubscribing(true);
     
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // Store in localStorage (mock database)
-    const existingSubscribers = JSON.parse(localStorage.getItem('newsletterSubscribers') || '[]');
-    const newSubscriber = {
-      email,
-      id: Date.now(),
-      timestamp: new Date().toISOString()
-    };
-    existingSubscribers.push(newSubscriber);
-    localStorage.setItem('newsletterSubscribers', JSON.stringify(existingSubscribers));
+    try {
+      await usersApi.subscribeNewsletter({
+        email: email,
+        name: null // Optional for newsletter
+      });
 
-    toast({
-      title: "Subscribed successfully!",
-      description: "You'll receive our weekly StableYield report.",
-    });
+      toast({
+        title: "Subscribed successfully!",
+        description: "You'll receive our weekly StableYield report.",
+      });
 
-    setEmail("");
-    setIsSubscribing(false);
+      setEmail("");
+
+    } catch (error) {
+      console.error("Newsletter subscription error:", error);
+      toast({
+        title: "Subscription failed",
+        description: error.response?.data?.detail || "Something went wrong. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubscribing(false);
+    }
   };
 
   return (
