@@ -1,33 +1,112 @@
 import React, { useState, useEffect } from "react";
-import { mockYieldData } from "../mock/data";
-import { TrendingUp, TrendingDown, ExternalLink, Sparkles } from "lucide-react";
+import { TrendingUp, TrendingDown, ExternalLink, Sparkles, RefreshCw } from "lucide-react";
 import { Button } from "./ui/button";
 import AIAlerts from "./AIAlerts";
+import { yieldsApi } from "../services/api";
+import { useToast } from "../hooks/use-toast";
 
 const LiveYields = () => {
   const [yieldsData, setYieldsData] = useState([]);
   const [lastUpdated, setLastUpdated] = useState(new Date());
+  const [isLoading, setIsLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const { toast } = useToast();
 
-  // Simulate real-time updates
-  useEffect(() => {
-    setYieldsData(mockYieldData.slice(0, 3)); // Show top 3 yields
-    
-    const interval = setInterval(() => {
-      setYieldsData(prevYields => 
-        prevYields.map(yieldItem => ({
-          ...yieldItem,
-          currentYield: yieldItem.currentYield + (Math.random() - 0.5) * 0.1,
-          change24h: yieldItem.change24h + (Math.random() - 0.5) * 0.05
-        }))
-      );
+  // Fetch yields from backend
+  const fetchYields = async (showRefreshToast = false) => {
+    try {
+      const response = await yieldsApi.getAllYields();
+      const yieldsFromAPI = response.data;
+      
+      // Take top 3 for display
+      setYieldsData(yieldsFromAPI.slice(0, 3));
       setLastUpdated(new Date());
-    }, 30000); // Update every 30 seconds
+      
+      if (showRefreshToast) {
+        toast({
+          title: "Data Updated",
+          description: "Latest yield data has been loaded.",
+        });
+      }
+    } catch (error) {
+      console.error("Failed to fetch yields:", error);
+      
+      // Fallback to mock data on error
+      const mockData = [
+        {
+          stablecoin: "USDT",
+          name: "Tether USD",
+          currentYield: 8.45,
+          source: "Binance Earn",
+          sourceType: "CeFi",
+          riskScore: "Medium",
+          change24h: 0.12,
+          liquidity: "$89.2B"
+        },
+        {
+          stablecoin: "USDC", 
+          name: "USD Coin",
+          currentYield: 7.82,
+          source: "Aave V3",
+          sourceType: "DeFi",
+          riskScore: "Low",
+          change24h: -0.05,
+          liquidity: "$32.1B"
+        },
+        {
+          stablecoin: "DAI",
+          name: "Dai Stablecoin", 
+          currentYield: 6.95,
+          source: "Compound",
+          sourceType: "DeFi",
+          riskScore: "Medium",
+          change24h: 0.08,
+          liquidity: "$4.8B"
+        }
+      ];
+      setYieldsData(mockData);
+      
+      toast({
+        title: "Using Cached Data",
+        description: "Unable to fetch latest data. Showing cached results.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Manual refresh
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    try {
+      await yieldsApi.refreshYields(); // Trigger backend refresh
+      await fetchYields(true);
+    } catch (error) {
+      toast({
+        title: "Refresh Failed",
+        description: "Unable to refresh data. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
+  // Initial load and periodic updates
+  useEffect(() => {
+    fetchYields();
+    
+    // Update every 5 minutes
+    const interval = setInterval(() => {
+      fetchYields();
+    }, 5 * 60 * 1000);
 
     return () => clearInterval(interval);
   }, []);
 
   const getRiskScoreColor = (score) => {
-    switch(score.toLowerCase()) {
+    switch(score?.toLowerCase()) {
       case 'low': return 'text-green-600 bg-green-100';
       case 'medium': return 'text-yellow-600 bg-yellow-100';
       case 'high': return 'text-red-600 bg-red-100';
@@ -40,6 +119,19 @@ const LiveYields = () => {
       ? 'text-blue-600 bg-blue-100' 
       : 'text-purple-600 bg-purple-100';
   };
+
+  if (isLoading) {
+    return (
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#4CC1E9] mx-auto"></div>
+            <p className="mt-4 text-gray-600">Loading latest yield data...</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="py-20 bg-white">
@@ -60,6 +152,16 @@ const LiveYields = () => {
             <p className="text-sm text-gray-500">
               Last updated: {lastUpdated.toLocaleTimeString()}
             </p>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleRefresh}
+              disabled={isRefreshing}
+              className="hover:bg-[#4CC1E9]/10 hover:border-[#4CC1E9]"
+            >
+              <RefreshCw className={`w-4 h-4 mr-1 ${isRefreshing ? 'animate-spin' : ''}`} />
+              {isRefreshing ? 'Refreshing...' : 'Refresh'}
+            </Button>
             <AIAlerts />
           </div>
         </div>
@@ -68,7 +170,7 @@ const LiveYields = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
           {yieldsData.map((yieldItem, index) => (
             <div 
-              key={yieldItem.id}
+              key={yieldItem.stablecoin}
               className="group bg-gradient-to-br from-white to-gray-50 rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 hover:border-[#4CC1E9]/30 transform hover:-translate-y-1"
             >
               {/* Header */}
