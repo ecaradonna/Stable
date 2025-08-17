@@ -5,6 +5,7 @@ import WhyStableYield from "../components/WhyStableYield";
 import LiveYields from "../components/LiveYields";
 import Footer from "../components/Footer";
 import WaitlistModal from "../components/WaitlistModal";
+import AIAssistant from "../components/AIAssistant";
 
 const HomePage = () => {
   const [isWaitlistOpen, setIsWaitlistOpen] = useState(false);
@@ -20,6 +21,7 @@ const HomePage = () => {
         isOpen={isWaitlistOpen} 
         onClose={() => setIsWaitlistOpen(false)} 
       />
+      <AIAssistant />
     </div>
   );
 };

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { mockYieldData } from "../mock/data";
 import { TrendingUp, TrendingDown, ExternalLink, Sparkles } from "lucide-react";
 import { Button } from "./ui/button";
+import AIAlerts from "./AIAlerts";
 
 const LiveYields = () => {
   const [yieldsData, setYieldsData] = useState([]);
@@ -55,9 +56,12 @@ const LiveYields = () => {
           <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-4">
             Real-time yields from the most trusted stablecoins across CeFi and DeFi platforms
           </p>
-          <p className="text-sm text-gray-500">
-            Last updated: {lastUpdated.toLocaleTimeString()}
-          </p>
+          <div className="flex items-center justify-center space-x-4">
+            <p className="text-sm text-gray-500">
+              Last updated: {lastUpdated.toLocaleTimeString()}
+            </p>
+            <AIAlerts />
+          </div>
         </div>
 
         {/* Yields Grid */}
