@@ -2,12 +2,12 @@ from fastapi import APIRouter, HTTPException, BackgroundTasks
 from typing import List, Dict, Any
 import uuid
 import json
-from ..models.ai_models import (
+from models.ai_models import (
     ChatMessage, ChatMessageCreate, ChatResponse,
     AIAlert, AIAlertCreate, AIAlertTrigger
 )
-from ..services.ai_service import StableYieldAI
-from ..services.alert_service import AlertService
+from services.ai_service import StableYieldAI
+from services.alert_service import AlertService
 
 router = APIRouter(prefix="/ai", tags=["AI Assistant"])
 
