@@ -183,63 +183,78 @@ backend:
 frontend:
   - task: "Live Yields Integration"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/frontend/src/components/LiveYields.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: "NA"
           agent: "main"
           comment: "Updated to use real API endpoints via /api/yields with error handling and fallback to mock data"
+        - working: true
+          agent: "testing"
+          comment: "✅ Live Yields Integration WORKING - Successfully displays real yield data from backend APIs. Found 3 stablecoins with live data: USDT (8.45%), USDC (7.82%), DAI (6.95%). API calls to /api/yields working correctly. Refresh functionality operational. Data updates with proper timestamps. Fallback to mock data works when API fails."
 
   - task: "Waitlist API Integration"
     implemented: true
-    working: "NA"
+    working: false
     file: "/app/frontend/src/components/WaitlistModal.js"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high" 
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: "NA"
           agent: "main"
           comment: "Updated to use POST /api/users/waitlist endpoint instead of localStorage"
+        - working: false
+          agent: "testing"
+          comment: "❌ Waitlist API Integration ISSUE - Modal opens correctly, form fields work (name, email, role selection), but success message not displayed after form submission. API endpoint may be called but UI feedback is missing. Users can fill form but don't get confirmation of successful signup."
 
   - task: "Newsletter API Integration" 
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/frontend/src/components/Footer.js"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: "NA"
           agent: "main" 
           comment: "Updated newsletter subscription to use POST /api/users/newsletter endpoint"
+        - working: true
+          agent: "testing"
+          comment: "✅ Newsletter API Integration WORKING - Newsletter subscription form in footer functional. API call to POST /api/users/newsletter returns 200 status. Email input accepts valid emails and form submits successfully. Integration with backend confirmed."
 
   - task: "AI Assistant API Integration"
     implemented: true
-    working: "NA"
+    working: false
     file: "/app/frontend/src/components/AIAssistant.js"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: "NA"
           agent: "main"
           comment: "Updated to use real AI API endpoints with proper error handling and loading states"
+        - working: false
+          agent: "testing"
+          comment: "❌ AI Assistant API Integration ISSUE - Floating button found but inconsistent behavior. Dialog sometimes opens, sometimes doesn't. When dialog opens, input field works but AI responses may not display properly in UI. API integration needs debugging for reliable functionality."
 
   - task: "AI Alerts API Integration"
     implemented: true
-    working: "NA" 
+    working: true
     file: "/app/frontend/src/components/AIAlerts.js"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: "NA"
           agent: "main"
           comment: "Updated to use real alert API endpoints for creation, deletion, and management"
+        - working: true
+          agent: "testing"
+          comment: "✅ AI Alerts API Integration WORKING - Alert dialog opens successfully from 'Set AI Alert' button. API calls to /api/ai/alerts/demo@stableyield.com and /api/ai/alerts/conditions return 200 status. Form displays stablecoin options, conditions, and threshold inputs. Alert creation and management functionality operational."
 
 metadata:
   created_by: "main_agent"
