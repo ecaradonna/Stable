@@ -43,12 +43,12 @@ const WaitlistModal = ({ isOpen, onClose }) => {
         description: "Welcome to StableYield waitlist. We'll notify you when we launch.",
       });
 
-      // Reset form after 2 seconds
+      // Reset form after 3 seconds and close modal
       setTimeout(() => {
         setIsSuccess(false);
         setFormData({ name: "", email: "", interest: "" });
         onClose();
-      }, 2000);
+      }, 3000);
 
     } catch (error) {
       console.error("Waitlist signup error:", error);
