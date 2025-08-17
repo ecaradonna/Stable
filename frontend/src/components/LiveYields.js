@@ -4,19 +4,19 @@ import { TrendingUp, TrendingDown, ExternalLink, Sparkles } from "lucide-react";
 import { Button } from "./ui/button";
 
 const LiveYields = () => {
-  const [yields, setYields] = useState([]);
+  const [yieldsData, setYieldsData] = useState([]);
   const [lastUpdated, setLastUpdated] = useState(new Date());
 
   // Simulate real-time updates
   useEffect(() => {
-    setYields(mockYieldData.slice(0, 3)); // Show top 3 yields
+    setYieldsData(mockYieldData.slice(0, 3)); // Show top 3 yields
     
     const interval = setInterval(() => {
-      setYields(prevYields => 
-        prevYields.map(yield => ({
-          ...yield,
-          currentYield: yield.currentYield + (Math.random() - 0.5) * 0.1,
-          change24h: yield.change24h + (Math.random() - 0.5) * 0.05
+      setYieldsData(prevYields => 
+        prevYields.map(yieldItem => ({
+          ...yieldItem,
+          currentYield: yieldItem.currentYield + (Math.random() - 0.5) * 0.1,
+          change24h: yieldItem.change24h + (Math.random() - 0.5) * 0.05
         }))
       );
       setLastUpdated(new Date());
