@@ -27,10 +27,22 @@ const ContactModal = ({ isOpen, onClose }) => {
     setIsSubmitting(true);
 
     try {
+      // Send email to ec@hexelon.ch
+      const emailData = {
+        to: "ec@hexelon.ch",
+        subject: `StableYield Contact: ${formData.subject}`,
+        name: formData.name,
+        email: formData.email,
+        company: formData.company,
+        phone: formData.phone,
+        message: formData.message,
+        timestamp: new Date().toISOString()
+      };
+      
       // Simulate API call - replace with actual endpoint
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      console.log("Contact form submitted:", formData);
+      console.log("Contact form submitted to ec@hexelon.ch:", emailData);
       
       toast({
         title: "Message Sent!",
