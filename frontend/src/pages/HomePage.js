@@ -15,9 +15,9 @@ const HomePage = () => {
     <div className="min-h-screen bg-white">
       <Header onJoinWaitlist={() => setIsWaitlistOpen(true)} />
       <HeroSection onJoinWaitlist={() => setIsWaitlistOpen(true)} />
-      <WhyStableYield />
-      <StableYieldIndex />
       <LiveYields />
+      <StableYieldIndex />
+      <WhyStableYield />
       <Footer />
       <WaitlistModal 
         isOpen={isWaitlistOpen} 
