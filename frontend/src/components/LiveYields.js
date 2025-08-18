@@ -25,14 +25,23 @@ const LiveYields = () => {
   // Fetch yields and risk data
   const fetchYields = async (showRefreshToast = false) => {
     try {
-      // Use localhost for local development
-      const localAPI = 'http://localhost:8001/api';
+      // Dynamic API URL based on environment
+      const getApiUrl = () => {
+        if (window.location.hostname === 'localhost') {
+          return 'http://localhost:8001/api';
+        }
+        const protocol = window.location.protocol;
+        const hostname = window.location.hostname;
+        return `${protocol}//${hostname}/api`;
+      };
+      
+      const apiUrl = getApiUrl();
       
       // Fetch regular yields and risk-adjusted data in parallel
       const [yieldsResponse, riskResponse, metricsResponse] = await Promise.all([
         yieldsApi.getAllYields(),
-        axios.get(`${localAPI}/v1/strategies/risk-adjusted-yield`),
-        axios.get(`${localAPI}/v1/stablecoins/all-metrics`)
+        axios.get(`${apiUrl}/v1/strategies/risk-adjusted-yield`),
+        axios.get(`${apiUrl}/v1/stablecoins/all-metrics`)
       ]);
 
       const yieldsFromAPI = yieldsResponse.data;
