@@ -206,8 +206,8 @@ const MethodologyPage = () => {
                   <Shield className="w-8 h-8 text-[#4CC1E9] mb-4" />
                   <h3 className="font-bold mb-2">Risk Management</h3>
                   <ul className="text-sm opacity-90 space-y-1">
-                    <li>• Peg deviation alerts (>50 bps)</li>
-                    <li>• Liquidity monitoring (score <0.3)</li>
+                    <li>• Peg deviation alerts (&gt;50 bps)</li>
+                    <li>• Liquidity monitoring (score &lt;0.3)</li>
                     <li>• Platform health checks</li>
                   </ul>
                 </div>
