@@ -13,46 +13,57 @@ class StableYieldAI:
     def __init__(self):
         # This will be set when user provides OpenAI key
         self.openai_key = os.getenv('OPENAI_API_KEY', 'YOUR_OPENAI_KEY_HERE')
-        self.system_message = """You are StableYield AI, an expert assistant for stablecoin yield data and analysis.
+        self.system_message = """You are StableYield AI, the expert assistant for the world's first stablecoin yield benchmark platform.
 
-CURRENT CONTEXT:
-You have access to real-time stablecoin yield data from major platforms including Binance Earn, Aave, Compound, and other CeFi/DeFi protocols.
+ABOUT STABLEYIELD:
+StableYield is the Bloomberg for stablecoin yields - an independent financial intelligence platform that delivers trusted data to power investment decisions. We believe the future of finance runs on stablecoins, and behind every yield opportunity lies the crucial question: How safe is the yield?
 
-YOUR CAPABILITIES:
-1. Answer questions about current stablecoin yields
-2. Compare yields across different stablecoins (USDT, USDC, DAI, PYUSD, TUSD)
-3. Explain risk factors and platform differences
-4. Provide historical context and trends
-5. Format responses in clear, structured formats
+OUR MISSION: Bring clarity, transparency, and confidence to the stablecoin economy.
+
+PLATFORM CAPABILITIES:
+- Stablecoin Yield Indices & Benchmarks (reference points for market performance)
+- Risk-Adjusted Analytics (peg stability, liquidity depth, counterparty risk)
+- API Feeds & Dashboards (real-time intelligence for funds, exchanges, institutions)
+- Comprehensive tracking from DeFi protocols to CeFi platforms and TradFi integrations
+
+TARGET AUDIENCE: Fund managers, exchanges, traders, institutions, and financial professionals
+
+YOUR EXPERTISE:
+1. Stablecoin yield analysis and comparison
+2. Risk assessment (peg stability, liquidity, counterparty exposure)
+3. Market intelligence and benchmarking
+4. Platform recommendations based on risk-return profiles
+5. Institutional-grade financial insights
 
 RESPONSE GUIDELINES:
-- Always include current data when available
-- Format numerical data clearly (tables when appropriate)
-- Explain the source and methodology
-- Be concise but informative
-- Include risk considerations
-- End every response with: "⚠️ Disclaimer: This is simulation data for informational purposes only. Not financial advice."
+- Provide professional, institutional-quality analysis
+- Always consider risk alongside yield opportunities
+- Reference StableYield's comprehensive data coverage
+- Include risk considerations and disclaimers
+- Format responses clearly with data tables when appropriate
+- Position insights as professional market intelligence
+- End every response with: "⚠️ Disclaimer: Market intelligence for professional use. Not investment advice. Always conduct due diligence."
 
-AVAILABLE DATA:
-- Current yields for major stablecoins
-- Platform sources (CeFi vs DeFi)
-- Risk scores and liquidity information
-- 24h changes and trends
-
-Remember: You're providing data analysis, not investment advice."""
+AVAILABLE DATA CONTEXT:
+Current real-time stablecoin yields across major CeFi and DeFi platforms."""
 
     def get_current_yields_context(self) -> str:
         """Get current yield data to provide context to the AI"""
         try:
             # In production, this would query the actual database
             # For now, using mock data
-            context = "CURRENT STABLECOIN YIELDS (Last Updated: " + datetime.now().strftime("%Y-%m-%d %H:%M") + "):\n\n"
+            context = "STABLEYIELD CURRENT MARKET INTELLIGENCE (Last Updated: " + datetime.now().strftime("%Y-%m-%d %H:%M") + "):\n\n"
             
             for yield_item in mockYieldData:
                 context += f"• {yield_item['stablecoin']} ({yield_item['name']}): {yield_item['currentYield']:.2f}%\n"
-                context += f"  Source: {yield_item['source']} ({yield_item['sourceType']})\n"
-                context += f"  Risk: {yield_item['riskScore']}, Liquidity: {yield_item['liquidity']}\n"
+                context += f"  Platform: {yield_item['source']} ({yield_item['sourceType']})\n"
+                context += f"  Risk Level: {yield_item['riskScore']}, Liquidity: {yield_item['liquidity']}\n"
                 context += f"  24h Change: {yield_item['change24h']:+.2f}%\n\n"
+            
+            context += "\nRISK ASSESSMENT FRAMEWORK:\n"
+            context += "- Low Risk: Regulated CeFi platforms, major DeFi protocols with proven track records\n"
+            context += "- Medium Risk: Established protocols with moderate exposure, emerging platforms\n"
+            context += "- High Risk: New protocols, complex strategies, high yield outliers\n\n"
             
             return context
         except Exception as e:
@@ -63,7 +74,7 @@ Remember: You're providing data analysis, not investment advice."""
         try:
             if self.openai_key == 'YOUR_OPENAI_KEY_HERE':
                 return ChatResponse(
-                    response="🔑 OpenAI API key not configured yet. Please provide your OpenAI API key to enable the AI assistant.",
+                    response="🔑 StableYield AI is ready but requires OpenAI API key configuration. Please contact your administrator to activate the full AI assistant functionality for professional market intelligence.",
                     session_id=session_id,
                     message_id="config_needed"
                 )
@@ -92,7 +103,7 @@ Remember: You're providing data analysis, not investment advice."""
 
         except Exception as e:
             return ChatResponse(
-                response=f"I apologize, but I'm experiencing technical difficulties. Please try again later. Error: {str(e)}",
+                response=f"I apologize, but I'm experiencing technical difficulties accessing the market intelligence systems. Please try again later. Error: {str(e)}",
                 session_id=session_id,
                 message_id="error"
             )
@@ -100,12 +111,12 @@ Remember: You're providing data analysis, not investment advice."""
     def get_sample_queries(self) -> List[str]:
         """Return sample queries users can ask"""
         return [
-            "What's the current top yield for USDT?",
-            "Compare USDC vs DAI yields today",
-            "Which platform offers the best USDT yield?",
-            "Show me all stablecoin yields above 6%",
-            "What are the risks with high-yield stablecoins?",
-            "Explain the difference between CeFi and DeFi yields"
+            "What's the current risk-adjusted yield ranking for major stablecoins?",
+            "Compare USDC vs USDT yields across CeFi and DeFi platforms",
+            "Which platforms offer the safest high-yield opportunities?",
+            "Analyze the liquidity and counterparty risk for top yields",
+            "What are the key risk factors I should consider for stablecoin yields?",
+            "Show me institutional-grade yield opportunities with low risk scores"
         ]
 
 # Import uuid for the service

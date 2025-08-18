@@ -20,12 +20,12 @@ const Footer = () => {
     try {
       await usersApi.subscribeNewsletter({
         email: email,
-        name: null // Optional for newsletter
+        name: null
       });
 
       toast({
         title: "Subscribed successfully!",
-        description: "You'll receive our weekly StableYield report.",
+        description: "You'll receive our weekly StableYield Intelligence Report.",
       });
 
       setEmail("");
@@ -49,16 +49,17 @@ const Footer = () => {
         <div className="py-12 border-b border-gray-700">
           <div className="text-center">
             <h3 className="text-2xl md:text-3xl font-bold mb-4">
-              Stay Informed with StableYield
+              StableYield Intelligence Report
             </h3>
             <p className="text-gray-300 mb-8 max-w-2xl mx-auto">
-              Get our weekly report with the latest stablecoin yields, market analysis, and insights delivered to your inbox.
+              Weekly insights on stablecoin yields, risk analysis, and market intelligence. 
+              The essential read for financial professionals in the digital asset space.
             </p>
             
             <form onSubmit={handleNewsletterSubmit} className="max-w-md mx-auto flex space-x-2">
               <Input
                 type="email"
-                placeholder="Enter your email"
+                placeholder="Enter your professional email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="bg-white/10 border-gray-600 text-white placeholder-gray-400 focus:border-[#4CC1E9] focus:ring-[#4CC1E9]"
@@ -88,9 +89,15 @@ const Footer = () => {
                 <span className="text-[#4CC1E9]">YIELD</span>
               </span>
             </Link>
-            <p className="text-gray-300 mb-6 max-w-md">
-              The benchmark for stablecoin yields. Transparent data on stablecoin returns across CeFi and DeFi platforms. No custody. No hype. Just facts.
+            <p className="text-gray-300 mb-6 max-w-md leading-relaxed">
+              The world's first benchmark platform for stablecoin yields. We are the Bloomberg for stablecoin yields — 
+              delivering independent, trusted intelligence to power better financial decisions.
             </p>
+            <div className="bg-[#4CC1E9]/10 border border-[#4CC1E9]/20 rounded-lg p-4 mb-6">
+              <p className="text-[#4CC1E9] text-sm font-medium">
+                "In a market built on stability, knowing where yield is truly safe makes all the difference."
+              </p>
+            </div>
             <div className="flex space-x-4">
               <a href="#" className="text-gray-400 hover:text-[#4CC1E9] transition-colors">
                 <Twitter className="w-5 h-5" />
@@ -107,15 +114,15 @@ const Footer = () => {
             </div>
           </div>
 
-          {/* Product Column */}
+          {/* Products Column */}
           <div>
-            <h4 className="font-semibold text-white mb-4">Product</h4>
+            <h4 className="font-semibold text-white mb-4">Platform</h4>
             <ul className="space-y-2 text-gray-300">
-              <li><a href="#" className="hover:text-[#4CC1E9] transition-colors">Dashboard</a></li>
-              <li><a href="#" className="hover:text-[#4CC1E9] transition-colors">API</a></li>
-              <li><a href="#" className="hover:text-[#4CC1E9] transition-colors">Alerts</a></li>
-              <li><a href="#" className="hover:text-[#4CC1E9] transition-colors">Historical Data</a></li>
-              <li><a href="#" className="hover:text-[#4CC1E9] transition-colors">Mobile App</a></li>
+              <li><a href="#" className="hover:text-[#4CC1E9] transition-colors">Yield Benchmarks</a></li>
+              <li><a href="#" className="hover:text-[#4CC1E9] transition-colors">Risk Analytics</a></li>
+              <li><a href="#" className="hover:text-[#4CC1E9] transition-colors">API Access</a></li>
+              <li><a href="#" className="hover:text-[#4CC1E9] transition-colors">Market Intelligence</a></li>
+              <li><a href="#" className="hover:text-[#4CC1E9] transition-colors">Institution Tools</a></li>
             </ul>
           </div>
 
@@ -123,11 +130,11 @@ const Footer = () => {
           <div>
             <h4 className="font-semibold text-white mb-4">Company</h4>
             <ul className="space-y-2 text-gray-300">
-              <li><Link to="/blog" className="hover:text-[#4CC1E9] transition-colors">Blog</Link></li>
-              <li><a href="#" className="hover:text-[#4CC1E9] transition-colors">About</a></li>
+              <li><Link to="/blog" className="hover:text-[#4CC1E9] transition-colors">Market Insights</Link></li>
+              <li><a href="#" className="hover:text-[#4CC1E9] transition-colors">About Us</a></li>
               <li><a href="#" className="hover:text-[#4CC1E9] transition-colors">Methodology</a></li>
-              <li><a href="#" className="hover:text-[#4CC1E9] transition-colors">Careers</a></li>
               <li><a href="#" className="hover:text-[#4CC1E9] transition-colors">Contact</a></li>
+              <li><a href="#" className="hover:text-[#4CC1E9] transition-colors">Partnerships</a></li>
             </ul>
           </div>
         </div>
@@ -135,12 +142,12 @@ const Footer = () => {
         {/* Bottom Bar */}
         <div className="py-6 border-t border-gray-700 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
           <div className="text-gray-400 text-sm">
-            © 2025 StableYield. All rights reserved.
+            © 2025 StableYield. All rights reserved. Independent financial intelligence platform.
           </div>
           <div className="flex space-x-6 text-gray-400 text-sm">
             <a href="#" className="hover:text-[#4CC1E9] transition-colors">Privacy Policy</a>
             <a href="#" className="hover:text-[#4CC1E9] transition-colors">Terms of Service</a>
-            <a href="#" className="hover:text-[#4CC1E9] transition-colors">Disclaimer</a>
+            <a href="#" className="hover:text-[#4CC1E9] transition-colors">Data Sources</a>
           </div>
         </div>
 
@@ -148,8 +155,10 @@ const Footer = () => {
         <div className="pb-6">
           <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-4">
             <p className="text-yellow-300 text-sm">
-              <strong>Disclaimer:</strong> StableYield provides data for informational purposes only. This is not financial advice. 
-              Cryptocurrency investments carry risks. Always do your own research and consult with financial advisors before making investment decisions.
+              <strong>Financial Disclaimer:</strong> StableYield provides market intelligence and analytical tools for informational purposes only. 
+              This platform does not provide investment advice. All yield data is for research purposes. Stablecoin investments carry risks including 
+              smart contract risk, counterparty risk, and regulatory risk. Always conduct your own due diligence and consult with qualified 
+              financial advisors before making investment decisions.
             </p>
           </div>
         </div>
