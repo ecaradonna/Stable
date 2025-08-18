@@ -8,10 +8,19 @@ import { yieldsApi } from "../services/api";
 import { useToast } from "../hooks/use-toast";
 import axios from "axios";
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || import.meta.env.REACT_APP_BACKEND_URL;
+const getBackendURL = () => {
+  if (window.location.hostname === 'localhost') {
+    return 'http://localhost:8001';
+  }
+  const protocol = window.location.protocol;
+  const hostname = window.location.hostname;
+  return `${protocol}//${hostname}`;
+};
+
+const BACKEND_URL = getBackendURL();
 const API = `${BACKEND_URL}/api`;
 
-console.log('Using Backend URL:', BACKEND_URL); // Debug log
+console.log('LiveYields using Backend URL:', BACKEND_URL); // Debug log
 
 const LiveYields = () => {
   const [yieldsData, setYieldsData] = useState([]);
