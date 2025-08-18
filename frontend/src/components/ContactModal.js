@@ -259,16 +259,6 @@ const ContactModal = ({ isOpen, onClose }) => {
               Cancel
             </Button>
           </div>
-
-          {/* Contact Information */}
-          <div className="bg-gradient-to-r from-[#4CC1E9]/10 to-[#007A99]/10 rounded-lg p-4 mt-6">
-            <h4 className="font-medium text-[#0E1A2B] mb-2">Need immediate assistance?</h4>
-            <div className="text-sm text-gray-600 space-y-1">
-              <p>📧 Email: contact@stableyield.com</p>
-              <p>📞 Phone: +1 (555) STABLE-1</p>
-              <p>🕒 Business Hours: Monday - Friday, 9 AM - 6 PM EST</p>
-            </div>
-          </div>
         </form>
       </div>
     </div>
