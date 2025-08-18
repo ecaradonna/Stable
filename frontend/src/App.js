@@ -6,6 +6,7 @@ import BlogPage from "./pages/BlogPage";
 import DashboardPage from "./pages/DashboardPage";
 import MethodologyPage from "./pages/MethodologyPage";
 import YieldIndicesPage from "./pages/YieldIndicesPage";
+import RiskAnalyticsPage from "./pages/RiskAnalyticsPage";
 import { Toaster } from "./components/ui/toaster";
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/methodology" element={<MethodologyPage />} />
           <Route path="/yield-indices" element={<YieldIndicesPage />} />
+          <Route path="/risk-analytics" element={<RiskAnalyticsPage />} />
         </Routes>
         <Toaster />
       </BrowserRouter>
