@@ -282,9 +282,8 @@ metadata:
 
 test_plan:
   current_focus:
+    - "StableYield Index Hero Integration"
     - "Live Yields Integration"
-    - "Waitlist API Integration" 
-    - "Newsletter API Integration"
     - "AI Assistant API Integration"
     - "AI Alerts API Integration"
   stuck_tasks: []
