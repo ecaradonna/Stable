@@ -118,10 +118,10 @@ const Footer = () => {
           <div>
             <h4 className="font-semibold text-white mb-4">Platform</h4>
             <ul className="space-y-2 text-gray-300">
-              <li><a href="#" className="hover:text-[#4CC1E9] transition-colors">Yield Benchmarks</a></li>
+              <li><Link to="/dashboard" className="hover:text-[#4CC1E9] transition-colors">Market Intelligence</Link></li>
+              <li><a href="#" className="hover:text-[#4CC1E9] transition-colors">StableYield Index</a></li>
               <li><a href="#" className="hover:text-[#4CC1E9] transition-colors">Risk Analytics</a></li>
               <li><a href="#" className="hover:text-[#4CC1E9] transition-colors">API Access</a></li>
-              <li><a href="#" className="hover:text-[#4CC1E9] transition-colors">Market Intelligence</a></li>
               <li><a href="#" className="hover:text-[#4CC1E9] transition-colors">Institution Tools</a></li>
             </ul>
           </div>
@@ -132,7 +132,7 @@ const Footer = () => {
             <ul className="space-y-2 text-gray-300">
               <li><Link to="/blog" className="hover:text-[#4CC1E9] transition-colors">Market Insights</Link></li>
               <li><a href="#" className="hover:text-[#4CC1E9] transition-colors">About Us</a></li>
-              <li><a href="#" className="hover:text-[#4CC1E9] transition-colors">Methodology</a></li>
+              <li><Link to="/methodology" className="hover:text-[#4CC1E9] transition-colors">Index Methodology</Link></li>
               <li><a href="#" className="hover:text-[#4CC1E9] transition-colors">Contact</a></li>
               <li><a href="#" className="hover:text-[#4CC1E9] transition-colors">Partnerships</a></li>
             </ul>
