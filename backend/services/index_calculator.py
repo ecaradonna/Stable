@@ -6,7 +6,7 @@ import math
 
 from models.index_models import IndexValue, StablecoinConstituent
 from services.crypto_compare_service import CryptoCompareService
-from services.defillama_service import DefiLlamaService
+from services.defi_llama_service import DefiLlamaService
 from services.binance_service import BinanceService
 
 logger = logging.getLogger(__name__)
