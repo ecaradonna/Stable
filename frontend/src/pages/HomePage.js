@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import Header from "../components/Header";
 import HeroSection from "../components/HeroSection";
-import WhyStableYield from "../components/WhyStableYield";
-import StableYieldIndex from "../components/StableYieldIndex";
 import LiveYields from "../components/LiveYields";
+import StableYieldIndex from "../components/StableYieldIndex";
+import QuotationSection from "../components/QuotationSection";
+import WhyStableYield from "../components/WhyStableYield";
 import Footer from "../components/Footer";
 import WaitlistModal from "../components/WaitlistModal";
 import AIAssistant from "../components/AIAssistant";
