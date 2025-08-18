@@ -18,6 +18,7 @@ const HomePage = () => {
       <HeroSection onJoinWaitlist={() => setIsWaitlistOpen(true)} />
       <LiveYields />
       <StableYieldIndex />
+      <QuotationSection onJoinWaitlist={() => setIsWaitlistOpen(true)} />
       <WhyStableYield />
       <Footer />
       <WaitlistModal 
