@@ -14,6 +14,7 @@ from routes.yield_routes import router as yield_router
 from routes.user_routes import router as user_router
 from routes.crypto_compare_routes import router as crypto_router
 from routes.index_routes import router as index_router
+from routes.production_status_routes import router as production_router
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
