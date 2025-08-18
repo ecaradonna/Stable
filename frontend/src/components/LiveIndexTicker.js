@@ -8,7 +8,7 @@ const LiveIndexTicker = () => {
 
   const fetchIndexData = async () => {
     try {
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || import.meta.env.REACT_APP_BACKEND_URL;
+      const backendUrl = 'http://localhost:8001';  // Use localhost for local development
       const response = await fetch(`${backendUrl}/api/index/live`);
       
       if (!response.ok) {
