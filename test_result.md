@@ -274,6 +274,30 @@ frontend:
           agent: "main"
           comment: "✅ INTEGRATION COMPLETE - Successfully integrated StableYield Index explanation directly into hero section after main title. Content includes clear definition of the Index as 'world's first benchmark for stablecoin yields' and explanation of risk-adjusted yield methodology. Also fixed JSX parsing errors in MethodologyPage.js by escaping HTML entities. Frontend now prominently displays core value proposition immediately after headline."
 
+  - task: "Yield Indices & Benchmarks Page"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/pages/YieldIndicesPage.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "main"
+          comment: "✅ NEW PAGE COMPLETE - Created comprehensive Yield Indices & Benchmarks page with detailed institutional-grade content. Includes methodology explanation, institutional benefits, and value proposition. Added route to App.js and updated header navigation. Hero section cards now clickable and link to dedicated page."
+
+  - task: "Risk-Adjusted Analytics Page"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/pages/RiskAnalyticsPage.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "main"
+          comment: "✅ NEW PAGE COMPLETE - Created comprehensive Risk-Adjusted Analytics page with quantitative frameworks content. Includes detailed risk dimensions (Peg Stability, Liquidity Depth, Counterparty Risk), RAY formula explanation, and institutional applications. Hero section Risk-Adjusted Analytics card now clickable and navigates to dedicated page. Both new pages integrated with consistent branding and navigation."
+
 metadata:
   created_by: "main_agent"
   version: "2.1"
