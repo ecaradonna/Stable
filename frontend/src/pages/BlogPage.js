@@ -19,12 +19,15 @@ const BlogPage = () => {
         <section className="py-16 bg-gradient-to-br from-gray-50 to-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
+              <div className="inline-flex items-center px-4 py-2 bg-[#4CC1E9]/10 border border-[#4CC1E9]/20 rounded-full mb-6">
+                <span className="text-[#007A99] font-semibold text-sm">Market Intelligence</span>
+              </div>
               <h1 className="text-4xl md:text-6xl font-bold text-[#0E1A2B] mb-6">
-                StableYield Insights
+                StableYield Intelligence
               </h1>
-              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                Deep dives into stablecoin markets, yield strategies, and DeFi trends. 
-                Stay ahead with expert analysis and data-driven insights.
+              <p className="text-xl text-gray-600 max-w-4xl mx-auto">
+                Professional insights on stablecoin markets, yield analytics, and institutional trends. 
+                The essential intelligence for financial professionals navigating the digital asset economy.
               </p>
             </div>
           </div>
