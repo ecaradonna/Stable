@@ -5,7 +5,7 @@ from typing import List, Optional, Dict
 from motor.motor_asyncio import AsyncIOMotorDatabase
 import pymongo
 
-from ..models.index_models import IndexValue, IndexHistoryQuery
+from models.index_models import IndexValue, IndexHistoryQuery
 
 logger = logging.getLogger(__name__)
 
