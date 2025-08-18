@@ -174,7 +174,7 @@ class StableYieldIndexCalculator:
         
         try:
             # Try DefiLlama
-            defi_yield = await self.defillama.get_yields_for_token(symbol)
+            defi_yield = await self.defi_llama.get_yields_for_token(symbol)
             if defi_yield:
                 return {"apy": defi_yield}
         except Exception as e:
