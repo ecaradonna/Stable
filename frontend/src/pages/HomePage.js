@@ -10,20 +10,20 @@ import ContactModal from "../components/ContactModal";
 import AIAssistant from "../components/AIAssistant";
 
 const HomePage = () => {
-  const [isWaitlistOpen, setIsWaitlistOpen] = useState(false);
+  const [isContactOpen, setIsContactOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-white">
-      <Header onJoinWaitlist={() => setIsWaitlistOpen(true)} />
-      <HeroSection onJoinWaitlist={() => setIsWaitlistOpen(true)} />
+      <Header onJoinWaitlist={() => setIsContactOpen(true)} />
+      <HeroSection onJoinWaitlist={() => setIsContactOpen(true)} />
       <LiveYields />
       <StableYieldIndex />
-      <QuotationSection onJoinWaitlist={() => setIsWaitlistOpen(true)} />
+      <QuotationSection onJoinWaitlist={() => setIsContactOpen(true)} />
       <WhyStableYield />
       <Footer />
-      <WaitlistModal 
-        isOpen={isWaitlistOpen} 
-        onClose={() => setIsWaitlistOpen(false)} 
+      <ContactModal 
+        isOpen={isContactOpen} 
+        onClose={() => setIsContactOpen(false)} 
       />
       <AIAssistant />
     </div>
