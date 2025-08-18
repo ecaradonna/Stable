@@ -111,6 +111,7 @@ app.include_router(ai_router, prefix="/api")
 app.include_router(yield_router, prefix="/api")
 app.include_router(user_router, prefix="/api")
 app.include_router(crypto_router, prefix="/api")  # New CryptoCompare routes
+app.include_router(index_router)  # StableYield Index routes
 
 app.add_middleware(
     CORSMiddleware,
