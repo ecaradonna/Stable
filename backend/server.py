@@ -131,12 +131,26 @@ logger = logging.getLogger(__name__)
 @app.on_event("startup")
 async def startup_event():
     logger.info("StableYield Market Intelligence API v2.0.0 starting up...")
+    
+    # Start the StableYield Index scheduler
+    try:
+        from services.index_scheduler import start_index_scheduler
+        await start_index_scheduler(db)
+        logger.info("✅ StableYield Index scheduler started - calculating every 1 minute")
+    except Exception as e:
+        logger.error(f"❌ Failed to start index scheduler: {e}")
+    
     logger.info("New capabilities enabled:")
+    logger.info("  - Real-time StableYield Index calculation")
     logger.info("  - Real-time peg stability monitoring")
     logger.info("  - Liquidity depth analysis")
     logger.info("  - Risk-adjusted yield calculations")
     logger.info("  - Professional market intelligence endpoints")
     logger.info("Available endpoints:")
+    logger.info("  - GET /api/index/current (Current StableYield Index)")
+    logger.info("  - GET /api/index/live (Live ticker data)")
+    logger.info("  - GET /api/index/history (Historical index data)")
+    logger.info("  - GET /api/index/constituents (Index constituents)")
     logger.info("  - GET /api/v1/stablecoins/metrics (Peg & liquidity metrics)")
     logger.info("  - GET /api/v1/strategies/risk-adjusted-yield (Risk-adjusted yields)")
     logger.info("  - GET /api/v1/peg-stability/ranking (Peg stability ranking)")
