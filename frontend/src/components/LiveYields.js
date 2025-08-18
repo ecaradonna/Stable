@@ -144,11 +144,8 @@ const LiveYields = () => {
       await yieldsApi.refreshYields(); // Trigger backend refresh
       await fetchYields(true);
     } catch (error) {
-      toast({
-        title: "Refresh Failed",
-        description: "Unable to refresh data. Please try again.",
-        variant: "destructive"
-      });
+      console.error("Manual refresh failed:", error);
+      // Don't show error toast - just log the error
     } finally {
       setIsRefreshing(false);
     }
