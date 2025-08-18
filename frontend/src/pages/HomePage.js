@@ -6,7 +6,7 @@ import StableYieldIndex from "../components/StableYieldIndex";
 import QuotationSection from "../components/QuotationSection";
 import WhyStableYield from "../components/WhyStableYield";
 import Footer from "../components/Footer";
-import WaitlistModal from "../components/WaitlistModal";
+import ContactModal from "../components/ContactModal";
 import AIAssistant from "../components/AIAssistant";
 
 const HomePage = () => {
