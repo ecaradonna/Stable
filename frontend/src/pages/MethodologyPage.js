@@ -51,7 +51,7 @@ const MethodologyPage = () => {
       details: [
         "Formula: RY_APY = APY × (peg_score^α) × (liq_score^β)",
         "Default parameters: α = 1.0, β = 0.7",
-        "Risk tier classification: Low (score > 0.8), Medium (0.6-0.8), High (<0.6)",
+        "Risk tier classification: Low (score &gt; 0.8), Medium (0.6-0.8), High (&lt;0.6)",
         "Capacity weighting for institutional allocation guidance"
       ]
     }
