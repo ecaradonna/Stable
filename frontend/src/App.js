@@ -5,6 +5,7 @@ import HomePage from "./pages/HomePage";
 import BlogPage from "./pages/BlogPage";
 import DashboardPage from "./pages/DashboardPage";
 import MethodologyPage from "./pages/MethodologyPage";
+import YieldIndicesPage from "./pages/YieldIndicesPage";
 import { Toaster } from "./components/ui/toaster";
 
 function App() {
@@ -16,6 +17,7 @@ function App() {
           <Route path="/blog" element={<BlogPage />} />
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/methodology" element={<MethodologyPage />} />
+          <Route path="/yield-indices" element={<YieldIndicesPage />} />
         </Routes>
         <Toaster />
       </BrowserRouter>
