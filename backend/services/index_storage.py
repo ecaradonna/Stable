@@ -184,7 +184,7 @@ class IndexStorageService:
     
     def _doc_to_index_value(self, doc: Dict) -> IndexValue:
         """Convert MongoDB document to IndexValue object"""
-        from ..models.index_models import StablecoinConstituent
+        from models.index_models import StablecoinConstituent
         
         constituents = []
         for c_doc in doc.get("constituents", []):
