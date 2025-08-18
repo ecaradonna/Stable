@@ -38,7 +38,7 @@ const HeroSection = ({ onJoinWaitlist }) => {
           </p>
 
           {/* StableYield Index Overview */}
-          <div className="max-w-5xl mx-auto mb-12">
+          <div className="max-w-5xl mx-auto mb-8">
             <div className="bg-gradient-to-r from-[#4CC1E9]/10 to-[#007A99]/10 rounded-2xl p-8 border border-[#4CC1E9]/20">
               <h3 className="text-2xl font-bold text-[#0E1A2B] mb-4">
                 What is the StableYield Index?
@@ -54,6 +54,11 @@ const HeroSection = ({ onJoinWaitlist }) => {
                 sustainable returns actually exist in the stablecoin economy.
               </p>
             </div>
+          </div>
+
+          {/* Live Index Ticker */}
+          <div className="max-w-2xl mx-auto mb-12">
+            <LiveIndexTicker />
           </div>
 
           {/* Value propositions */}
