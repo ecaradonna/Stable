@@ -4,10 +4,10 @@ from datetime import datetime, timedelta
 from typing import List, Dict, Optional
 import math
 
-from ..models.index_models import IndexValue, StablecoinConstituent
-from .crypto_compare_service import CryptoCompareService
-from .defillama_service import DefiLlamaService
-from .binance_service import BinanceService
+from models.index_models import IndexValue, StablecoinConstituent
+from services.crypto_compare_service import CryptoCompareService
+from services.defillama_service import DefiLlamaService
+from services.binance_service import BinanceService
 
 logger = logging.getLogger(__name__)
 
