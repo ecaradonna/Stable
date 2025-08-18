@@ -216,7 +216,7 @@ const MethodologyPage = () => {
                   <BarChart3 className="w-8 h-8 text-[#4CC1E9] mb-4" />
                   <h3 className="font-bold mb-2">Performance SLOs</h3>
                   <ul className="text-sm opacity-90 space-y-1">
-                    <li>• P95 latency <5 seconds</li>
+                    <li>• P95 latency &lt;5 seconds</li>
                     <li>• 99.9% data availability</li>
                     <li>• 15-min batch processing</li>
                   </ul>
