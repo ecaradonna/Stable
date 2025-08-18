@@ -22,7 +22,7 @@ const DashboardPage = () => {
               </div>
               <div className="text-right">
                 <div className="text-sm text-gray-500">StableYield Professional</div>
-                <div className="text-lg font-semibold text-[#4CC1E9]">Bloomberg for Stablecoin Yields</div>
+                <div className="text-lg font-semibold text-[#4CC1E9]">Stablecoin Yield Intelligence</div>
               </div>
             </div>
           </div>
