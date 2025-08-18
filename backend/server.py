@@ -158,5 +158,13 @@ async def startup_event():
 
 @app.on_event("shutdown")
 async def shutdown_db_client():
+    try:
+        # Stop the index scheduler
+        from services.index_scheduler import stop_index_scheduler
+        await stop_index_scheduler()
+        logger.info("✅ StableYield Index scheduler stopped")
+    except Exception as e:
+        logger.error(f"❌ Error stopping scheduler: {e}")
+    
     client.close()
     logger.info("StableYield Market Intelligence API shutting down...")
