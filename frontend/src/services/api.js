@@ -1,7 +1,10 @@
 import axios from 'axios';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+// Use localhost for local development
+const BACKEND_URL = 'http://localhost:8001';
 const API = `${BACKEND_URL}/api`;
+
+console.log('API Service using:', API); // Debug log
 
 // Create axios instance with default config
 const api = axios.create({
