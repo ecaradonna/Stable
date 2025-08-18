@@ -30,11 +30,11 @@ const Header = ({ onJoinWaitlist }) => {
             <Link to="/blog" className="text-[#0E1A2B] hover:text-[#2E6049] transition-colors font-medium">
               Market Insights
             </Link>
+            <Link to="/methodology" className="text-[#0E1A2B] hover:text-[#2E6049] transition-colors font-medium">
+              Index Methodology
+            </Link>
             <a href="#newsletter" className="text-[#0E1A2B] hover:text-[#2E6049] transition-colors font-medium">
               Intelligence Report
-            </a>
-            <a href="#about" className="text-[#0E1A2B] hover:text-[#2E6049] transition-colors font-medium">
-              About
             </a>
           </nav>
 
