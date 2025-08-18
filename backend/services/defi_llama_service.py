@@ -136,3 +136,14 @@ class DefiLlamaService:
             return f"${tvl/1e6:.1f}M"
         else:
             return f"${tvl:,.0f}"
+    
+    async def get_yields_for_token(self, symbol: str) -> Optional[float]:
+        """Get the best yield for a specific token"""
+        try:
+            best_yields = await self.get_best_yields()
+            if symbol.upper() in best_yields:
+                return best_yields[symbol.upper()]['currentYield']
+            return None
+        except Exception as e:
+            logger.error(f"Error getting yields for {symbol}: {e}")
+            return None
