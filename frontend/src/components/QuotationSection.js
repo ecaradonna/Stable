@@ -17,7 +17,7 @@ const QuotationSection = ({ onJoinWaitlist }) => {
           onClick={onJoinWaitlist}
           className="bg-gradient-to-r from-[#4CC1E9] to-[#007A99] hover:from-[#007A99] hover:to-[#4CC1E9] text-white font-bold text-lg px-12 py-4 rounded-xl transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:-translate-y-1 mb-8"
         >
-          Join the Platform
+          Contact Us
         </Button>
 
         {/* Trust indicators */}
