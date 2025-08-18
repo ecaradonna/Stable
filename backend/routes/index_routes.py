@@ -3,10 +3,10 @@ from typing import List, Optional
 from datetime import datetime, timedelta
 import logging
 
-from ..models.index_models import IndexValue, IndexHistoryQuery
-from ..services.index_storage import IndexStorageService
-from ..services.index_scheduler import get_scheduler_instance
-from ..database import get_database
+from models.index_models import IndexValue, IndexHistoryQuery
+from services.index_storage import IndexStorageService
+from services.index_scheduler import get_scheduler_instance
+from database import get_database
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/index", tags=["StableYield Index"])
