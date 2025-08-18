@@ -24,7 +24,7 @@ class StableYieldIndexCalculator:
     
     def __init__(self):
         self.crypto_compare = CryptoCompareService()
-        self.defillama = DefiLlamaService()
+        self.defi_llama = DefiLlamaService()
         self.binance = BinanceService()
         
         # Core stablecoins for Phase 1
