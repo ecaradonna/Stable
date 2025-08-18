@@ -138,8 +138,7 @@ const WhyStableYield = () => {
             <h3 className="text-2xl md:text-3xl font-bold mb-6">Our Mission</h3>
             <p className="text-xl leading-relaxed max-w-4xl mx-auto mb-6">
               Bring clarity, transparency, and confidence to the stablecoin economy. 
-              We position ourselves as the Bloomberg for stablecoin yields — delivering independent, 
-              trusted intelligence that powers better financial decisions.
+              We deliver independent, trusted intelligence that powers better financial decisions.
             </p>
             <div className="inline-flex items-center px-6 py-3 bg-white/10 backdrop-blur-sm rounded-lg border border-white/20">
               <span className="text-[#4CC1E9] font-semibold">Clarity • Transparency • Confidence</span>
