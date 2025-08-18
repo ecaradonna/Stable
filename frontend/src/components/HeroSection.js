@@ -17,7 +17,7 @@ const HeroSection = ({ onJoinWaitlist }) => {
           {/* Badge */}
           <div className="inline-flex items-center px-4 py-2 bg-[#4CC1E9]/10 border border-[#4CC1E9]/20 rounded-full mb-8">
             <BarChart3 className="w-4 h-4 text-[#4CC1E9] mr-2" />
-            <span className="text-[#007A99] font-semibold text-sm">The Bloomberg for Stablecoin Yields</span>
+            <span className="text-[#007A99] font-semibold text-sm">Stablecoin Yield Intelligence</span>
           </div>
 
           {/* Main headline */}
