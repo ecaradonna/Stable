@@ -30,10 +30,29 @@ const HeroSection = ({ onJoinWaitlist }) => {
           </h1>
 
           {/* Subtitle */}
-          <p className="text-xl md:text-2xl text-gray-600 mb-12 max-w-4xl mx-auto leading-relaxed">
+          <p className="text-xl md:text-2xl text-gray-600 mb-8 max-w-4xl mx-auto leading-relaxed">
             Combining cutting-edge data, risk analytics, and market intelligence into one trusted source. 
             Where yield meets safety in the digital dollar economy.
           </p>
+
+          {/* StableYield Index Overview */}
+          <div className="max-w-5xl mx-auto mb-12">
+            <div className="bg-gradient-to-r from-[#4CC1E9]/10 to-[#007A99]/10 rounded-2xl p-8 border border-[#4CC1E9]/20">
+              <h3 className="text-2xl font-bold text-[#0E1A2B] mb-4">
+                What is the StableYield Index?
+              </h3>
+              <p className="text-lg text-gray-700 leading-relaxed mb-6">
+                The StableYield Index is the <strong>world's first benchmark for stablecoin yields</strong>. 
+                It measures and tracks how much return (APY) investors can earn on stablecoins — 
+                adjusted for peg stability, liquidity, and risk.
+              </p>
+              <p className="text-base text-gray-600 leading-relaxed">
+                Unlike simple yield trackers that only display headline APYs, the StableYield Index goes deeper. 
+                It creates a <strong>risk-adjusted yield benchmark</strong> that reflects where safe, 
+                sustainable returns actually exist in the stablecoin economy.
+              </p>
+            </div>
+          </div>
 
           {/* Value propositions */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12 max-w-5xl mx-auto">
