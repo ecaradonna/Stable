@@ -262,6 +262,18 @@ frontend:
           agent: "testing"
           comment: "✅ AI Alerts API Integration WORKING - Alert dialog opens successfully from 'Set AI Alert' button. API calls to /api/ai/alerts/demo@stableyield.com and /api/ai/alerts/conditions return 200 status. Form displays stablecoin options, conditions, and threshold inputs. Alert creation and management functionality operational."
 
+  - task: "StableYield Index Hero Integration"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/components/HeroSection.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "main"
+          comment: "✅ INTEGRATION COMPLETE - Successfully integrated StableYield Index explanation directly into hero section after main title. Content includes clear definition of the Index as 'world's first benchmark for stablecoin yields' and explanation of risk-adjusted yield methodology. Also fixed JSX parsing errors in MethodologyPage.js by escaping HTML entities. Frontend now prominently displays core value proposition immediately after headline."
+
 metadata:
   created_by: "main_agent"
   version: "2.1"
