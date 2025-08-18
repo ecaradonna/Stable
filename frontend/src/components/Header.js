@@ -24,14 +24,14 @@ const Header = ({ onJoinWaitlist }) => {
 
           {/* Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            <Link to="/" className="text-[#0E1A2B] hover:text-[#2E6049] transition-colors font-medium">
+            <Link to="/dashboard" className="text-[#0E1A2B] hover:text-[#2E6049] transition-colors font-medium">
               Dashboard
             </Link>
             <Link to="/blog" className="text-[#0E1A2B] hover:text-[#2E6049] transition-colors font-medium">
-              Insights
+              Market Insights
             </Link>
             <a href="#newsletter" className="text-[#0E1A2B] hover:text-[#2E6049] transition-colors font-medium">
-              Newsletter
+              Intelligence Report
             </a>
             <a href="#about" className="text-[#0E1A2B] hover:text-[#2E6049] transition-colors font-medium">
               About
