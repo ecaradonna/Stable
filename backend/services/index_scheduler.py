@@ -6,8 +6,8 @@ from apscheduler.triggers.interval import IntervalTrigger
 import signal
 import sys
 
-from .index_calculator import StableYieldIndexCalculator
-from .index_storage import IndexStorageService
+from services.index_calculator import StableYieldIndexCalculator
+from services.index_storage import IndexStorageService
 
 logger = logging.getLogger(__name__)
 
