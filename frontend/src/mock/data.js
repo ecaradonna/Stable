@@ -106,7 +106,7 @@ export const mockBlogPosts = [
   {
     id: 1,
     title: "The Case for Stablecoin Yield Benchmarks: Why the Market Needs an Independent Authority",
-    excerpt: "As the stablecoin economy reaches $500B+ in market cap, the absence of standardized yield benchmarks creates inefficiencies and risks for institutional investors. Here's why the market is ready for a Bloomberg-style intelligence platform.",
+    excerpt: "As the stablecoin economy reaches $500B+ in market cap, the absence of standardized yield benchmarks creates inefficiencies and risks for institutional investors. Here's why the market is ready for a comprehensive intelligence platform.",
     date: "2025-01-25",
     readTime: "8 min read",
     category: "Market Intelligence",
