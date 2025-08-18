@@ -105,20 +105,29 @@ export const waitlistSignups = [];
 export const mockBlogPosts = [
   {
     id: 1,
-    title: "USDT vs USDC: Complete Yield Comparison Guide 2025",
-    excerpt: "Comprehensive analysis of the two largest stablecoins and their yield opportunities across CeFi and DeFi platforms.",
+    title: "The Case for Stablecoin Yield Benchmarks: Why the Market Needs an Independent Authority",
+    excerpt: "As the stablecoin economy reaches $500B+ in market cap, the absence of standardized yield benchmarks creates inefficiencies and risks for institutional investors. Here's why the market is ready for a Bloomberg-style intelligence platform.",
     date: "2025-01-25",
     readTime: "8 min read",
-    category: "Analysis",
-    slug: "usdt-vs-usdc-yield-comparison-2025"
+    category: "Market Intelligence",
+    slug: "stablecoin-yield-benchmarks-independent-authority"
   },
   {
     id: 2,
-    title: "Understanding Stablecoin Risk Scores: A Deep Dive",
-    excerpt: "How we calculate and assess risk for different stablecoin yield opportunities to help you make informed decisions.",
+    title: "Risk-Adjusted Yield Analysis: Beyond APY in the Stablecoin Economy", 
+    excerpt: "How StableYield's proprietary risk scoring methodology evaluates peg stability, liquidity depth, and counterparty exposure to provide institutional-grade investment intelligence.",
     date: "2025-01-22",
     readTime: "6 min read",
-    category: "Education",
-    slug: "understanding-stablecoin-risk-scores"
+    category: "Risk Analytics",
+    slug: "risk-adjusted-yield-analysis-beyond-apy"
+  },
+  {
+    id: 3,
+    title: "DeFi vs CeFi vs TradFi: The Complete Stablecoin Yield Landscape for Institutions",
+    excerpt: "A comprehensive analysis of yield generation mechanisms across decentralized protocols, centralized exchanges, and traditional finance integration points.",
+    date: "2025-01-20", 
+    readTime: "10 min read",
+    category: "Platform Analysis", 
+    slug: "defi-cefi-tradfi-stablecoin-yield-landscape"
   }
 ];
