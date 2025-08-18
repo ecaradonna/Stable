@@ -12,6 +12,7 @@ from datetime import datetime
 from routes.ai_routes import router as ai_router
 from routes.yield_routes import router as yield_router
 from routes.user_routes import router as user_router
+from routes.crypto_compare_routes import router as crypto_router
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -23,9 +24,9 @@ db = client[os.environ['DB_NAME']]
 
 # Create the main app without a prefix
 app = FastAPI(
-    title="StableYield API",
-    description="API for StableYield.com - The Benchmark for Stablecoin Yields",
-    version="1.0.0"
+    title="StableYield Market Intelligence API",
+    description="Professional-grade API for stablecoin yield benchmarks, risk analytics, and market intelligence",
+    version="2.0.0"
 )
 
 # Create a router with the /api prefix
@@ -44,13 +45,21 @@ class StatusCheckCreate(BaseModel):
 @api_router.get("/")
 async def root():
     return {
-        "message": "StableYield API v1.0.0",
+        "message": "StableYield Market Intelligence API v2.0.0",
+        "tagline": "The Bloomberg for Stablecoin Yields",
         "status": "operational",
         "timestamp": datetime.utcnow().isoformat(),
         "endpoints": {
             "yields": "/api/yields",
             "users": "/api/users", 
-            "ai": "/api/ai"
+            "ai": "/api/ai",
+            "market_intelligence": "/api/v1"
+        },
+        "new_features": {
+            "peg_stability_monitoring": "/api/v1/stablecoins/metrics",
+            "liquidity_analysis": "/api/v1/liquidity/analysis",
+            "risk_adjusted_yields": "/api/v1/strategies/risk-adjusted-yield",
+            "peg_stability_ranking": "/api/v1/peg-stability/ranking"
         }
     }
 
@@ -76,11 +85,23 @@ async def health_check():
     except Exception as e:
         db_status = f"error: {str(e)}"
     
+    # Check CryptoCompare API key
+    cc_key_status = "configured" if os.getenv('CC_API_KEY_STABLEYIELD', 'DEMO_KEY') != 'DEMO_KEY' else "demo_mode"
+    
     return {
         "status": "healthy",
         "timestamp": datetime.utcnow().isoformat(),
         "database": db_status,
-        "version": "1.0.0"
+        "cryptocompare_api": cc_key_status,
+        "openai_api": "configured" if os.getenv('OPENAI_API_KEY') else "not_configured",
+        "version": "2.0.0",
+        "capabilities": [
+            "Real-time yield aggregation",
+            "Peg stability monitoring", 
+            "Liquidity analysis",
+            "Risk-adjusted yield calculations",
+            "AI-powered market intelligence"
+        ]
     }
 
 # Include all routers in the main app
@@ -88,6 +109,7 @@ app.include_router(api_router)
 app.include_router(ai_router, prefix="/api")
 app.include_router(yield_router, prefix="/api")
 app.include_router(user_router, prefix="/api")
+app.include_router(crypto_router, prefix="/api")  # New CryptoCompare routes
 
 app.add_middleware(
     CORSMiddleware,
@@ -106,15 +128,19 @@ logger = logging.getLogger(__name__)
 
 @app.on_event("startup")
 async def startup_event():
-    logger.info("StableYield API starting up...")
+    logger.info("StableYield Market Intelligence API v2.0.0 starting up...")
+    logger.info("New capabilities enabled:")
+    logger.info("  - Real-time peg stability monitoring")
+    logger.info("  - Liquidity depth analysis")
+    logger.info("  - Risk-adjusted yield calculations")
+    logger.info("  - Professional market intelligence endpoints")
     logger.info("Available endpoints:")
-    logger.info("  - GET /api/ (API info)")
-    logger.info("  - GET /api/health (Health check)")
-    logger.info("  - GET /api/yields (All yields)")
-    logger.info("  - POST /api/users/waitlist (Join waitlist)")
-    logger.info("  - POST /api/ai/chat (AI assistant)")
+    logger.info("  - GET /api/v1/stablecoins/metrics (Peg & liquidity metrics)")
+    logger.info("  - GET /api/v1/strategies/risk-adjusted-yield (Risk-adjusted yields)")
+    logger.info("  - GET /api/v1/peg-stability/ranking (Peg stability ranking)")
+    logger.info("  - GET /api/v1/liquidity/analysis (Liquidity analysis)")
 
 @app.on_event("shutdown")
 async def shutdown_db_client():
     client.close()
-    logger.info("StableYield API shutting down...")
+    logger.info("StableYield Market Intelligence API shutting down...")
