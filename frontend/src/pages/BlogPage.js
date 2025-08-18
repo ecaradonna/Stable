@@ -37,7 +37,7 @@ const BlogPage = () => {
         <section className="py-16">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="mb-8">
-              <span className="text-sm font-semibold text-[#4CC1E9] uppercase tracking-wider">Featured Article</span>
+              <span className="text-sm font-semibold text-[#4CC1E9] uppercase tracking-wider">Featured Intelligence Report</span>
             </div>
             
             <div className="bg-gradient-to-br from-white to-gray-50 rounded-2xl p-8 md:p-12 shadow-lg border border-gray-100">
