@@ -1,7 +1,25 @@
 import axios from 'axios';
 
-// Use localhost for local development
-const BACKEND_URL = 'http://localhost:8001';
+// Dynamic backend URL detection
+const getBackendURL = () => {
+  // Check if we're in development (localhost)
+  if (window.location.hostname === 'localhost') {
+    return 'http://localhost:8001';
+  }
+  
+  // For production/preview, use the environment variable or construct from current URL
+  const envBackendUrl = process.env.REACT_APP_BACKEND_URL;
+  if (envBackendUrl) {
+    return envBackendUrl;
+  }
+  
+  // Fallback: construct backend URL from current window location
+  const protocol = window.location.protocol;
+  const hostname = window.location.hostname;
+  return `${protocol}//${hostname}`;
+};
+
+const BACKEND_URL = getBackendURL();
 const API = `${BACKEND_URL}/api`;
 
 console.log('API Service using:', API); // Debug log
