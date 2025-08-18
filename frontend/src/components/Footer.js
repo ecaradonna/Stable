@@ -90,7 +90,7 @@ const Footer = () => {
               </span>
             </Link>
             <p className="text-gray-300 mb-6 max-w-md leading-relaxed">
-              The world's first benchmark platform for stablecoin yields. We are the Bloomberg for stablecoin yields — 
+              The world's first benchmark platform for stablecoin yields — 
               delivering independent, trusted intelligence to power better financial decisions.
             </p>
             <div className="bg-[#4CC1E9]/10 border border-[#4CC1E9]/20 rounded-lg p-4 mb-6">
