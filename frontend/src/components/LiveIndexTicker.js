@@ -8,7 +8,17 @@ const LiveIndexTicker = () => {
 
   const fetchIndexData = async () => {
     try {
-      const backendUrl = 'http://localhost:8001';  // Use localhost for local development
+      // Dynamic backend URL detection
+      const getBackendURL = () => {
+        if (window.location.hostname === 'localhost') {
+          return 'http://localhost:8001';
+        }
+        const protocol = window.location.protocol;
+        const hostname = window.location.hostname;
+        return `${protocol}//${hostname}`;
+      };
+      
+      const backendUrl = getBackendURL();
       const response = await fetch(`${backendUrl}/api/index/live`);
       
       if (!response.ok) {
