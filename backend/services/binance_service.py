@@ -138,3 +138,14 @@ class BinanceService:
                 return f"${amount_float:,.0f}"
         except:
             return "N/A"
+    
+    async def get_earn_products(self, symbol: str) -> Optional[Dict]:
+        """Get earn product data for a specific symbol"""
+        try:
+            yields = await self.get_stablecoin_yields()
+            if symbol.upper() in yields:
+                return yields[symbol.upper()]
+            return None
+        except Exception as e:
+            logger.error(f"Error getting earn products for {symbol}: {e}")
+            return None
