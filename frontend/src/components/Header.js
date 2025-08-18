@@ -24,6 +24,9 @@ const Header = ({ onJoinWaitlist }) => {
 
           {/* Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
+            <Link to="/index-dashboard" className="text-[#0E1A2B] hover:text-[#2E6049] transition-colors font-medium">
+              Live Index
+            </Link>
             <Link to="/yield-indices" className="text-[#0E1A2B] hover:text-[#2E6049] transition-colors font-medium">
               Yield Indices & Benchmarks
             </Link>
@@ -33,9 +36,6 @@ const Header = ({ onJoinWaitlist }) => {
             <Link to="/methodology" className="text-[#0E1A2B] hover:text-[#2E6049] transition-colors font-medium">
               Index Methodology
             </Link>
-            <a href="#newsletter" className="text-[#0E1A2B] hover:text-[#2E6049] transition-colors font-medium">
-              Intelligence Report
-            </a>
           </nav>
 
           {/* CTA Button */}
