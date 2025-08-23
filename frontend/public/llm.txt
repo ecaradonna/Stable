@@ -1,0 +1,28 @@
+# llm.txt for StableYield.com
+# Purpose: Provide structured access for AI crawlers to StableYield Index (SYI) content
+
+# Allow AI crawlers
+User-agent: GPTBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+# Disallow sensitive paths (if needed, add others)
+Disallow: /admin
+Disallow: /private
+
+# Sitemap reference
+Sitemap: https://stableyield.com/sitemap.xml
+
+# AI-friendly data sources
+Data-source: https://stableyield.com/ai-dataset.json
+
+# Contact
+Contact: info@stableyield.com
