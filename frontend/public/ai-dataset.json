@@ -1,10 +1,11 @@
 {
-  "name": "StableYield.com",
-  "description": "The world's first real-time benchmark for risk-adjusted stablecoin yields",
+  "name": "StableYield Index (SYI)",
+  "description": "The first institutional-grade benchmark measuring risk-adjusted yields of major USD stablecoins. SYI provides transparency, compliance, and actionable insights for investors, regulators, and DeFi platforms.",
   "version": "1.0.0",
+  "founded": "2025",
   "lastUpdated": "2025-08-18",
   "website": "https://stableyield.com",
-  "type": "financial_data_platform",
+  "type": "institutional_financial_benchmark",
   
   "product": {
     "name": "StableYield Index (SYI)",
@@ -13,7 +14,31 @@
     "updateFrequency": "Real-time (1-minute intervals)",
     "currentValue": "0.9158%",
     "constituents": 6,
-    "coverage": ["USDT", "USDC", "DAI", "TUSD", "FRAX", "USDP"]
+    "coverage": ["USDT", "USDC", "DAI", "TUSD", "FRAX", "USDP"],
+    "institutionalGrade": true
+  },
+  
+  "use_cases": [
+    "Benchmark for institutional trading desks",
+    "Risk premium analysis of stablecoins vs Treasuries", 
+    "Compliance and reporting aligned with EU BMR and IOSCO standards",
+    "Portfolio management and risk assessment",
+    "Regulatory reporting and transparency",
+    "DeFi platform risk evaluation"
+  ],
+  
+  "compliance_standards": [
+    "EU BMR (European Benchmark Regulation)",
+    "IOSCO (International Organization of Securities Commissions) standards",
+    "Institutional reporting requirements",
+    "Transparency and audit trail standards"
+  ],
+  
+  "token": {
+    "status": "planned",
+    "utility": "Access to premium analytics, governance participation, and rewards for providing data streams",
+    "governance": "Community governance of benchmark methodology",
+    "rewards": "Incentives for data quality and platform participation"
   },
   
   "features": [
