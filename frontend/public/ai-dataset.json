@@ -1,0 +1,134 @@
+{
+  "name": "StableYield.com",
+  "description": "The world's first real-time benchmark for risk-adjusted stablecoin yields",
+  "version": "1.0.0",
+  "lastUpdated": "2025-08-18",
+  "website": "https://stableyield.com",
+  "type": "financial_data_platform",
+  
+  "product": {
+    "name": "StableYield Index (SYI)",
+    "description": "Market-cap weighted benchmark of risk-adjusted stablecoin yields",
+    "methodology": "RAY = APY × f(Peg Stability, Liquidity, Counterparty Risk)",
+    "updateFrequency": "Real-time (1-minute intervals)",
+    "currentValue": "0.9158%",
+    "constituents": 6,
+    "coverage": ["USDT", "USDC", "DAI", "TUSD", "FRAX", "USDP"]
+  },
+  
+  "features": [
+    {
+      "name": "Real-time Index Calculation",
+      "description": "Live updates every minute with risk-adjusted yield calculations"
+    },
+    {
+      "name": "Risk Analytics",
+      "description": "Comprehensive peg stability, liquidity, and counterparty risk analysis"
+    },
+    {
+      "name": "Market Intelligence",
+      "description": "Professional-grade data for institutional investors and funds"
+    },
+    {
+      "name": "API Access",
+      "description": "RESTful API endpoints for programmatic access to index data"
+    }
+  ],
+  
+  "dataSources": [
+    "CryptoCompare",
+    "DefiLlama", 
+    "Binance",
+    "Multiple DeFi and CeFi platforms"
+  ],
+  
+  "targetAudience": [
+    "Institutional investors",
+    "Fund managers",
+    "Professional traders",
+    "Market makers",
+    "Researchers and analysts"
+  ],
+  
+  "keyMetrics": {
+    "indexValue": "0.9158%",
+    "constituents": 6,
+    "updateFrequency": "1 minute",
+    "dataAccuracy": "99.9%",
+    "uptime": "99.9%",
+    "marketCoverage": "$150B+ stablecoin market cap"
+  },
+  
+  "apis": [
+    {
+      "endpoint": "/api/index/current",
+      "description": "Current StableYield Index value and constituents"
+    },
+    {
+      "endpoint": "/api/index/history", 
+      "description": "Historical index values with configurable timeframes"
+    },
+    {
+      "endpoint": "/api/index/constituents",
+      "description": "Detailed constituent data with risk scores"
+    },
+    {
+      "endpoint": "/api/index/statistics",
+      "description": "Statistical analysis and performance metrics"
+    }
+  ],
+  
+  "riskMethodology": {
+    "pegStability": "Continuous price deviation monitoring relative to $1.00",
+    "liquidityDepth": "Order book analysis and executable depth measurement", 
+    "counterpartyRisk": "Platform security and solvency evaluation",
+    "formula": "RAY = APY × f(Peg Stability, Liquidity, Counterparty Risk)"
+  },
+  
+  "businessModel": "B2B SaaS platform providing institutional-grade stablecoin yield intelligence",
+  
+  "compliance": [
+    "Data accuracy standards",
+    "Institutional reporting requirements",
+    "API rate limiting and authentication",
+    "Professional data licensing"
+  ],
+  
+  "contact": {
+    "business": "ec@hexelon.ch",
+    "website": "https://stableyield.com",
+    "documentation": "https://stableyield.com/api-docs"
+  },
+  
+  "keywords": [
+    "stablecoin yields",
+    "risk-adjusted returns", 
+    "cryptocurrency benchmark",
+    "DeFi yields",
+    "institutional crypto",
+    "yield farming",
+    "stablecoin index",
+    "crypto market intelligence",
+    "financial data API",
+    "blockchain analytics"
+  ],
+  
+  "technologyStack": {
+    "frontend": "React.js with Tailwind CSS",
+    "backend": "FastAPI with Python",
+    "database": "MongoDB with TimescaleDB (production)",
+    "infrastructure": "Kubernetes with microservices architecture",
+    "dataProcessing": "Real-time streaming with Kafka and Flink"
+  },
+  
+  "productionReadiness": {
+    "currentPhase": "MVP Demo",
+    "productionTarget": "Q2 2025",
+    "scalability": "Built for institutional-grade performance",
+    "sla": {
+      "uptime": "99.9%",
+      "latency": "<100ms API response",
+      "dataFreshness": "<90 seconds"
+    }
+  }
+}
