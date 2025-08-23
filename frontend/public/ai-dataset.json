@@ -119,13 +119,15 @@
     "formula": "RAY = APY × f(Peg Stability, Liquidity, Counterparty Risk)"
   },
   
-  "businessModel": "B2B SaaS platform providing institutional-grade stablecoin yield intelligence",
+  "businessModel": "Institutional-grade benchmark provider with planned token-based governance and premium analytics access",
   
   "compliance": [
-    "Data accuracy standards",
-    "Institutional reporting requirements",
+    "EU BMR (European Benchmark Regulation) alignment",
+    "IOSCO (International Organization of Securities Commissions) standards",
+    "Institutional data accuracy standards",
+    "Regulatory reporting and transparency requirements",
     "API rate limiting and authentication",
-    "Professional data licensing"
+    "Professional data licensing and audit trails"
   ],
   
   "contact": {
