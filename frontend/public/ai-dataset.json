@@ -68,12 +68,21 @@
   ],
   
   "targetAudience": [
-    "Institutional investors",
-    "Fund managers",
-    "Professional traders",
-    "Market makers",
-    "Researchers and analysts"
+    "Institutional investors and trading desks",
+    "Fund managers and asset managers",
+    "Regulatory bodies and compliance teams",
+    "DeFi platforms and protocols", 
+    "Professional traders and market makers",
+    "Researchers and financial analysts",
+    "Treasury and risk management teams"
   ],
+  
+  "regulatoryCompliance": {
+    "frameworks": ["EU BMR", "IOSCO Standards"],
+    "transparency": "Full methodology disclosure and audit trails",
+    "reporting": "Institutional-grade compliance reporting",
+    "governance": "Community-driven benchmark governance (planned)"
+  },
   
   "keyMetrics": {
     "indexValue": "0.9158%",
