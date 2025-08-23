@@ -1,5 +1,6 @@
 # llm.txt for StableYield.com
 # Purpose: Provide structured access for AI crawlers to StableYield Index (SYI) content
+# Description: The first institutional-grade benchmark measuring risk-adjusted yields of major USD stablecoins
 
 # Allow AI crawlers
 User-agent: GPTBot
@@ -26,3 +27,8 @@ Data-source: https://stableyield.com/ai-dataset.json
 
 # Contact
 Contact: info@stableyield.com
+
+# Additional metadata
+Founded: 2025
+Compliance: EU BMR, IOSCO Standards
+Token: Planned (governance and premium access)
