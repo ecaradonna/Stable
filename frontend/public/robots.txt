@@ -1,0 +1,30 @@
+# robots.txt for StableYield.com
+
+# Allow all web crawlers
+User-agent: *
+Allow: /
+
+# Allow AI crawlers (see llm.txt for more details)
+User-agent: GPTBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+# Disallow sensitive paths
+Disallow: /admin
+Disallow: /private
+Disallow: /_next/static/chunks/
+Disallow: /api/production/
+
+# Sitemap location
+Sitemap: https://stableyield.com/sitemap.xml
+
+# Crawl-delay for respectful crawling
+Crawl-delay: 1
