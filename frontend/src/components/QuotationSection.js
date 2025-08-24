@@ -13,13 +13,24 @@ const QuotationSection = ({ onJoinWaitlist, onDownloadWhitepaper }) => {
           </blockquote>
         </div>
 
-        {/* CTA Button */}
-        <Button 
-          onClick={onJoinWaitlist}
-          className="bg-gradient-to-r from-[#4CC1E9] to-[#007A99] hover:from-[#007A99] hover:to-[#4CC1E9] text-white font-bold text-lg px-12 py-4 rounded-xl transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:-translate-y-1 mb-8"
-        >
-          Contact Us
-        </Button>
+        {/* CTA Buttons */}
+        <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
+          <Button 
+            onClick={onJoinWaitlist}
+            className="bg-gradient-to-r from-[#4CC1E9] to-[#007A99] hover:from-[#007A99] hover:to-[#4CC1E9] text-white font-bold text-lg px-12 py-4 rounded-xl transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:-translate-y-1"
+          >
+            Contact Us
+          </Button>
+          
+          <Button 
+            onClick={onDownloadWhitepaper}
+            variant="outline"
+            className="border-[#4CC1E9] text-[#4CC1E9] hover:bg-[#4CC1E9] hover:text-white font-bold text-lg px-12 py-4 rounded-xl transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:-translate-y-1"
+          >
+            <FileText className="w-5 h-5 mr-2" />
+            Download Whitepaper
+          </Button>
+        </div>
 
         {/* Trust indicators */}
         <div className="pt-8 border-t border-gray-200">
