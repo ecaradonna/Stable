@@ -23,7 +23,10 @@ const HomePage = () => {
       <HeroSection onJoinWaitlist={() => setIsContactOpen(true)} />
       <LiveYields />
       <StableYieldIndex />
-      <QuotationSection onJoinWaitlist={() => setIsContactOpen(true)} />
+      <QuotationSection 
+        onJoinWaitlist={() => setIsContactOpen(true)}
+        onDownloadWhitepaper={() => setIsWhitepaperOpen(true)}
+      />
       <WhyStableYield />
       <Footer />
       <ContactModal 
