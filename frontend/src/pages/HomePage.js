@@ -7,6 +7,7 @@ import QuotationSection from "../components/QuotationSection";
 import WhyStableYield from "../components/WhyStableYield";
 import Footer from "../components/Footer";
 import ContactModal from "../components/ContactModal";
+import WhitepaperDownloadModal from "../components/WhitepaperDownloadModal";
 import AIAssistant from "../components/AIAssistant";
 
 const HomePage = () => {
