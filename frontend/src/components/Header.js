@@ -39,13 +39,26 @@ const Header = ({ onJoinWaitlist, onDownloadWhitepaper }) => {
             </Link>
           </nav>
 
-          {/* CTA Button */}
-          <Button 
-            onClick={onJoinWaitlist}
-            className="bg-gradient-to-r from-[#4CC1E9] to-[#007A99] hover:from-[#007A99] hover:to-[#4CC1E9] text-white font-semibold px-6 py-2 rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
-          >
-            Contact Us
-          </Button>
+          {/* Actions */}
+          <div className="hidden md:flex items-center space-x-4">
+            {/* Download Whitepaper Button */}
+            <Button 
+              onClick={onDownloadWhitepaper}
+              variant="outline"
+              className="border-[#4CC1E9] text-[#4CC1E9] hover:bg-[#4CC1E9] hover:text-white font-semibold px-4 py-2 rounded-lg transition-all duration-300"
+            >
+              <FileText className="w-4 h-4 mr-2" />
+              Whitepaper
+            </Button>
+            
+            {/* Contact Us Button */}
+            <Button 
+              onClick={onJoinWaitlist}
+              className="bg-gradient-to-r from-[#4CC1E9] to-[#007A99] hover:from-[#007A99] hover:to-[#4CC1E9] text-white font-semibold px-6 py-2 rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+            >
+              Contact Us
+            </Button>
+          </div>
         </div>
       </div>
     </header>
