@@ -12,10 +12,14 @@ import AIAssistant from "../components/AIAssistant";
 
 const HomePage = () => {
   const [isContactOpen, setIsContactOpen] = useState(false);
+  const [isWhitepaperOpen, setIsWhitepaperOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-white">
-      <Header onJoinWaitlist={() => setIsContactOpen(true)} />
+      <Header 
+        onJoinWaitlist={() => setIsContactOpen(true)}
+        onDownloadWhitepaper={() => setIsWhitepaperOpen(true)}
+      />
       <HeroSection onJoinWaitlist={() => setIsContactOpen(true)} />
       <LiveYields />
       <StableYieldIndex />
@@ -25,6 +29,10 @@ const HomePage = () => {
       <ContactModal 
         isOpen={isContactOpen} 
         onClose={() => setIsContactOpen(false)} 
+      />
+      <WhitepaperDownloadModal 
+        isOpen={isWhitepaperOpen} 
+        onClose={() => setIsWhitepaperOpen(false)} 
       />
       <AIAssistant />
     </div>
