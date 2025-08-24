@@ -1,7 +1,8 @@
 import React from "react";
 import { Button } from "./ui/button";
+import { FileText } from "lucide-react";
 
-const QuotationSection = ({ onJoinWaitlist }) => {
+const QuotationSection = ({ onJoinWaitlist, onDownloadWhitepaper }) => {
   return (
     <section className="py-16 bg-white">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
