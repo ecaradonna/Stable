@@ -9,6 +9,7 @@ import Footer from "../components/Footer";
 import ContactModal from "../components/ContactModal";
 import WhitepaperDownloadModal from "../components/WhitepaperDownloadModal";
 import AIAssistant from "../components/AIAssistant";
+import SEOHead from "../components/SEOHead";
 
 const HomePage = () => {
   const [isContactOpen, setIsContactOpen] = useState(false);
