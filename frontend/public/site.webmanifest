@@ -1,0 +1,27 @@
+{
+  "name": "StableYield Index",
+  "short_name": "StableYield",
+  "description": "Institutional Risk-Adjusted Benchmark for Stablecoins",
+  "icons": [
+    {
+      "src": "/favicons/favicon-16.png",
+      "sizes": "16x16",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicons/favicon-32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicons/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ],
+  "theme_color": "#2E6049",
+  "background_color": "#ffffff",
+  "display": "standalone",
+  "start_url": "/",
+  "scope": "/"
+}
