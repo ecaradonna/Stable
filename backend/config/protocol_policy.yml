@@ -41,6 +41,12 @@ allowlist:
       reputation_base: 0.78
       risk_factors: ["smart_contract", "governance", "complexity"]
       rationale: "Curve yield optimization protocol"
+      
+    - protocol_id: "binance_earn"
+      name: "Binance Earn"
+      reputation_base: 0.75
+      risk_factors: ["centralization", "regulatory"]
+      rationale: "Leading centralized exchange yield products"
 
 denylist:
   high_risk:
