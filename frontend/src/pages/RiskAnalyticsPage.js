@@ -22,6 +22,9 @@ import {
 } from "lucide-react";
 
 const RiskAnalyticsPage = () => {
+  const [isContactOpen, setIsContactOpen] = useState(false);
+  const [isWhitepaperOpen, setIsWhitepaperOpen] = useState(false);
+
   const riskDimensions = [
     {
       icon: DollarSign,
