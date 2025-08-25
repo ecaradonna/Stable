@@ -19,6 +19,8 @@ import {
 } from "lucide-react";
 
 const IndexDashboardPage = () => {
+  const [isContactOpen, setIsContactOpen] = useState(false);
+  const [isWhitepaperOpen, setIsWhitepaperOpen] = useState(false);
   const [indexData, setIndexData] = useState(null);
   const [constituents, setConstituents] = useState([]);
   const [statistics, setStatistics] = useState(null);
