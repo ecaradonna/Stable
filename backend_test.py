@@ -753,6 +753,19 @@ class StableYieldTester:
         await self.test_ai_alerts_conditions()
         await self.test_ai_alerts_check()
         
+        # Protocol Policy System tests (STEP 2)
+        print("\n🛡️ Testing Protocol Policy System (STEP 2)...")
+        await self.test_policy_summary()
+        await self.test_policy_allowlist()
+        await self.test_policy_denylist()
+        await self.test_policy_reputation_tiers()
+        await self.test_protocol_info_aave_v3()
+        await self.test_protocol_info_compound_v3()
+        await self.test_protocol_info_curve()
+        await self.test_yields_policy_enforcement()
+        await self.test_policy_refresh()
+        await self.test_policy_enforcement_settings()
+        
         # Summary
         print("\n" + "=" * 60)
         self.print_summary()
