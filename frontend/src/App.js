@@ -13,20 +13,22 @@ import { Toaster } from "./components/ui/toaster";
 
 function App() {
   return (
-    <div className="App">
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/blog" element={<BlogPage />} />
-          <Route path="/dashboard" element={<DashboardPage />} />
-          <Route path="/methodology" element={<MethodologyPage />} />
-          <Route path="/yield-indices" element={<YieldIndicesPage />} />
-          <Route path="/risk-analytics" element={<RiskAnalyticsPage />} />
-          <Route path="/index-dashboard" element={<IndexDashboardPage />} />
-        </Routes>
-        <Toaster />
-      </BrowserRouter>
-    </div>
+    <HelmetProvider>
+      <div className="App">
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/blog" element={<BlogPage />} />
+            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/methodology" element={<MethodologyPage />} />
+            <Route path="/yield-indices" element={<YieldIndicesPage />} />
+            <Route path="/risk-analytics" element={<RiskAnalyticsPage />} />
+            <Route path="/index-dashboard" element={<IndexDashboardPage />} />
+          </Routes>
+          <Toaster />
+        </BrowserRouter>
+      </div>
+    </HelmetProvider>
   );
 }
 
