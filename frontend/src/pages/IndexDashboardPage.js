@@ -103,6 +103,11 @@ const IndexDashboardPage = () => {
 
   return (
     <div className="min-h-screen bg-white">
+      <SEOHead 
+        title="Live StableYield Index Dashboard – Real-Time Stablecoin Analytics"
+        description="Live StableYield Index (SYI) dashboard with real-time risk-adjusted yields, constituent analysis, and historical performance data for major stablecoins."
+        url="https://stableyield.com/index-dashboard"
+      />
       <Header />
       
       {/* Hero Section */}
