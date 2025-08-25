@@ -41,6 +41,16 @@ const DashboardPage = () => {
 
       <Footer />
       <AIAssistant />
+      
+      {/* Modals */}
+      <ContactModal 
+        isOpen={isContactOpen} 
+        onClose={() => setIsContactOpen(false)} 
+      />
+      <WhitepaperDownloadModal 
+        isOpen={isWhitepaperOpen} 
+        onClose={() => setIsWhitepaperOpen(false)} 
+      />
     </div>
   );
 };
