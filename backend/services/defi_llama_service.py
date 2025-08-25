@@ -84,7 +84,7 @@ class DefiLlamaService:
             coin = pool['stablecoin']
             apy = float(pool['apy']) if pool['apy'] else 0
             
-            if coin not in best_yields or apy > best_yields[coin]['apy']:
+            if coin not in best_yields or apy > best_yields[coin]['currentYield']:
                 best_yields[coin] = {
                     'stablecoin': coin,
                     'name': self._get_coin_name(coin),
