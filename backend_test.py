@@ -1122,6 +1122,17 @@ class StableYieldTester:
         await self.test_policy_refresh()
         await self.test_policy_enforcement_settings()
         
+        # Liquidity Filter System tests (STEP 3)
+        print("\n💧 Testing Liquidity Filter System (STEP 3)...")
+        await self.test_liquidity_summary()
+        await self.test_liquidity_thresholds()
+        await self.test_liquidity_stats()
+        await self.test_liquidity_refresh()
+        await self.test_yields_tvl_filtering()
+        await self.test_pools_filter_api()
+        await self.test_liquidity_metrics_verification()
+        await self.test_parameter_validation()
+        
         # Summary
         print("\n" + "=" * 60)
         self.print_summary()
