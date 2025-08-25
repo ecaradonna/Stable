@@ -4,6 +4,7 @@ from typing import List, Dict, Any, Optional
 from datetime import datetime
 import logging
 from .data_validator import DataValidator
+from .protocol_policy_service import ProtocolPolicyService
 
 logger = logging.getLogger(__name__)
 
@@ -12,6 +13,7 @@ class DefiLlamaService:
         self.base_url = "https://yields.llama.fi"
         self.stablecoins = ["USDT", "USDC", "DAI", "PYUSD", "TUSD"]
         self.validator = DataValidator()
+        self.policy_service = ProtocolPolicyService()
         
     async def get_all_pools(self) -> List[Dict[str, Any]]:
         """Get all yield pools from DefiLlama""" 
@@ -31,7 +33,7 @@ class DefiLlamaService:
             return []
     
     async def get_stablecoin_pools(self) -> List[Dict[str, Any]]:
-        """Filter pools for stablecoins with canonical normalization"""
+        """Filter pools for stablecoins with canonical normalization and policy enforcement"""
         all_pools = await self.get_all_pools()
         stablecoin_pools = []
         processed_count = 0
@@ -58,14 +60,15 @@ class DefiLlamaService:
             canonical_protocol = self.validator.normalize_protocol_id(project)
             if not canonical_protocol:
                 continue
-                
-            # Get protocol reputation
-            reputation_score = self.validator.get_protocol_reputation(canonical_protocol)
             
-            # Apply protocol reputation filter (minimum 0.7 for inclusion)
-            if reputation_score < 0.7:
+            # Check protocol policy BEFORE processing
+            protocol_info = self.policy_service.get_protocol_info(canonical_protocol, pool.get('tvlUsd', 0))
+            
+            # Skip denied protocols
+            if protocol_info.policy_decision.value == 'deny':
+                logger.debug(f"Skipping denied protocol {canonical_protocol}: {protocol_info.rationale}")
                 continue
-            
+                
             # Validate and normalize yield data
             raw_yield_data = {
                 'pool_id': pool.get('pool'),
@@ -80,7 +83,7 @@ class DefiLlamaService:
             is_valid, normalized_data, errors = self.validator.validate_and_normalize_yield_data(raw_yield_data)
             
             if is_valid:
-                # Add StableYield-specific fields
+                # Add StableYield-specific fields with policy information
                 normalized_pool = {
                     'pool_id': normalized_data['pool_id'],
                     'canonical_stablecoin_id': normalized_data['stablecoin_id'],
@@ -90,7 +93,10 @@ class DefiLlamaService:
                     'chain': normalized_data['chain_id'],
                     'apy': normalized_data['apy_base'],
                     'tvl': normalized_data['tvl_usd'],
-                    'reputation_score': reputation_score,
+                    'reputation_score': protocol_info.reputation_score,
+                    'reputation_tier': protocol_info.tier,
+                    'risk_factors': protocol_info.risk_factors,
+                    'policy_decision': protocol_info.policy_decision.value,
                     'is_institutional_grade': self.validator.is_institutional_grade(
                         normalized_data['tvl_usd'], 
                         normalized_data['protocol_id']
@@ -98,13 +104,20 @@ class DefiLlamaService:
                     'normalized_data': normalized_data
                 }
                 
+                # Add policy warnings for greylist protocols
+                if protocol_info.policy_decision.value == 'greylist':
+                    normalized_pool['policy_warning'] = f"Under review: {protocol_info.rationale}"
+                
                 stablecoin_pools.append(normalized_pool)
                 valid_count += 1
             else:
                 logger.debug(f"Invalid pool data for {symbol} on {project}: {errors}")
         
-        logger.info(f"Processed {processed_count} pools, found {valid_count} valid stablecoin pools")
-        return stablecoin_pools
+        # Apply final policy filtering
+        filtered_pools = self.policy_service.filter_pools_by_policy(stablecoin_pools)
+        
+        logger.info(f"Processed {processed_count} pools, found {valid_count} valid stablecoin pools, {len(filtered_pools)} passed policy filter")
+        return filtered_pools
     
     def _extract_stablecoin(self, symbol: str) -> str:
         """Extract the main stablecoin from pool symbol"""
