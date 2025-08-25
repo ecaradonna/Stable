@@ -69,7 +69,10 @@ const YieldIndicesPage = () => {
         description="Professional yield indices and benchmarks for USD stablecoins. Risk-adjusted returns, peg stability analytics, and institutional-grade data for USDT, USDC, DAI."
         url="https://stableyield.com/yield-indices"
       />
-      <Header />
+      <Header 
+        onJoinWaitlist={() => setIsContactOpen(true)}
+        onDownloadWhitepaper={() => setIsWhitepaperOpen(true)}
+      />
       
       {/* Hero Section */}
       <section className="pt-20 pb-16 bg-gradient-to-br from-gray-50 to-white">
