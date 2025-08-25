@@ -98,6 +98,12 @@ allowlist:
       risk_factors:
         - "Algorithmic stablecoin risk"
         - "Newer protocol risk"
+        
+    - protocol_id: "kraken_staking"
+      name: "Kraken Staking"
+      reputation_base: 0.73
+      risk_factors: ["centralization", "regulatory"]
+      rationale: "Regulated US exchange staking services"
 
 # DENYLIST - Explicitly Excluded Protocols
 denylist:
