@@ -1,0 +1,142 @@
+version: "2.0.0"
+description: "StableYield Protocol Policy - Institutional Grade DeFi Curation"
+last_updated: "2025-01-27"
+
+enforcement:
+  strict_mode: true
+  reputation_threshold: 0.70
+  institutional_grade_only: true
+  auto_exclude_exploited: true
+
+allowlist:
+  tier_1_lending:
+    - protocol_id: "aave_v3"
+      name: "Aave V3"
+      reputation_base: 0.95
+      risk_factors: ["smart_contract", "governance"]
+      rationale: "Leading institutional DeFi lending protocol with extensive audits"
+      
+    - protocol_id: "compound_v3"
+      name: "Compound V3"
+      reputation_base: 0.90
+      risk_factors: ["smart_contract", "governance", "centralization"]
+      rationale: "Established lending protocol with institutional adoption"
+      
+  tier_2_amm:
+    - protocol_id: "curve"
+      name: "Curve Finance"
+      reputation_base: 0.85
+      risk_factors: ["smart_contract", "impermanent_loss", "governance"]
+      rationale: "Specialized stablecoin AMM with deep liquidity"
+      
+    - protocol_id: "uniswap_v3"
+      name: "Uniswap V3"
+      reputation_base: 0.82
+      risk_factors: ["smart_contract", "impermanent_loss"]
+      rationale: "Leading DEX with concentrated liquidity"
+      
+  tier_3_specialized:
+    - protocol_id: "convex"
+      name: "Convex Finance"
+      reputation_base: 0.78
+      risk_factors: ["smart_contract", "governance", "complexity"]
+      rationale: "Curve yield optimization protocol"
+
+denylist:
+  high_risk:
+    - protocol_id: "iron_finance"
+      name: "Iron Finance"
+      reason: "Algorithmic stablecoin collapse (TITAN)"
+      date_added: "2021-06-17"
+      
+  exploited:
+    - protocol_id: "cream_finance"
+      name: "Cream Finance"
+      reason: "Multiple exploits totaling $130M+"
+      date_added: "2021-10-27"
+      
+    - protocol_id: "rari_capital"
+      name: "Rari Capital"
+      reason: "Multiple exploits, $80M+ losses"
+      date_added: "2022-04-30"
+      
+  regulatory:
+    - protocol_id: "tornado_cash"
+      name: "Tornado Cash"
+      reason: "OFAC sanctions"
+      date_added: "2022-08-08"
+
+greylist:
+  - protocol_id: "yearn_finance"
+    name: "Yearn Finance"
+    reason: "Under review for complexity and governance risks"
+    review_date: "2025-02-15"
+    
+  - protocol_id: "maker_dao"
+    name: "MakerDAO"
+    reason: "Governance token concentration concerns"
+    review_date: "2025-03-01"
+
+reputation_scoring:
+  factors:
+    exploit_penalty:
+      recent_exploit_penalty: 0.30
+      historical_exploit_penalty: 0.15
+      
+    tvl_longevity:
+      high_tvl_bonus: 0.05  # >$100M TVL
+      low_tvl_penalty: 0.10  # <$10M TVL
+      
+    audit_quality:
+      tier_1_audit_bonus: 0.05  # Big 4 audits
+      no_audit_penalty: 0.20
+      
+    governance:
+      decentralized_bonus: 0.03
+      centralized_penalty: 0.08
+      
+  tiers:
+    institutional:
+      range: [0.90, 1.00]
+      label: "Institutional Grade"
+      description: "Highest quality protocols suitable for institutional capital"
+      
+    professional:
+      range: [0.75, 0.89]
+      label: "Professional Grade"
+      description: "High quality protocols with minor risk factors"
+      
+    retail:
+      range: [0.60, 0.74]
+      label: "Retail Grade"
+      description: "Moderate risk protocols suitable for retail investors"
+      
+    speculative:
+      range: [0.40, 0.59]
+      label: "Speculative"
+      description: "Higher risk protocols requiring careful evaluation"
+      
+    high_risk:
+      range: [0.00, 0.39]
+      label: "High Risk"
+      description: "Protocols with significant risk factors"
+
+dynamic_rules:
+  tvl_thresholds:
+    minimum_tvl: 10_000_000  # $10M minimum
+    institutional_tvl: 100_000_000  # $100M for institutional grade
+    
+  time_requirements:
+    minimum_age_days: 90  # 3 months minimum
+    institutional_age_days: 365  # 1 year for institutional
+    
+  exploit_rules:
+    exploit_exclusion_period: 730  # 2 years
+    critical_exploit_permanent_ban: true
+
+monitoring:
+  reputation_refresh_hours: 1
+  policy_refresh_hours: 24
+  exploit_monitoring: true
+  tvl_monitoring: true
+  governance_monitoring: true
