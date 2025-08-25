@@ -117,6 +117,7 @@ app.include_router(crypto_router, prefix="/api")  # New CryptoCompare routes
 app.include_router(index_router)  # StableYield Index routes
 app.include_router(production_router)  # Production status routes
 app.include_router(policy_router, prefix="/api")  # Protocol policy routes
+app.include_router(liquidity_router, prefix="/api")  # Liquidity filtering routes
 
 app.add_middleware(
     CORSMiddleware,
