@@ -1,12 +1,16 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import ContactModal from "../components/ContactModal";
+import WhitepaperDownloadModal from "../components/WhitepaperDownloadModal";
 import { mockBlogPosts } from "../mock/data";
 import { Clock, ArrowRight, TrendingUp } from "lucide-react";
 import { Button } from "../components/ui/button";
 
 const BlogPage = () => {
+  const [isContactOpen, setIsContactOpen] = useState(false);
+  const [isWhitepaperOpen, setIsWhitepaperOpen] = useState(false);
   const featuredPost = mockBlogPosts[0];
   const recentPosts = mockBlogPosts.slice(1);
 
