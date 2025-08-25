@@ -6,7 +6,7 @@ API endpoints for protocol policy information and management
 from fastapi import APIRouter, HTTPException, Query
 from typing import Dict, Any, List, Optional
 import logging
-from ..services.protocol_policy_service import ProtocolPolicyService
+from services.protocol_policy_service import ProtocolPolicyService
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
