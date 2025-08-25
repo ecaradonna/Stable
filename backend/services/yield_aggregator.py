@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 import logging
 from .defi_llama_service import DefiLlamaService
 from .binance_service import BinanceService
+from .protocol_policy_service import ProtocolPolicyService
 
 logger = logging.getLogger(__name__)
 
@@ -11,6 +12,7 @@ class YieldAggregator:
     def __init__(self):
         self.defi_llama = DefiLlamaService()
         self.binance = BinanceService()
+        self.policy_service = ProtocolPolicyService()
         self.cache = {}
         self.cache_expiry = {}
         self.cache_duration = timedelta(minutes=5)  # Cache for 5 minutes
