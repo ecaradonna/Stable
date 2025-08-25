@@ -461,6 +461,10 @@ class StableYieldTester:
         await self.test_yields_compare()
         await self.test_yields_refresh()
         
+        # Binance API Integration Tests (NEW)
+        await self.test_binance_api_integration()
+        await self.check_backend_logs_for_binance()
+        
         # User management tests
         print("\n👥 Testing User Management APIs...")
         await self.test_user_waitlist()
