@@ -1,0 +1,298 @@
+# StableYield Liquidity Thresholds Configuration
+# Version: 1.0.0
+# Last Updated: 2025-01-25
+
+version: "1.0.0"
+config_name: "institutional_liquidity_thresholds"
+description: "TVL and liquidity filtering rules for institutional-grade stablecoin yield benchmarking"
+
+# Global TVL Thresholds (USD)
+global_thresholds:
+  # Minimum TVL for any pool inclusion
+  absolute_minimum: 1_000_000  # $1M - Basic inclusion threshold
+  
+  # Institutional grade thresholds
+  institutional_minimum: 50_000_000   # $50M - Institutional grade
+  institutional_preferred: 100_000_000  # $100M - Preferred institutional
+  
+  # Blue chip protocol threshold
+  blue_chip_minimum: 500_000_000  # $500M - Blue chip protocols only
+  
+  # Market impact considerations
+  low_slippage_threshold: 10_000_000   # $10M - Low market impact trades
+  high_capacity_threshold: 250_000_000  # $250M - High capacity institutional
+
+# Chain-Specific TVL Thresholds
+chain_thresholds:
+  # Layer 1 Networks (Higher requirements due to gas costs)
+  ethereum:
+    minimum_tvl: 5_000_000      # $5M - Higher due to gas costs
+    institutional_tvl: 100_000_000  # $100M
+    preferred_tvl: 500_000_000      # $500M
+    gas_cost_factor: 1.0  # Base multiplier
+    
+  bitcoin:
+    minimum_tvl: 10_000_000     # $10M - Limited DeFi ecosystem
+    institutional_tvl: 50_000_000   # $50M
+    preferred_tvl: 100_000_000      # $100M
+    gas_cost_factor: 1.2
+    
+  # Layer 2 Networks (Lower requirements, higher velocity)
+  polygon:
+    minimum_tvl: 500_000        # $500K - Lower gas costs
+    institutional_tvl: 25_000_000   # $25M
+    preferred_tvl: 100_000_000      # $100M
+    gas_cost_factor: 0.1  # Much lower costs
+    
+  arbitrum:
+    minimum_tvl: 1_000_000      # $1M
+    institutional_tvl: 50_000_000   # $50M
+    preferred_tvl: 200_000_000      # $200M
+    gas_cost_factor: 0.2
+    
+  optimism:
+    minimum_tvl: 1_000_000      # $1M
+    institutional_tvl: 50_000_000   # $50M
+    preferred_tvl: 200_000_000      # $200M
+    gas_cost_factor: 0.2
+    
+  base:
+    minimum_tvl: 2_000_000      # $2M - Newer L2
+    institutional_tvl: 25_000_000   # $25M
+    preferred_tvl: 100_000_000      # $100M
+    gas_cost_factor: 0.15
+    
+  # Sidechains
+  avalanche:
+    minimum_tvl: 2_000_000      # $2M
+    institutional_tvl: 25_000_000   # $25M
+    preferred_tvl: 100_000_000      # $100M
+    gas_cost_factor: 0.3
+    
+  bsc:
+    minimum_tvl: 1_000_000      # $1M
+    institutional_tvl: 20_000_000   # $20M - Lower institutional adoption
+    preferred_tvl: 75_000_000       # $75M
+    gas_cost_factor: 0.05
+
+# Asset-Specific TVL Requirements
+asset_thresholds:
+  # Tier 1 Stablecoins (Most liquid)
+  USDT:
+    minimum_tvl: 5_000_000      # $5M
+    institutional_tvl: 100_000_000  # $100M
+    liquidity_depth_requirement: 50_000_000  # $50M depth requirement
+    daily_volume_minimum: 10_000_000        # $10M daily volume
+    
+  USDC:
+    minimum_tvl: 5_000_000      # $5M
+    institutional_tvl: 100_000_000  # $100M
+    liquidity_depth_requirement: 50_000_000  # $50M depth requirement
+    daily_volume_minimum: 10_000_000        # $10M daily volume
+    
+  # Tier 2 Stablecoins (Good liquidity)
+  DAI:
+    minimum_tvl: 2_000_000      # $2M
+    institutional_tvl: 50_000_000   # $50M
+    liquidity_depth_requirement: 25_000_000  # $25M depth requirement
+    daily_volume_minimum: 5_000_000         # $5M daily volume
+    
+  TUSD:
+    minimum_tvl: 1_000_000      # $1M
+    institutional_tvl: 25_000_000   # $25M
+    liquidity_depth_requirement: 10_000_000  # $10M depth requirement
+    daily_volume_minimum: 2_000_000         # $2M daily volume
+    
+  # Tier 3 Stablecoins (Emerging)
+  PYUSD:
+    minimum_tvl: 1_000_000      # $1M
+    institutional_tvl: 20_000_000   # $20M
+    liquidity_depth_requirement: 5_000_000   # $5M depth requirement
+    daily_volume_minimum: 1_000_000         # $1M daily volume
+    
+  FRAX:
+    minimum_tvl: 2_000_000      # $2M
+    institutional_tvl: 25_000_000   # $25M
+    liquidity_depth_requirement: 10_000_000  # $10M depth requirement
+    daily_volume_minimum: 2_000_000         # $2M daily volume
+
+# Protocol-Specific TVL Requirements
+protocol_thresholds:
+  # Tier 1 Protocols (Blue chip)
+  aave_v3:
+    minimum_pool_tvl: 10_000_000    # $10M per pool
+    institutional_pool_tvl: 100_000_000  # $100M
+    total_protocol_tvl: 1_000_000_000    # $1B protocol TVL minimum
+    
+  compound_v3:
+    minimum_pool_tvl: 10_000_000    # $10M per pool
+    institutional_pool_tvl: 100_000_000  # $100M
+    total_protocol_tvl: 500_000_000      # $500M protocol TVL minimum
+    
+  # Tier 2 Protocols (Established)
+  curve:
+    minimum_pool_tvl: 5_000_000     # $5M per pool
+    institutional_pool_tvl: 50_000_000   # $50M
+    total_protocol_tvl: 2_000_000_000    # $2B protocol TVL minimum
+    
+  uniswap_v3:
+    minimum_pool_tvl: 2_000_000     # $2M per pool
+    institutional_pool_tvl: 25_000_000   # $25M
+    total_protocol_tvl: 5_000_000_000    # $5B protocol TVL minimum
+    
+  # Tier 3 Protocols (Emerging)
+  convex:
+    minimum_pool_tvl: 5_000_000     # $5M per pool
+    institutional_pool_tvl: 50_000_000   # $50M
+    total_protocol_tvl: 1_000_000_000    # $1B protocol TVL minimum
+
+# TVL Stability Requirements
+stability_requirements:
+  # TVL volatility thresholds
+  max_7d_volatility: 0.30    # 30% max 7-day TVL volatility
+  max_30d_volatility: 0.50   # 50% max 30-day TVL volatility
+  max_90d_volatility: 0.70   # 70% max 90-day TVL volatility
+  
+  # TVL decline thresholds
+  max_24h_decline: 0.20      # 20% max 24-hour decline
+  max_7d_decline: 0.40       # 40% max 7-day decline
+  max_30d_decline: 0.60      # 60% max 30-day decline
+  
+  # Minimum stable period requirements
+  min_stable_days: 7         # 7 days minimum stable TVL
+  stable_variance_threshold: 0.15  # 15% max variance for "stable" period
+  
+  # Recovery requirements after decline
+  recovery_period_days: 30   # 30 days to recover from major decline
+  recovery_threshold: 0.80   # Must recover to 80% of previous high
+
+# Liquidity Depth Requirements
+liquidity_depth:
+  # Order book depth requirements (for AMM pools)
+  min_1pct_depth: 1_000_000     # $1M depth within 1% of mid price
+  min_5pct_depth: 5_000_000     # $5M depth within 5% of mid price
+  min_10pct_depth: 10_000_000   # $10M depth within 10% of mid price
+  
+  # Institutional depth requirements
+  institutional_1pct_depth: 10_000_000   # $10M within 1%
+  institutional_5pct_depth: 50_000_000   # $50M within 5%
+  
+  # Market impact calculations
+  max_market_impact_1m: 0.001   # 0.1% max impact for $1M trade
+  max_market_impact_10m: 0.005  # 0.5% max impact for $10M trade
+  max_market_impact_100m: 0.02  # 2% max impact for $100M trade
+
+# Volume Requirements
+volume_requirements:
+  # Minimum trading volumes
+  min_24h_volume: 1_000_000      # $1M minimum 24h volume
+  min_7d_average_volume: 5_000_000   # $5M average 7-day volume
+  min_30d_average_volume: 3_000_000  # $3M average 30-day volume
+  
+  # Institutional volume requirements
+  institutional_24h_volume: 10_000_000     # $10M
+  institutional_7d_volume: 50_000_000      # $50M average
+  
+  # Volume consistency requirements
+  volume_consistency_ratio: 0.3  # Min volume should be 30% of max in period
+  volume_spike_threshold: 10.0   # Flag volume spikes >10x average
+
+# Dynamic Adjustment Rules
+dynamic_adjustments:
+  # Market condition adjustments
+  bull_market_multiplier: 1.5    # Increase thresholds in bull markets
+  bear_market_multiplier: 0.7    # Decrease thresholds in bear markets
+  high_volatility_multiplier: 1.2  # Increase during high volatility periods
+  
+  # Time-based adjustments
+  weekend_multiplier: 0.8        # Lower requirements on weekends
+  holiday_multiplier: 0.7        # Lower requirements on holidays
+  
+  # Protocol maturity adjustments
+  new_protocol_multiplier: 2.0   # Higher requirements for new protocols
+  beta_protocol_multiplier: 1.5  # Higher for beta versions
+  
+  # Chain maturity adjustments
+  new_chain_multiplier: 3.0      # Much higher for new chains
+  testnet_exclusion: true        # Exclude all testnet pools
+
+# API Query Parameters
+api_parameters:
+  # Supported query parameters
+  supported_params:
+    - "min_tvl"               # Minimum TVL filter
+    - "min_24h_volume"        # Minimum 24h volume
+    - "max_volatility"        # Maximum TVL volatility
+    - "chain"                 # Chain-specific filtering
+    - "asset"                 # Asset-specific filtering
+    - "institutional_only"    # Institutional grade only
+    - "blue_chip_only"        # Blue chip protocols only
+    - "stable_tvl_only"       # Stable TVL pools only
+    
+  # Default values
+  defaults:
+    min_tvl: 1_000_000        # $1M default minimum
+    max_volatility: 0.30      # 30% max volatility
+    institutional_only: false # Include all grades by default
+    
+  # Parameter validation
+  validation:
+    min_tvl_range: [100_000, 10_000_000_000]  # $100K to $10B
+    max_volatility_range: [0.01, 2.0]         # 1% to 200%
+    supported_chains: ["ethereum", "polygon", "arbitrum", "optimism", "base", "avalanche", "bsc"]
+    supported_assets: ["USDT", "USDC", "DAI", "TUSD", "PYUSD", "FRAX"]
+
+# Monitoring and Alerting
+monitoring:
+  # TVL monitoring
+  tvl_drop_alert_threshold: 0.25    # Alert on 25%+ TVL drop
+  tvl_spike_alert_threshold: 5.0    # Alert on 5x TVL spike
+  
+  # Volume monitoring  
+  volume_drop_alert_threshold: 0.30  # Alert on 30%+ volume drop
+  zero_volume_alert_minutes: 30     # Alert on 30+ min zero volume
+  
+  # Stability monitoring
+  stability_breach_alert: true      # Alert on stability requirement breach
+  depth_monitoring: true           # Monitor liquidity depth changes
+  
+  # Automated actions
+  auto_exclude_unstable: true      # Auto-exclude highly unstable pools
+  auto_grade_downgrade: true       # Auto-downgrade institutional grade
+  
+  # Alert frequencies
+  critical_alert_frequency: "immediate"  # Critical issues
+  warning_alert_frequency: "hourly"      # Warning level issues  
+  info_alert_frequency: "daily"          # Informational updates
+
+# Performance Optimization
+optimization:
+  # Caching strategies
+  tvl_cache_duration_minutes: 5      # Cache TVL data for 5 minutes
+  volume_cache_duration_minutes: 15  # Cache volume data for 15 minutes
+  stability_cache_duration_hours: 1  # Cache stability metrics for 1 hour
+  
+  # Batch processing
+  batch_size: 100                    # Process 100 pools per batch
+  max_concurrent_requests: 10        # Max concurrent API requests
+  
+  # Database optimization
+  index_tvl_fields: true            # Index TVL-related fields
+  partition_by_chain: true          # Partition data by chain
+  compress_historical_data: true   # Compress old data
+
+# Compliance and Reporting
+compliance:
+  # Audit trail
+  log_all_filtering_decisions: true  # Log every filtering decision
+  retention_period_days: 365        # Keep logs for 1 year
+  
+  # Reporting requirements
+  daily_tvl_report: true            # Generate daily TVL reports
+  weekly_stability_report: true     # Generate weekly stability reports
+  monthly_threshold_review: true    # Monthly threshold effectiveness review
+  
+  # Transparency requirements
+  publish_threshold_methodology: true  # Make thresholds public
+  provide_exclusion_reasons: true     # Explain why pools are excluded
+  threshold_change_notification: true # Notify on threshold changes
