@@ -1,0 +1,282 @@
+# StableYield Protocol Policy Configuration
+# Version: 1.0.0
+# Last Updated: 2025-01-25
+
+version: "1.0.0"
+policy_name: "institutional_grade_protocols"
+description: "Curated protocol universe for institutional stablecoin yield benchmarking"
+
+# Policy Enforcement Settings
+enforcement:
+  strict_mode: true  # Reject all non-allowlisted protocols
+  reputation_threshold: 0.70  # Minimum reputation score for inclusion
+  tvl_weighted_reputation: true  # Weight reputation by protocol TVL
+  auto_denylist_exploited: true  # Auto-denylist protocols with recent exploits
+
+# ALLOWLIST - Approved Protocols for Institutional Use
+allowlist:
+  # Tier 1 - Major Lending Protocols (Reputation >= 0.90)
+  tier_1_lending:
+    - protocol_id: "aave_v3"
+      name: "Aave V3"
+      reputation_base: 0.95
+      rationale: "Blue-chip lending protocol, extensive audits, proven track record"
+      included_chains: ["ethereum", "polygon", "arbitrum", "optimism"]
+      risk_factors:
+        - "Smart contract risk"
+        - "Liquidation risk"
+      
+    - protocol_id: "compound_v3" 
+      name: "Compound V3"
+      reputation_base: 0.90
+      rationale: "Established lending protocol, Comet architecture, strong governance"
+      included_chains: ["ethereum", "polygon", "arbitrum"]
+      risk_factors:
+        - "Smart contract risk" 
+        - "Governance risk"
+        
+    - protocol_id: "morpho_blue"
+      name: "Morpho Blue"
+      reputation_base: 0.88
+      rationale: "Next-gen lending primitive, institutional focus, extensive audits"
+      included_chains: ["ethereum"]
+      risk_factors:
+        - "Smart contract risk"
+        - "Newer protocol risk"
+
+  # Tier 2 - Established AMM/Stable Pools (Reputation >= 0.80)
+  tier_2_amm:
+    - protocol_id: "curve"
+      name: "Curve Finance"
+      reputation_base: 0.85
+      rationale: "Leading stable pool AMM, battle-tested, high liquidity"
+      included_chains: ["ethereum", "polygon", "arbitrum"]
+      pool_types: ["stable_pools", "lending_pools"]
+      risk_factors:
+        - "Impermanent loss (minimal for stable pools)"
+        - "Smart contract risk"
+        
+    - protocol_id: "balancer_v2"
+      name: "Balancer V2"
+      reputation_base: 0.82
+      rationale: "Sophisticated AMM, stable pools, institutional adoption"
+      included_chains: ["ethereum", "polygon", "arbitrum"]
+      pool_types: ["stable_pools", "weighted_pools"]
+      risk_factors:
+        - "Impermanent loss"
+        - "Smart contract complexity"
+        
+    - protocol_id: "uniswap_v3"
+      name: "Uniswap V3"
+      reputation_base: 0.80
+      rationale: "Leading DEX, concentrated liquidity, institutional volume"
+      included_chains: ["ethereum", "polygon", "arbitrum", "optimism"]
+      pool_types: ["stable_pools"]
+      fee_tiers: [0.01, 0.05, 0.30]  # 1bps, 5bps, 30bps
+      risk_factors:
+        - "Impermanent loss"
+        - "Liquidity concentration risk"
+
+  # Tier 3 - Specialized/Emerging Protocols (Reputation >= 0.70)
+  tier_3_specialized:
+    - protocol_id: "maker_dsr"
+      name: "MakerDAO Savings Rate"
+      reputation_base: 0.87
+      rationale: "DAI Savings Rate, protocol-native yield, governance-controlled"
+      included_chains: ["ethereum"]
+      assets: ["DAI"]
+      risk_factors:
+        - "Governance risk"
+        - "DAI peg risk"
+        
+    - protocol_id: "frax_finance"
+      name: "Frax Finance"
+      reputation_base: 0.75
+      rationale: "Innovative stablecoin protocol, FRAX staking rewards"
+      included_chains: ["ethereum", "polygon", "arbitrum"]
+      assets: ["FRAX", "USDC"]
+      risk_factors:
+        - "Algorithmic stablecoin risk"
+        - "Newer protocol risk"
+
+# DENYLIST - Explicitly Excluded Protocols
+denylist:
+  # High Risk / Experimental Protocols
+  high_risk:
+    - protocol_id: "yearn_v2"
+      name: "Yearn V2"
+      reason: "Complex strategy risk, yield volatility"
+      denylist_date: "2025-01-25"
+      
+    - protocol_id: "alpha_homora"
+      name: "Alpha Homora"
+      reason: "Historical exploit, leveraged farming risk"
+      denylist_date: "2025-01-25"
+      
+  # Recent Exploits (Auto-generated)
+  exploited:
+    - protocol_id: "euler_finance"
+      name: "Euler Finance"
+      reason: "Major exploit March 2023 ($197M)"
+      exploit_date: "2023-03-13"
+      denylist_date: "2025-01-25"
+      
+  # Regulatory Concerns
+  regulatory:
+    - protocol_id: "tornado_cash"
+      name: "Tornado Cash"
+      reason: "OFAC sanctions"
+      denylist_date: "2025-01-25"
+
+# GREYLIST - Protocols Under Review
+greylist:
+  - protocol_id: "convex_finance"
+    name: "Convex Finance"
+    reason: "Meta-protocol complexity, dependency on Curve"
+    review_date: "2025-02-01"
+    conditions: "Pending TVL stability analysis"
+    
+  - protocol_id: "stakewise_v3"
+    name: "StakeWise V3"
+    reason: "Liquid staking, newer protocol version"
+    review_date: "2025-02-15"
+    conditions: "Pending audit completion"
+
+# REPUTATION SCORING METHODOLOGY
+reputation_scoring:
+  # Base Factors (0.0 - 1.0 scale)
+  factors:
+    audit_score:
+      weight: 0.25
+      calculation: "Number of tier-1 audit firms / 4 (max)"
+      tier_1_firms: ["Trail of Bits", "OpenZeppelin", "Consensys Diligence", "ChainSecurity"]
+      
+    exploit_penalty:
+      weight: 0.20
+      recent_exploit_penalty: 0.30  # 30% penalty for exploits in last 24 months
+      critical_exploit_penalty: 0.50  # 50% penalty for critical exploits
+      
+    tvl_longevity:
+      weight: 0.20
+      min_operational_months: 12
+      tvl_stability_bonus: 0.10  # Bonus for consistent TVL
+      
+    governance_maturity:
+      weight: 0.15
+      decentralized_bonus: 0.05
+      timelock_bonus: 0.05
+      multisig_penalty: 0.05
+      
+    institutional_adoption:
+      weight: 0.20
+      institutional_users_bonus: 0.10
+      integration_partnerships_bonus: 0.10
+
+  # Reputation Tiers
+  tiers:
+    tier_1: 
+      range: [0.90, 1.00]
+      label: "Blue Chip"
+      description: "Highest confidence protocols for institutional use"
+      
+    tier_2:
+      range: [0.80, 0.89]
+      label: "Established"
+      description: "Proven protocols with strong track record"
+      
+    tier_3:
+      range: [0.70, 0.79]
+      label: "Emerging"
+      description: "Promising protocols with adequate risk controls"
+      
+    tier_4:
+      range: [0.50, 0.69]
+      label: "Speculative"
+      description: "Higher risk protocols, limited institutional suitability"
+      
+    tier_5:
+      range: [0.00, 0.49]
+      label: "High Risk"
+      description: "Not suitable for institutional benchmarking"
+
+# DYNAMIC POLICY RULES
+dynamic_rules:
+  # Auto-denylist conditions
+  auto_denylist:
+    - condition: "exploit_amount > 50000000"  # $50M+ exploit
+      duration_days: 365
+      
+    - condition: "tvl_drop > 0.80"  # 80%+ TVL drop in 7 days
+      duration_days: 90
+      
+    - condition: "governance_attack"  # Governance compromise
+      duration_days: 180
+      
+  # Auto-greylist conditions  
+  auto_greylist:
+    - condition: "tvl_drop > 0.50"  # 50%+ TVL drop
+      duration_days: 30
+      
+    - condition: "new_protocol_version"  # Major version upgrade
+      duration_days: 90
+      
+  # Reputation adjustments
+  reputation_adjustments:
+    - condition: "consistent_high_yields"  # APY > 2x market average for 30+ days
+      adjustment: -0.10
+      
+    - condition: "audit_completion"  # New tier-1 audit
+      adjustment: +0.05
+      
+    - condition: "institutional_integration"  # New institutional partnership
+      adjustment: +0.05
+
+# POLICY OVERRIDE SETTINGS
+overrides:
+  # Emergency circuit breaker
+  emergency_denylist_all: false
+  
+  # Manual reputation overrides (requires approval)
+  manual_overrides: []
+  
+  # Testing/sandbox mode
+  sandbox_mode: false
+  sandbox_protocols: []
+
+# MONITORING & ALERTING
+monitoring:
+  # Alert triggers
+  alerts:
+    - trigger: "protocol_auto_denylisted"
+      severity: "high"
+      channels: ["slack", "email"]
+      
+    - trigger: "reputation_drop > 0.20"
+      severity: "medium"
+      channels: ["slack"]
+      
+    - trigger: "new_exploit_detected"
+      severity: "critical"
+      channels: ["slack", "email", "sms"]
+      
+  # Audit trail
+  audit_log:
+    enabled: true
+    retention_days: 365
+    log_policy_changes: true
+    log_reputation_changes: true
+    log_access_attempts: true
+
+# INTEGRATION SETTINGS
+integration:
+  # API endpoints that use this policy
+  enforced_endpoints:
+    - "/api/yields/"
+    - "/api/pools/"
+    - "/api/syi"
+    
+  # Policy refresh interval
+  refresh_interval_minutes: 15
+  
+  # Cache settings
+  policy_cache_ttl_seconds: 900  # 15 minutes
