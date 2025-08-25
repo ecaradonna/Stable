@@ -3,6 +3,7 @@ import asyncio
 from typing import List, Dict, Any, Optional
 from datetime import datetime
 import logging
+from .data_validator import DataValidator
 
 logger = logging.getLogger(__name__)
 
@@ -10,15 +11,18 @@ class DefiLlamaService:
     def __init__(self):
         self.base_url = "https://yields.llama.fi"
         self.stablecoins = ["USDT", "USDC", "DAI", "PYUSD", "TUSD"]
+        self.validator = DataValidator()
         
     async def get_all_pools(self) -> List[Dict[str, Any]]:
-        """Get all yield pools from DefiLlama"""
+        """Get all yield pools from DefiLlama""" 
         try:
             async with aiohttp.ClientSession() as session:
                 async with session.get(f"{self.base_url}/pools") as response:
                     if response.status == 200:
                         data = await response.json()
-                        return data.get('data', [])
+                        pools = data.get('data', [])
+                        logger.info(f"Retrieved {len(pools)} total pools from DefiLlama")
+                        return pools
                     else:
                         logger.error(f"DefiLlama API error: {response.status}")
                         return []
@@ -27,30 +31,79 @@ class DefiLlamaService:
             return []
     
     async def get_stablecoin_pools(self) -> List[Dict[str, Any]]:
-        """Filter pools for stablecoins only"""
+        """Filter pools for stablecoins with canonical normalization"""
         all_pools = await self.get_all_pools()
         stablecoin_pools = []
+        processed_count = 0
+        valid_count = 0
         
         for pool in all_pools:
+            processed_count += 1
+            
+            # Extract basic pool information
             symbol = pool.get('symbol', '').upper()
             project = pool.get('project', '').lower()
             
-            # Check if pool contains stablecoins
+            # Check if pool contains supported stablecoins
+            canonical_stablecoin = None
             for stablecoin in self.stablecoins:
                 if stablecoin in symbol or stablecoin.lower() in symbol.lower():
-                    # Filter for major DeFi platforms
-                    if any(platform in project for platform in ['aave', 'compound', 'curve', 'convex']):
-                        stablecoin_pools.append({
-                            'pool_id': pool.get('pool_id'),
-                            'symbol': symbol,
-                            'project': project,
-                            'chain': pool.get('chain'),
-                            'apy': pool.get('apy', 0),
-                            'tvl': pool.get('tvlUsd', 0),
-                            'stablecoin': self._extract_stablecoin(symbol)
-                        })
+                    canonical_stablecoin = self.validator.normalize_stablecoin_id(stablecoin)
                     break
+            
+            if not canonical_stablecoin:
+                continue
+                
+            # Normalize protocol ID
+            canonical_protocol = self.validator.normalize_protocol_id(project)
+            if not canonical_protocol:
+                continue
+                
+            # Get protocol reputation
+            reputation_score = self.validator.get_protocol_reputation(canonical_protocol)
+            
+            # Apply protocol reputation filter (minimum 0.7 for inclusion)
+            if reputation_score < 0.7:
+                continue
+            
+            # Validate and normalize yield data
+            raw_yield_data = {
+                'pool_id': pool.get('pool'),
+                'symbol': canonical_stablecoin,
+                'project': canonical_protocol,
+                'chain': pool.get('chain', 'ethereum'),
+                'apy': pool.get('apy', 0),
+                'tvlUsd': pool.get('tvlUsd', 0),
+                'metadata': pool
+            }
+            
+            is_valid, normalized_data, errors = self.validator.validate_and_normalize_yield_data(raw_yield_data)
+            
+            if is_valid:
+                # Add StableYield-specific fields
+                normalized_pool = {
+                    'pool_id': normalized_data['pool_id'],
+                    'canonical_stablecoin_id': normalized_data['stablecoin_id'],
+                    'canonical_protocol_id': normalized_data['protocol_id'],
+                    'symbol': symbol,
+                    'project': project.title(),
+                    'chain': normalized_data['chain_id'],
+                    'apy': normalized_data['apy_base'],
+                    'tvl': normalized_data['tvl_usd'],
+                    'reputation_score': reputation_score,
+                    'is_institutional_grade': self.validator.is_institutional_grade(
+                        normalized_data['tvl_usd'], 
+                        normalized_data['protocol_id']
+                    ),
+                    'normalized_data': normalized_data
+                }
+                
+                stablecoin_pools.append(normalized_pool)
+                valid_count += 1
+            else:
+                logger.debug(f"Invalid pool data for {symbol} on {project}: {errors}")
         
+        logger.info(f"Processed {processed_count} pools, found {valid_count} valid stablecoin pools")
         return stablecoin_pools
     
     def _extract_stablecoin(self, symbol: str) -> str:
