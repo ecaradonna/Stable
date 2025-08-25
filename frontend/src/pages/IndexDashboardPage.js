@@ -112,7 +112,10 @@ const IndexDashboardPage = () => {
         description="Live StableYield Index (SYI) dashboard with real-time risk-adjusted yields, constituent analysis, and historical performance data for major stablecoins."
         url="https://stableyield.com/index-dashboard"
       />
-      <Header />
+      <Header 
+        onJoinWaitlist={() => setIsContactOpen(true)}
+        onDownloadWhitepaper={() => setIsWhitepaperOpen(true)}
+      />
       
       {/* Hero Section */}
       <section className="pt-20 pb-8 bg-gradient-to-br from-gray-50 to-white">
