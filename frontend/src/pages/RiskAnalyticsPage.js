@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import SEOHead from "../components/SEOHead";
+import ContactModal from "../components/ContactModal";
+import WhitepaperDownloadModal from "../components/WhitepaperDownloadModal";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
