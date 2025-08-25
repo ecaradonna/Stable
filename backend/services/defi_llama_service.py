@@ -93,6 +93,7 @@ class DefiLlamaService:
                     'chain': normalized_data['chain_id'],
                     'apy': normalized_data['apy_base'],
                     'tvl': normalized_data['tvl_usd'],
+                    'stablecoin': canonical_stablecoin,  # Fix: Add stablecoin field
                     'reputation_score': protocol_info.reputation_score,
                     'reputation_tier': protocol_info.tier,
                     'risk_factors': protocol_info.risk_factors,
