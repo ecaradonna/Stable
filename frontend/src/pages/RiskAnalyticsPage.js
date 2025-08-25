@@ -56,6 +56,11 @@ const RiskAnalyticsPage = () => {
 
   return (
     <div className="min-h-screen bg-white">
+      <SEOHead 
+        title="Risk-Adjusted Analytics – Stablecoin Risk Assessment Platform"
+        description="Advanced risk analytics for stablecoins. Peg stability metrics, liquidity analysis, counterparty risk assessment. Professional tools for institutional risk management."
+        url="https://stableyield.com/risk-analytics"
+      />
       <Header />
       
       {/* Hero Section */}
