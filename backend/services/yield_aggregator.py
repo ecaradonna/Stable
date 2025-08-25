@@ -150,14 +150,27 @@ class YieldAggregator:
             'convex': 'convex',
             'convex finance': 'convex',
             'binance earn': 'binance_earn',
-            'binance': 'binance_earn'
+            'kraken staking': 'kraken_staking',
+            'coinbase earn': 'coinbase_earn',
+            # Add more mappings for common DeFi protocols
+            'yearn': 'yearn_finance',
+            'yearn finance': 'yearn_finance',
+            'maker': 'maker_dao',
+            'makerdao': 'maker_dao',
+            'frax': 'frax_finance',
+            'frax finance': 'frax_finance'
         }
         
+        # Try exact match first
+        if source_lower in mapping:
+            return mapping[source_lower]
+            
+        # Try partial matches for flexibility
         for key, protocol_id in mapping.items():
-            if key in source_lower:
+            if key in source_lower or source_lower in key:
                 return protocol_id
         
-        # Default: convert source to protocol_id format
+        # Default fallback - use source as protocol_id (normalized)
         return source_lower.replace(' ', '_').replace('-', '_')
     
     def _estimate_tvl_from_liquidity(self, liquidity_str: str) -> float:
