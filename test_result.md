@@ -337,6 +337,7 @@ metadata:
 test_plan:
   current_focus:
     - "Protocol Policy System (STEP 2)"
+    - "Liquidity Filter System (STEP 3)"
     - "StableYield Index Hero Integration"
     - "Live Yields Integration"
     - "AI Assistant API Integration"
