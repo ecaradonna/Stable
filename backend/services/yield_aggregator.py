@@ -48,15 +48,18 @@ class YieldAggregator:
             # Combine and prioritize yields
             combined_yields = self._combine_yields(defi_yields, cefi_yields)
             
+            # Apply protocol policy filtering
+            filtered_yields = self._apply_policy_filtering(combined_yields)
+            
             # Add 24h change simulation (in production, this would be calculated from historical data)
-            for yield_data in combined_yields:
+            for yield_data in filtered_yields:
                 yield_data['change24h'] = self._simulate_24h_change()
             
             # Cache the results
-            self.cache[cache_key] = combined_yields
+            self.cache[cache_key] = filtered_yields
             self.cache_expiry[cache_key] = datetime.utcnow() + self.cache_duration
             
-            return combined_yields
+            return filtered_yields
             
         except Exception as e:
             logger.error(f"Yield aggregation error: {str(e)}")
