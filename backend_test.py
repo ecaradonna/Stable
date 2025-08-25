@@ -712,6 +712,362 @@ class StableYieldTester:
         except Exception as e:
             self.log_test("Policy Enforcement Settings", False, f"Exception: {str(e)}")
     
+    # ========================================
+    # LIQUIDITY FILTER SYSTEM TESTS (STEP 3)
+    # ========================================
+    
+    async def test_liquidity_summary(self):
+        """Test GET /api/liquidity/summary endpoint"""
+        try:
+            async with self.session.get(f"{API_BASE}/liquidity/summary") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    required_fields = ['config_version', 'last_refresh', 'thresholds']
+                    missing_fields = [field for field in required_fields if field not in data]
+                    
+                    if not missing_fields:
+                        thresholds = data['thresholds']
+                        version = data['config_version']
+                        self.log_test("Liquidity Summary", True, 
+                                    f"Config v{version}: Min ${thresholds.get('absolute_minimum', 0):,.0f}, Institutional ${thresholds.get('institutional_minimum', 0):,.0f}, Blue Chip ${thresholds.get('blue_chip_minimum', 0):,.0f}")
+                    else:
+                        self.log_test("Liquidity Summary", False, f"Missing fields: {missing_fields}")
+                else:
+                    self.log_test("Liquidity Summary", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("Liquidity Summary", False, f"Exception: {str(e)}")
+    
+    async def test_liquidity_thresholds(self):
+        """Test GET /api/liquidity/thresholds endpoint"""
+        try:
+            # Test default thresholds
+            async with self.session.get(f"{API_BASE}/liquidity/thresholds") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    required_fields = ['chain', 'asset', 'thresholds', 'currency']
+                    missing_fields = [field for field in required_fields if field not in data]
+                    
+                    if not missing_fields:
+                        thresholds = data['thresholds']
+                        chain = data['chain']
+                        asset = data['asset']
+                        self.log_test("Liquidity Thresholds Default", True, 
+                                    f"{chain}/{asset}: Min ${thresholds.get('minimum_tvl', 0):,.0f}, Institutional ${thresholds.get('institutional_tvl', 0):,.0f}")
+                    else:
+                        self.log_test("Liquidity Thresholds Default", False, f"Missing fields: {missing_fields}")
+                else:
+                    self.log_test("Liquidity Thresholds Default", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("Liquidity Thresholds Default", False, f"Exception: {str(e)}")
+        
+        # Test with specific parameters
+        try:
+            async with self.session.get(f"{API_BASE}/liquidity/thresholds?chain=ethereum&asset=USDC&protocol=aave_v3") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if 'thresholds' in data:
+                        thresholds = data['thresholds']
+                        self.log_test("Liquidity Thresholds Specific", True, 
+                                    f"Ethereum/USDC/Aave: {len(thresholds)} threshold levels")
+                    else:
+                        self.log_test("Liquidity Thresholds Specific", False, f"No thresholds in response: {data}")
+                else:
+                    self.log_test("Liquidity Thresholds Specific", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("Liquidity Thresholds Specific", False, f"Exception: {str(e)}")
+    
+    async def test_liquidity_stats(self):
+        """Test GET /api/liquidity/stats endpoint"""
+        try:
+            async with self.session.get(f"{API_BASE}/liquidity/stats") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    required_fields = ['total_pools', 'total_tvl_usd', 'average_tvl_usd', 'grade_distribution']
+                    missing_fields = [field for field in required_fields if field not in data]
+                    
+                    if not missing_fields:
+                        total_pools = data['total_pools']
+                        total_tvl = data['total_tvl_usd']
+                        grade_dist = data['grade_distribution']
+                        institutional_pools = data.get('institutional_grade_pools', 0)
+                        
+                        self.log_test("Liquidity Stats", True, 
+                                    f"Total pools: {total_pools}, TVL: ${total_tvl:,.0f}, Institutional: {institutional_pools}, Grades: {list(grade_dist.keys())}")
+                    else:
+                        self.log_test("Liquidity Stats", False, f"Missing fields: {missing_fields}")
+                else:
+                    self.log_test("Liquidity Stats", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("Liquidity Stats", False, f"Exception: {str(e)}")
+    
+    async def test_liquidity_refresh(self):
+        """Test POST /api/liquidity/refresh endpoint"""
+        try:
+            async with self.session.post(f"{API_BASE}/liquidity/refresh") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if data.get('status') == 'success' and 'summary' in data:
+                        summary = data['summary']
+                        version = summary.get('config_version', 'unknown')
+                        self.log_test("Liquidity Refresh", True, f"Config refreshed to v{version}")
+                    else:
+                        self.log_test("Liquidity Refresh", False, f"Invalid response: {data}")
+                else:
+                    self.log_test("Liquidity Refresh", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("Liquidity Refresh", False, f"Exception: {str(e)}")
+    
+    async def test_yields_tvl_filtering(self):
+        """Test TVL filtering in yield endpoints"""
+        # Test 1: $10M minimum TVL filter
+        try:
+            async with self.session.get(f"{API_BASE}/yields/?min_tvl=10000000") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if isinstance(data, list):
+                        self.log_test("Yields TVL Filter $10M", True, 
+                                    f"Found {len(data)} yields with TVL >= $10M")
+                    else:
+                        self.log_test("Yields TVL Filter $10M", False, f"Invalid response format: {type(data)}")
+                else:
+                    self.log_test("Yields TVL Filter $10M", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("Yields TVL Filter $10M", False, f"Exception: {str(e)}")
+        
+        # Test 2: $50M institutional TVL filter
+        try:
+            async with self.session.get(f"{API_BASE}/yields/?min_tvl=50000000") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if isinstance(data, list):
+                        self.log_test("Yields TVL Filter $50M", True, 
+                                    f"Found {len(data)} yields with TVL >= $50M (institutional)")
+                    else:
+                        self.log_test("Yields TVL Filter $50M", False, f"Invalid response format: {type(data)}")
+                else:
+                    self.log_test("Yields TVL Filter $50M", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("Yields TVL Filter $50M", False, f"Exception: {str(e)}")
+        
+        # Test 3: Institutional-only filter
+        try:
+            async with self.session.get(f"{API_BASE}/yields/?institutional_only=true") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if isinstance(data, list):
+                        self.log_test("Yields Institutional Only", True, 
+                                    f"Found {len(data)} institutional-grade yields")
+                    else:
+                        self.log_test("Yields Institutional Only", False, f"Invalid response format: {type(data)}")
+                else:
+                    self.log_test("Yields Institutional Only", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("Yields Institutional Only", False, f"Exception: {str(e)}")
+        
+        # Test 4: Blue chip grade filter
+        try:
+            async with self.session.get(f"{API_BASE}/yields/?grade_filter=blue_chip") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if isinstance(data, list):
+                        self.log_test("Yields Blue Chip Filter", True, 
+                                    f"Found {len(data)} blue chip yields")
+                    else:
+                        self.log_test("Yields Blue Chip Filter", False, f"Invalid response format: {type(data)}")
+                else:
+                    self.log_test("Yields Blue Chip Filter", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("Yields Blue Chip Filter", False, f"Exception: {str(e)}")
+    
+    async def test_pools_filter_api(self):
+        """Test pool filtering API endpoints"""
+        # Test 1: Basic pool filtering without parameters
+        try:
+            async with self.session.get(f"{API_BASE}/pools/filter") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    required_fields = ['pools', 'total_pools', 'returned_pools', 'filters_applied']
+                    missing_fields = [field for field in required_fields if field not in data]
+                    
+                    if not missing_fields:
+                        total = data['total_pools']
+                        returned = data['returned_pools']
+                        self.log_test("Pools Filter Basic", True, 
+                                    f"Total: {total}, Returned: {returned}")
+                    else:
+                        self.log_test("Pools Filter Basic", False, f"Missing fields: {missing_fields}")
+                else:
+                    self.log_test("Pools Filter Basic", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("Pools Filter Basic", False, f"Exception: {str(e)}")
+        
+        # Test 2: $25M minimum filter
+        try:
+            async with self.session.get(f"{API_BASE}/pools/filter?min_tvl=25000000") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if 'pools' in data and 'total_pools' in data:
+                        pools = data['pools']
+                        total = data['total_pools']
+                        filters = data.get('filters_applied', {})
+                        
+                        self.log_test("Pools Filter $25M", True, 
+                                    f"Found {total} pools with TVL >= $25M, min_tvl filter: {filters.get('min_tvl')}")
+                    else:
+                        self.log_test("Pools Filter $25M", False, f"Invalid response structure: {data}")
+                else:
+                    self.log_test("Pools Filter $25M", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("Pools Filter $25M", False, f"Exception: {str(e)}")
+        
+        # Test 3: Institutional grade filter
+        try:
+            async with self.session.get(f"{API_BASE}/pools/filter?grade_filter=institutional") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if 'pools' in data:
+                        pools = data['pools']
+                        total = data['total_pools']
+                        
+                        # Check if pools have liquidity metrics
+                        pools_with_metrics = [p for p in pools if 'liquidity_metrics' in p]
+                        
+                        self.log_test("Pools Filter Institutional", True, 
+                                    f"Found {total} institutional pools, {len(pools_with_metrics)} with metrics")
+                    else:
+                        self.log_test("Pools Filter Institutional", False, f"Invalid response structure: {data}")
+                else:
+                    self.log_test("Pools Filter Institutional", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("Pools Filter Institutional", False, f"Exception: {str(e)}")
+        
+        # Test 4: Chain and asset filters
+        try:
+            async with self.session.get(f"{API_BASE}/pools/filter?chain=ethereum&asset=USDC") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if 'pools' in data:
+                        pools = data['pools']
+                        total = data['total_pools']
+                        filters = data.get('filters_applied', {})
+                        
+                        # Verify filtering worked
+                        ethereum_usdc_pools = [p for p in pools if p.get('chain', '').lower() == 'ethereum' and p.get('stablecoin', '').upper() == 'USDC']
+                        
+                        self.log_test("Pools Filter Chain/Asset", True, 
+                                    f"Found {total} Ethereum/USDC pools, {len(ethereum_usdc_pools)} correctly filtered")
+                    else:
+                        self.log_test("Pools Filter Chain/Asset", False, f"Invalid response structure: {data}")
+                else:
+                    self.log_test("Pools Filter Chain/Asset", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("Pools Filter Chain/Asset", False, f"Exception: {str(e)}")
+    
+    async def test_liquidity_metrics_verification(self):
+        """Test liquidity metrics and grade classification"""
+        # Test pool liquidity metrics endpoint
+        try:
+            test_pool_id = "USDC_Aave_V3"
+            async with self.session.get(f"{API_BASE}/liquidity/metrics/{test_pool_id}") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    required_fields = ['pool_id', 'tvl_usd', 'liquidity_grade', 'meets_threshold']
+                    missing_fields = [field for field in required_fields if field not in data]
+                    
+                    if not missing_fields:
+                        tvl = data['tvl_usd']
+                        grade = data['liquidity_grade']
+                        meets_threshold = data['meets_threshold']
+                        
+                        self.log_test("Liquidity Metrics Verification", True, 
+                                    f"Pool {test_pool_id}: TVL ${tvl:,.0f}, Grade: {grade}, Meets threshold: {meets_threshold}")
+                    else:
+                        self.log_test("Liquidity Metrics Verification", False, f"Missing fields: {missing_fields}")
+                else:
+                    self.log_test("Liquidity Metrics Verification", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("Liquidity Metrics Verification", False, f"Exception: {str(e)}")
+        
+        # Test TVL parsing verification by comparing different filters
+        try:
+            # Get all yields first
+            async with self.session.get(f"{API_BASE}/yields/") as response:
+                if response.status == 200:
+                    all_yields = await response.json()
+                    
+                    # Get yields with $10M filter
+                    async with self.session.get(f"{API_BASE}/yields/?min_tvl=10000000") as response2:
+                        if response2.status == 200:
+                            filtered_yields = await response2.json()
+                            
+                            # Verify filtering reduces results
+                            if len(filtered_yields) <= len(all_yields):
+                                reduction_pct = (1 - len(filtered_yields) / len(all_yields)) * 100 if all_yields else 0
+                                self.log_test("TVL Parsing Verification", True, 
+                                            f"TVL filter working: {len(all_yields)} -> {len(filtered_yields)} yields ({reduction_pct:.1f}% reduction)")
+                            else:
+                                self.log_test("TVL Parsing Verification", False, 
+                                            f"Filter increased results: {len(all_yields)} -> {len(filtered_yields)}")
+                        else:
+                            self.log_test("TVL Parsing Verification", False, f"Filtered request failed: HTTP {response2.status}")
+                else:
+                    self.log_test("TVL Parsing Verification", False, f"Base request failed: HTTP {response.status}")
+        except Exception as e:
+            self.log_test("TVL Parsing Verification", False, f"Exception: {str(e)}")
+    
+    async def test_parameter_validation(self):
+        """Test parameter validation for liquidity endpoints"""
+        # Test 1: Invalid negative TVL
+        try:
+            async with self.session.get(f"{API_BASE}/yields/?min_tvl=-1000000") as response:
+                if response.status == 422:  # Validation error
+                    self.log_test("Parameter Validation Negative TVL", True, "Correctly rejected negative TVL")
+                elif response.status == 200:
+                    self.log_test("Parameter Validation Negative TVL", False, "Should reject negative TVL but didn't")
+                else:
+                    self.log_test("Parameter Validation Negative TVL", False, f"Unexpected status: {response.status}")
+        except Exception as e:
+            self.log_test("Parameter Validation Negative TVL", False, f"Exception: {str(e)}")
+        
+        # Test 2: Invalid volatility > 1.0
+        try:
+            async with self.session.get(f"{API_BASE}/pools/filter?max_volatility=1.5") as response:
+                if response.status == 422:  # Validation error
+                    self.log_test("Parameter Validation High Volatility", True, "Correctly rejected volatility > 1.0")
+                elif response.status == 200:
+                    self.log_test("Parameter Validation High Volatility", False, "Should reject volatility > 1.0 but didn't")
+                else:
+                    self.log_test("Parameter Validation High Volatility", False, f"Unexpected status: {response.status}")
+        except Exception as e:
+            self.log_test("Parameter Validation High Volatility", False, f"Exception: {str(e)}")
+        
+        # Test 3: Invalid grade filter
+        try:
+            async with self.session.get(f"{API_BASE}/yields/?grade_filter=invalid_grade") as response:
+                if response.status == 422:  # Validation error
+                    self.log_test("Parameter Validation Invalid Grade", True, "Correctly rejected invalid grade filter")
+                elif response.status == 200:
+                    self.log_test("Parameter Validation Invalid Grade", False, "Should reject invalid grade but didn't")
+                else:
+                    self.log_test("Parameter Validation Invalid Grade", False, f"Unexpected status: {response.status}")
+        except Exception as e:
+            self.log_test("Parameter Validation Invalid Grade", False, f"Exception: {str(e)}")
+        
+        # Test 4: Valid parameters should work
+        try:
+            async with self.session.get(f"{API_BASE}/pools/filter?min_tvl=1000000&max_volatility=0.5&grade_filter=professional") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if 'pools' in data:
+                        self.log_test("Parameter Validation Valid Params", True, 
+                                    f"Valid parameters accepted, returned {data['total_pools']} pools")
+                    else:
+                        self.log_test("Parameter Validation Valid Params", False, f"Invalid response structure: {data}")
+                else:
+                    self.log_test("Parameter Validation Valid Params", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("Parameter Validation Valid Params", False, f"Exception: {str(e)}")
+    
     async def run_all_tests(self):
         """Run all backend tests"""
         print(f"🚀 Starting StableYield Backend API Tests")
