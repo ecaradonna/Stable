@@ -122,9 +122,9 @@ backend:
 
   - task: "External API Integration"
     implemented: true
-    working: true  
+    working: false  
     file: "/app/backend/services/yield_aggregator.py"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
     needs_retesting: false
     status_history:
@@ -134,6 +134,9 @@ backend:
         - working: true
           agent: "testing"
           comment: "✅ External API integration working well. Binance demo data is being served correctly (USDT, USDC, TUSD). DefiLlama integration has minor parsing issues but falls back gracefully. Caching and aggregation logic functional."
+        - working: false
+          agent: "testing"
+          comment: "❌ BINANCE API BLOCKED - Despite having valid API key and secret configured, Binance API returns HTTP 451 (legal restrictions) preventing access to live data. System falls back to demo data (USDT 8.45%, USDC 7.12%, TUSD 4.23%). API integration is technically working but blocked by jurisdiction restrictions. Backend logs show consistent 'Binance API error: 451' messages."
 
   - task: "User Management APIs"
     implemented: true
