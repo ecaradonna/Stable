@@ -1,10 +1,14 @@
-import React from "react";
+import React, { useState } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import ContactModal from "../components/ContactModal";
+import WhitepaperDownloadModal from "../components/WhitepaperDownloadModal";
 import RiskAnalyticsDashboard from "../components/RiskAnalyticsDashboard";
 import AIAssistant from "../components/AIAssistant";
 
 const DashboardPage = () => {
+  const [isContactOpen, setIsContactOpen] = useState(false);
+  const [isWhitepaperOpen, setIsWhitepaperOpen] = useState(false);
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
