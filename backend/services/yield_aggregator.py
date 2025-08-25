@@ -92,6 +92,7 @@ class YieldAggregator:
             for yield_data in yields:
                 # Map source to protocol_id
                 protocol_id = self._map_source_to_protocol_id(yield_data.get('source', ''))
+                logger.info(f"Mapping source '{yield_data.get('source', '')}' to protocol_id '{protocol_id}'")
                 
                 pool = {
                     'pool_id': f"{yield_data['stablecoin']}_{protocol_id}",
