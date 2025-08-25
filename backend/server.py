@@ -16,6 +16,7 @@ from routes.crypto_compare_routes import router as crypto_router
 from routes.index_routes import router as index_router
 from routes.production_status_routes import router as production_router
 from routes.policy_routes import router as policy_router
+from routes.liquidity_routes import router as liquidity_router
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
