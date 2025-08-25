@@ -66,7 +66,10 @@ const RiskAnalyticsPage = () => {
         description="Advanced risk analytics for stablecoins. Peg stability metrics, liquidity analysis, counterparty risk assessment. Professional tools for institutional risk management."
         url="https://stableyield.com/risk-analytics"
       />
-      <Header />
+      <Header 
+        onJoinWaitlist={() => setIsContactOpen(true)}
+        onDownloadWhitepaper={() => setIsWhitepaperOpen(true)}
+      />
       
       {/* Hero Section */}
       <section className="pt-20 pb-16 bg-gradient-to-br from-gray-50 to-white">
