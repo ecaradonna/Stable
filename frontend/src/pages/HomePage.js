@@ -17,6 +17,11 @@ const HomePage = () => {
 
   return (
     <div className="min-h-screen bg-white">
+      <SEOHead 
+        title="StableYield Index (SYI) – World's First Stablecoin Yield Benchmark"
+        description="Real-time risk-adjusted stablecoin yield benchmark. Institutional-grade analytics for USDT, USDC, DAI and major stablecoins. Transparent methodology, compliance-ready data."
+        url="https://stableyield.com/"
+      />
       <Header 
         onJoinWaitlist={() => setIsContactOpen(true)}
         onDownloadWhitepaper={() => setIsWhitepaperOpen(true)}
