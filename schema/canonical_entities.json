@@ -1,0 +1,408 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "StableYield Canonical Data Model",
+  "version": "1.0.0",
+  "description": "Unified entity definitions for stablecoins, protocols, pools, and chains",
+  
+  "definitions": {
+    "stablecoin": {
+      "type": "object",
+      "properties": {
+        "canonical_id": {
+          "type": "string",
+          "pattern": "^[A-Z0-9]+$",
+          "description": "Canonical identifier (e.g., USDT, USDC, DAI)"
+        },
+        "name": {
+          "type": "string",
+          "description": "Full name (e.g., Tether USD, USD Coin, Dai Stablecoin)"
+        },
+        "symbol": {
+          "type": "string",
+          "description": "Primary trading symbol"
+        },
+        "synonyms": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Alternative symbols and naming variations"
+        },
+        "peg_currency": {
+          "type": "string",
+          "enum": ["USD", "EUR", "GBP", "CHF"],
+          "description": "Currency this stablecoin is pegged to"
+        },
+        "mechanism": {
+          "type": "string", 
+          "enum": ["collateralized", "algorithmic", "hybrid"],
+          "description": "Stability mechanism type"
+        },
+        "issuer": {
+          "type": "string",
+          "description": "Primary issuer organization"
+        },
+        "market_cap_tier": {
+          "type": "string",
+          "enum": ["tier_1", "tier_2", "tier_3"],
+          "description": "Market cap classification"
+        }
+      },
+      "required": ["canonical_id", "name", "symbol", "peg_currency", "mechanism"]
+    },
+    
+    "protocol": {
+      "type": "object", 
+      "properties": {
+        "canonical_id": {
+          "type": "string",
+          "pattern": "^[a-z0-9_]+$",
+          "description": "Canonical protocol identifier (e.g., aave_v3, compound_v3)"
+        },
+        "name": {
+          "type": "string",
+          "description": "Display name (e.g., Aave V3, Compound V3)"
+        },
+        "synonyms": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Alternative names and identifiers"
+        },
+        "protocol_type": {
+          "type": "string",
+          "enum": ["lending", "amm", "stable_pool", "yield_farming", "liquid_staking"],
+          "description": "Primary protocol function"
+        },
+        "reputation_score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Reputation score [0,1] based on audits, TVL, longevity"
+        },
+        "audit_status": {
+          "type": "object",
+          "properties": {
+            "is_audited": {"type": "boolean"},
+            "audit_firms": {"type": "array", "items": {"type": "string"}},
+            "last_audit_date": {"type": "string", "format": "date"}
+          }
+        },
+        "exploit_history": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "date": {"type": "string", "format": "date"},
+              "severity": {"type": "string", "enum": ["low", "medium", "high", "critical"]},
+              "amount_lost": {"type": "number"},
+              "description": {"type": "string"}
+            }
+          }
+        },
+        "launch_date": {
+          "type": "string", 
+          "format": "date",
+          "description": "Protocol launch date"
+        },
+        "governance_token": {
+          "type": "string",
+          "description": "Governance token symbol if applicable"
+        }
+      },
+      "required": ["canonical_id", "name", "protocol_type", "reputation_score"]
+    },
+    
+    "chain": {
+      "type": "object",
+      "properties": {
+        "canonical_id": {
+          "type": "string",
+          "pattern": "^[a-z0-9_]+$", 
+          "description": "Canonical chain identifier (e.g., ethereum, polygon, arbitrum)"
+        },
+        "name": {
+          "type": "string",
+          "description": "Display name (e.g., Ethereum, Polygon, Arbitrum One)"
+        },
+        "synonyms": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Alternative names"
+        },
+        "chain_type": {
+          "type": "string",
+          "enum": ["L1", "L2", "sidechain"],
+          "description": "Layer classification"
+        },
+        "parent_chain": {
+          "type": "string",
+          "description": "Parent chain for L2s (e.g., ethereum for arbitrum)"
+        },
+        "native_token": {
+          "type": "string", 
+          "description": "Native token symbol (e.g., ETH, MATIC)"
+        },
+        "avg_block_time": {
+          "type": "number",
+          "description": "Average block time in seconds"
+        },
+        "finality_time": {
+          "type": "number",
+          "description": "Transaction finality time in seconds"
+        }
+      },
+      "required": ["canonical_id", "name", "chain_type", "native_token"]
+    },
+    
+    "pool": {
+      "type": "object",
+      "properties": {
+        "pool_id": {
+          "type": "string",
+          "description": "Unique pool identifier from source"
+        },
+        "canonical_pool_id": {
+          "type": "string", 
+          "description": "StableYield canonical pool identifier"
+        },
+        "protocol_id": {
+          "$ref": "#/definitions/protocol/properties/canonical_id"
+        },
+        "chain_id": {
+          "$ref": "#/definitions/chain/properties/canonical_id"
+        },
+        "pool_type": {
+          "type": "string",
+          "enum": ["single_asset", "multi_asset", "lp_token", "vault"],
+          "description": "Pool structure type"
+        },
+        "assets": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "stablecoin_id": {"$ref": "#/definitions/stablecoin/properties/canonical_id"},
+              "weight": {"type": "number", "minimum": 0, "maximum": 1}
+            },
+            "required": ["stablecoin_id"]
+          },
+          "minItems": 1
+        },
+        "pool_address": {
+          "type": "string",
+          "pattern": "^0x[a-fA-F0-9]{40}$",
+          "description": "Smart contract address"
+        },
+        "fee_structure": {
+          "type": "object",
+          "properties": {
+            "management_fee": {"type": "number"},
+            "performance_fee": {"type": "number"},
+            "withdrawal_fee": {"type": "number"}
+          }
+        }
+      },
+      "required": ["pool_id", "protocol_id", "chain_id", "pool_type", "assets"]
+    },
+    
+    "yield_data": {
+      "type": "object",
+      "properties": {
+        "pool_id": {"type": "string"},
+        "timestamp": {"type": "string", "format": "date-time"},
+        "apy_base": {
+          "type": "number",
+          "description": "Base APY excluding incentives"
+        },
+        "apy_reward": {
+          "type": "number", 
+          "description": "Additional APY from token incentives"
+        },
+        "apy_total": {
+          "type": "number",
+          "description": "Total APY (base + rewards)"
+        },
+        "tvl_usd": {
+          "type": "number",
+          "description": "Total Value Locked in USD"
+        },
+        "volume_24h_usd": {
+          "type": "number",
+          "description": "24-hour trading volume in USD"
+        },
+        "utilization_rate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Asset utilization rate [0,1]"
+        },
+        "risk_factors": {
+          "type": "object",
+          "properties": {
+            "peg_stability_score": {"type": "number", "minimum": 0, "maximum": 1},
+            "liquidity_score": {"type": "number", "minimum": 0, "maximum": 1}, 
+            "counterparty_score": {"type": "number", "minimum": 0, "maximum": 1}
+          }
+        },
+        "data_quality": {
+          "type": "object",
+          "properties": {
+            "is_stale": {"type": "boolean"},
+            "confidence_score": {"type": "number", "minimum": 0, "maximum": 1},
+            "source_reliability": {"type": "string", "enum": ["high", "medium", "low"]}
+          }
+        }
+      },
+      "required": ["pool_id", "timestamp", "apy_base", "tvl_usd"]
+    }
+  },
+  
+  "canonical_mappings": {
+    "stablecoins": {
+      "USDT": {
+        "canonical_id": "USDT",
+        "name": "Tether USD", 
+        "symbol": "USDT",
+        "synonyms": ["USDT.e", "USDt", "Tether"],
+        "peg_currency": "USD",
+        "mechanism": "collateralized",
+        "issuer": "Tether Limited",
+        "market_cap_tier": "tier_1"
+      },
+      "USDC": {
+        "canonical_id": "USDC",
+        "name": "USD Coin",
+        "symbol": "USDC", 
+        "synonyms": ["USDC.e", "Centre USD Coin"],
+        "peg_currency": "USD",
+        "mechanism": "collateralized",
+        "issuer": "Centre Consortium",
+        "market_cap_tier": "tier_1"
+      },
+      "DAI": {
+        "canonical_id": "DAI",
+        "name": "Dai Stablecoin",
+        "symbol": "DAI",
+        "synonyms": ["MakerDAO DAI", "Multi-Collateral DAI"],
+        "peg_currency": "USD", 
+        "mechanism": "collateralized",
+        "issuer": "MakerDAO",
+        "market_cap_tier": "tier_1"
+      },
+      "TUSD": {
+        "canonical_id": "TUSD",
+        "name": "TrueUSD",
+        "symbol": "TUSD",
+        "synonyms": ["True USD", "TrustToken USD"],
+        "peg_currency": "USD",
+        "mechanism": "collateralized", 
+        "issuer": "TrustToken",
+        "market_cap_tier": "tier_2"
+      },
+      "PYUSD": {
+        "canonical_id": "PYUSD",
+        "name": "PayPal USD",
+        "symbol": "PYUSD",
+        "synonyms": ["PayPal USD Stablecoin"],
+        "peg_currency": "USD",
+        "mechanism": "collateralized",
+        "issuer": "PayPal",
+        "market_cap_tier": "tier_2"
+      }
+    },
+    
+    "protocols": {
+      "aave_v3": {
+        "canonical_id": "aave_v3",
+        "name": "Aave V3",
+        "synonyms": ["aave", "aave-v3", "Aave Protocol V3"],
+        "protocol_type": "lending", 
+        "reputation_score": 0.95,
+        "audit_status": {
+          "is_audited": true,
+          "audit_firms": ["OpenZeppelin", "Trail of Bits", "Consensys Diligence"],
+          "last_audit_date": "2024-01-15"
+        },
+        "exploit_history": [],
+        "launch_date": "2022-03-16",
+        "governance_token": "AAVE"
+      },
+      "compound_v3": {
+        "canonical_id": "compound_v3", 
+        "name": "Compound V3",
+        "synonyms": ["compound", "compound-v3", "Compound Protocol"],
+        "protocol_type": "lending",
+        "reputation_score": 0.90,
+        "audit_status": {
+          "is_audited": true,
+          "audit_firms": ["OpenZeppelin", "ChainSecurity"],
+          "last_audit_date": "2024-02-01"
+        },
+        "exploit_history": [],
+        "launch_date": "2022-08-26",
+        "governance_token": "COMP"
+      },
+      "curve": {
+        "canonical_id": "curve",
+        "name": "Curve Finance", 
+        "synonyms": ["curve-fi", "Curve Protocol"],
+        "protocol_type": "amm",
+        "reputation_score": 0.85,
+        "audit_status": {
+          "is_audited": true,
+          "audit_firms": ["MixBytes", "ChainSecurity"],
+          "last_audit_date": "2023-12-10"
+        },
+        "exploit_history": [],
+        "launch_date": "2020-01-19",
+        "governance_token": "CRV"
+      }
+    },
+    
+    "chains": {
+      "ethereum": {
+        "canonical_id": "ethereum",
+        "name": "Ethereum",
+        "synonyms": ["eth", "mainnet", "ethereum-mainnet"],
+        "chain_type": "L1",
+        "native_token": "ETH", 
+        "avg_block_time": 12,
+        "finality_time": 384
+      },
+      "polygon": {
+        "canonical_id": "polygon", 
+        "name": "Polygon",
+        "synonyms": ["matic", "polygon-pos", "matic-network"],
+        "chain_type": "sidechain",
+        "parent_chain": "ethereum",
+        "native_token": "MATIC",
+        "avg_block_time": 2,
+        "finality_time": 256
+      },
+      "arbitrum": {
+        "canonical_id": "arbitrum",
+        "name": "Arbitrum One", 
+        "synonyms": ["arbitrum-one", "arb1"],
+        "chain_type": "L2",
+        "parent_chain": "ethereum",
+        "native_token": "ETH",
+        "avg_block_time": 0.25,
+        "finality_time": 604800
+      }
+    }
+  },
+  
+  "validation_rules": {
+    "apy_bounds": {
+      "min_apy": 0,
+      "max_reasonable_apy": 50,
+      "outlier_threshold": 100
+    },
+    "tvl_bounds": {
+      "min_tvl": 1000,
+      "institutional_min_tvl": 10000000
+    },
+    "data_freshness": {
+      "max_age_seconds": 1800,
+      "stale_warning_seconds": 600
+    }
+  }
+}
