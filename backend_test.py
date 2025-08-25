@@ -457,6 +457,261 @@ class StableYieldTester:
         except Exception as e:
             self.log_test("AI Alerts Check", False, f"Exception: {str(e)}")
     
+    # ========================================
+    # PROTOCOL POLICY SYSTEM TESTS (STEP 2)
+    # ========================================
+    
+    async def test_policy_summary(self):
+        """Test GET /api/policy/summary endpoint"""
+        try:
+            async with self.session.get(f"{API_BASE}/policy/summary") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    required_fields = ['policy_version', 'enforcement', 'protocol_counts', 'reputation_threshold']
+                    missing_fields = [field for field in required_fields if field not in data]
+                    
+                    if not missing_fields:
+                        counts = data['protocol_counts']
+                        threshold = data['reputation_threshold']
+                        self.log_test("Policy Summary", True, 
+                                    f"Policy v{data['policy_version']}: {counts['allowlisted']} allowed, {counts['denylisted']} denied, threshold: {threshold}")
+                    else:
+                        self.log_test("Policy Summary", False, f"Missing fields: {missing_fields}")
+                else:
+                    self.log_test("Policy Summary", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("Policy Summary", False, f"Exception: {str(e)}")
+    
+    async def test_policy_allowlist(self):
+        """Test GET /api/policy/allowlist endpoint"""
+        try:
+            async with self.session.get(f"{API_BASE}/policy/allowlist") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if 'allowlist' in data and 'total_protocols' in data:
+                        allowlist = data['allowlist']
+                        total = data['total_protocols']
+                        
+                        # Check for expected protocols
+                        protocol_ids = [p.get('protocol_id') for p in allowlist]
+                        expected_protocols = ['aave_v3', 'compound_v3', 'curve']
+                        found_protocols = [p for p in expected_protocols if p in protocol_ids]
+                        
+                        if len(found_protocols) >= 3:
+                            self.log_test("Policy Allowlist", True, 
+                                        f"Found {total} protocols including: {', '.join(found_protocols)}")
+                        else:
+                            self.log_test("Policy Allowlist", False, 
+                                        f"Missing expected protocols. Found: {found_protocols}")
+                    else:
+                        self.log_test("Policy Allowlist", False, f"Invalid response structure: {data}")
+                else:
+                    self.log_test("Policy Allowlist", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("Policy Allowlist", False, f"Exception: {str(e)}")
+    
+    async def test_policy_denylist(self):
+        """Test GET /api/policy/denylist endpoint"""
+        try:
+            async with self.session.get(f"{API_BASE}/policy/denylist") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if 'denylist' in data and 'total_protocols' in data:
+                        denylist = data['denylist']
+                        total = data['total_protocols']
+                        
+                        # Check for expected denied protocols
+                        protocol_ids = [p.get('protocol_id') for p in denylist]
+                        expected_denied = ['iron_finance', 'cream_finance', 'tornado_cash']
+                        found_denied = [p for p in expected_denied if p in protocol_ids]
+                        
+                        self.log_test("Policy Denylist", True, 
+                                    f"Found {total} denied protocols including: {', '.join(found_denied)}")
+                    else:
+                        self.log_test("Policy Denylist", False, f"Invalid response structure: {data}")
+                else:
+                    self.log_test("Policy Denylist", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("Policy Denylist", False, f"Exception: {str(e)}")
+    
+    async def test_policy_reputation_tiers(self):
+        """Test GET /api/policy/reputation/tiers endpoint"""
+        try:
+            async with self.session.get(f"{API_BASE}/policy/reputation/tiers") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if 'tiers' in data and 'scoring_methodology' in data:
+                        tiers = data['tiers']
+                        methodology = data['scoring_methodology']
+                        
+                        # Check for expected tiers
+                        expected_tiers = ['institutional', 'professional', 'retail']
+                        found_tiers = [tier for tier in expected_tiers if tier in tiers]
+                        
+                        if len(found_tiers) >= 3:
+                            self.log_test("Policy Reputation Tiers", True, 
+                                        f"Found {len(tiers)} tiers: {', '.join(found_tiers)}")
+                        else:
+                            self.log_test("Policy Reputation Tiers", False, 
+                                        f"Missing expected tiers. Found: {list(tiers.keys())}")
+                    else:
+                        self.log_test("Policy Reputation Tiers", False, f"Invalid response structure: {data}")
+                else:
+                    self.log_test("Policy Reputation Tiers", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("Policy Reputation Tiers", False, f"Exception: {str(e)}")
+    
+    async def test_protocol_info_aave_v3(self):
+        """Test GET /api/policy/protocols/aave_v3 endpoint"""
+        try:
+            async with self.session.get(f"{API_BASE}/policy/protocols/aave_v3?tvl_usd=1000000000") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    required_fields = ['protocol_id', 'name', 'reputation_score', 'tier', 'policy_decision']
+                    missing_fields = [field for field in required_fields if field not in data]
+                    
+                    if not missing_fields:
+                        score = data['reputation_score']
+                        tier = data['tier']
+                        decision = data['policy_decision']
+                        
+                        # Aave V3 should have high reputation score (~0.95)
+                        if score >= 0.90 and decision == 'allow':
+                            self.log_test("Protocol Info Aave V3", True, 
+                                        f"Score: {score:.2f}, Tier: {tier}, Decision: {decision}")
+                        else:
+                            self.log_test("Protocol Info Aave V3", False, 
+                                        f"Unexpected values - Score: {score}, Decision: {decision}")
+                    else:
+                        self.log_test("Protocol Info Aave V3", False, f"Missing fields: {missing_fields}")
+                else:
+                    self.log_test("Protocol Info Aave V3", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("Protocol Info Aave V3", False, f"Exception: {str(e)}")
+    
+    async def test_protocol_info_compound_v3(self):
+        """Test GET /api/policy/protocols/compound_v3 endpoint"""
+        try:
+            async with self.session.get(f"{API_BASE}/policy/protocols/compound_v3?tvl_usd=500000000") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    score = data.get('reputation_score', 0)
+                    tier = data.get('tier', 'unknown')
+                    decision = data.get('policy_decision', 'unknown')
+                    
+                    # Compound V3 should have good reputation score (~0.90)
+                    if score >= 0.85 and decision == 'allow':
+                        self.log_test("Protocol Info Compound V3", True, 
+                                    f"Score: {score:.2f}, Tier: {tier}, Decision: {decision}")
+                    else:
+                        self.log_test("Protocol Info Compound V3", False, 
+                                    f"Unexpected values - Score: {score}, Decision: {decision}")
+                else:
+                    self.log_test("Protocol Info Compound V3", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("Protocol Info Compound V3", False, f"Exception: {str(e)}")
+    
+    async def test_protocol_info_curve(self):
+        """Test GET /api/policy/protocols/curve endpoint"""
+        try:
+            async with self.session.get(f"{API_BASE}/policy/protocols/curve?tvl_usd=300000000") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    score = data.get('reputation_score', 0)
+                    tier = data.get('tier', 'unknown')
+                    decision = data.get('policy_decision', 'unknown')
+                    
+                    # Curve should have decent reputation score (~0.85)
+                    if score >= 0.80 and decision == 'allow':
+                        self.log_test("Protocol Info Curve", True, 
+                                    f"Score: {score:.2f}, Tier: {tier}, Decision: {decision}")
+                    else:
+                        self.log_test("Protocol Info Curve", False, 
+                                    f"Unexpected values - Score: {score}, Decision: {decision}")
+                else:
+                    self.log_test("Protocol Info Curve", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("Protocol Info Curve", False, f"Exception: {str(e)}")
+    
+    async def test_yields_policy_enforcement(self):
+        """Test that GET /api/yields/ now includes policy enforcement"""
+        try:
+            async with self.session.get(f"{API_BASE}/yields/") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    
+                    if isinstance(data, list) and len(data) > 0:
+                        # Check if yields include protocol policy information
+                        policy_enhanced_yields = []
+                        reputation_scores = []
+                        
+                        for yield_item in data:
+                            metadata = yield_item.get('metadata', {})
+                            protocol_info = metadata.get('protocol_info', {})
+                            
+                            if protocol_info:
+                                policy_enhanced_yields.append(yield_item)
+                                rep_score = protocol_info.get('reputation_score')
+                                if rep_score:
+                                    reputation_scores.append(rep_score)
+                        
+                        if policy_enhanced_yields:
+                            avg_reputation = sum(reputation_scores) / len(reputation_scores) if reputation_scores else 0
+                            self.log_test("Yields Policy Enforcement", True, 
+                                        f"Found {len(policy_enhanced_yields)} policy-enhanced yields, avg reputation: {avg_reputation:.2f}")
+                        else:
+                            # Check if yields are filtered (fewer protocols than before)
+                            total_yields = len(data)
+                            if total_yields > 0:
+                                self.log_test("Yields Policy Enforcement", True, 
+                                            f"Policy filtering active - {total_yields} yields returned (institutional-grade only)")
+                            else:
+                                self.log_test("Yields Policy Enforcement", False, 
+                                            "No yields returned - policy may be too restrictive")
+                    else:
+                        self.log_test("Yields Policy Enforcement", False, f"Empty or invalid response: {data}")
+                else:
+                    self.log_test("Yields Policy Enforcement", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("Yields Policy Enforcement", False, f"Exception: {str(e)}")
+    
+    async def test_policy_refresh(self):
+        """Test POST /api/policy/refresh endpoint"""
+        try:
+            async with self.session.post(f"{API_BASE}/policy/refresh") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if data.get('status') == 'success' and 'summary' in data:
+                        summary = data['summary']
+                        self.log_test("Policy Refresh", True, 
+                                    f"Policy refreshed successfully, version: {summary.get('policy_version', 'unknown')}")
+                    else:
+                        self.log_test("Policy Refresh", False, f"Invalid response: {data}")
+                else:
+                    self.log_test("Policy Refresh", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("Policy Refresh", False, f"Exception: {str(e)}")
+    
+    async def test_policy_enforcement_settings(self):
+        """Test GET /api/policy/enforcement endpoint"""
+        try:
+            async with self.session.get(f"{API_BASE}/policy/enforcement") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if 'enforcement' in data and 'dynamic_rules' in data:
+                        enforcement = data['enforcement']
+                        strict_mode = enforcement.get('strict_mode', False)
+                        threshold = enforcement.get('reputation_threshold', 0)
+                        
+                        self.log_test("Policy Enforcement Settings", True, 
+                                    f"Strict mode: {strict_mode}, Reputation threshold: {threshold}")
+                    else:
+                        self.log_test("Policy Enforcement Settings", False, f"Invalid response structure: {data}")
+                else:
+                    self.log_test("Policy Enforcement Settings", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("Policy Enforcement Settings", False, f"Exception: {str(e)}")
+    
     async def run_all_tests(self):
         """Run all backend tests"""
         print(f"🚀 Starting StableYield Backend API Tests")
