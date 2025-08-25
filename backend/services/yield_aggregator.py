@@ -84,6 +84,101 @@ class YieldAggregator:
         
         return result
     
+    def _apply_policy_filtering(self, yields: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """Apply protocol policy filtering to yields"""
+        try:
+            # Convert yields to pool-like format for policy filtering
+            pools = []
+            for yield_data in yields:
+                # Map source to protocol_id
+                protocol_id = self._map_source_to_protocol_id(yield_data.get('source', ''))
+                
+                pool = {
+                    'pool_id': f"{yield_data['stablecoin']}_{protocol_id}",
+                    'canonical_protocol_id': protocol_id,
+                    'project': yield_data.get('source', ''),
+                    'tvl': self._estimate_tvl_from_liquidity(yield_data.get('liquidity', '0')),
+                    'yield_data': yield_data  # Store original yield data
+                }
+                pools.append(pool)
+            
+            # Apply policy filtering
+            filtered_pools = self.policy_service.filter_pools_by_policy(pools)
+            
+            # Extract yield data from filtered pools and enrich with policy info
+            filtered_yields = []
+            for pool in filtered_pools:
+                yield_data = pool['yield_data']
+                
+                # Add protocol policy information to metadata
+                if 'protocol_info' in pool:
+                    if 'metadata' not in yield_data:
+                        yield_data['metadata'] = {}
+                    yield_data['metadata']['protocol_info'] = pool['protocol_info']
+                
+                # Add policy warning if present
+                if 'policy_warning' in pool:
+                    if 'metadata' not in yield_data:
+                        yield_data['metadata'] = {}
+                    yield_data['metadata']['policy_warning'] = pool['policy_warning']
+                
+                filtered_yields.append(yield_data)
+            
+            logger.info(f"Policy filtering: {len(yields)} -> {len(filtered_yields)} yields")
+            return filtered_yields
+            
+        except Exception as e:
+            logger.error(f"Policy filtering error: {e}")
+            # Return original yields if policy filtering fails
+            return yields
+    
+    def _map_source_to_protocol_id(self, source: str) -> str:
+        """Map yield source to protocol ID for policy checking"""
+        source_lower = source.lower()
+        
+        # Map common sources to protocol IDs
+        mapping = {
+            'aave v3': 'aave_v3',
+            'aave': 'aave_v3',
+            'compound v3': 'compound_v3', 
+            'compound': 'compound_v3',
+            'curve': 'curve',
+            'curve finance': 'curve',
+            'uniswap v3': 'uniswap_v3',
+            'uniswap': 'uniswap_v3',
+            'convex': 'convex',
+            'convex finance': 'convex',
+            'binance earn': 'binance_earn',
+            'binance': 'binance_earn'
+        }
+        
+        for key, protocol_id in mapping.items():
+            if key in source_lower:
+                return protocol_id
+        
+        # Default: convert source to protocol_id format
+        return source_lower.replace(' ', '_').replace('-', '_')
+    
+    def _estimate_tvl_from_liquidity(self, liquidity_str: str) -> float:
+        """Estimate TVL from liquidity string (e.g., '$89.2B' -> 89200000000)"""
+        try:
+            if not liquidity_str or liquidity_str == '0':
+                return 0
+                
+            # Remove $ and convert
+            clean_str = liquidity_str.replace('$', '').replace(',', '')
+            
+            if clean_str.endswith('B'):
+                return float(clean_str[:-1]) * 1_000_000_000
+            elif clean_str.endswith('M'):
+                return float(clean_str[:-1]) * 1_000_000
+            elif clean_str.endswith('K'):
+                return float(clean_str[:-1]) * 1_000
+            else:
+                return float(clean_str)
+        except:
+            return 0
+    
     def _simulate_24h_change(self) -> float:
         """Simulate 24h change (replace with real calculation in production)"""
         import random
