@@ -86,7 +86,10 @@ const MethodologyPage = () => {
 
   return (
     <div className="min-h-screen bg-white">
-      <Header />
+      <Header 
+        onJoinWaitlist={() => setIsContactOpen(true)}
+        onDownloadWhitepaper={() => setIsWhitepaperOpen(true)}
+      />
       
       <main className="pt-8">
         {/* Hero Section */}
