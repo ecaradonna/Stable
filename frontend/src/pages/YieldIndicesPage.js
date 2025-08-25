@@ -59,6 +59,11 @@ const YieldIndicesPage = () => {
 
   return (
     <div className="min-h-screen bg-white">
+      <SEOHead 
+        title="Yield Indices & Benchmarks – Institutional Stablecoin Analytics"
+        description="Professional yield indices and benchmarks for USD stablecoins. Risk-adjusted returns, peg stability analytics, and institutional-grade data for USDT, USDC, DAI."
+        url="https://stableyield.com/yield-indices"
+      />
       <Header />
       
       {/* Hero Section */}
