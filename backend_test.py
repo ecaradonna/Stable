@@ -209,13 +209,25 @@ class StableYieldTester:
                     binance_yields = [item for item in data if item.get('source') == 'Binance Earn']
                     
                     if binance_yields:
-                        # Check for demo data indicators
-                        has_demo_metadata = any(item.get('metadata', {}).get('fallback') for item in binance_yields)
+                        # Check for demo data values (USDT 8.45%, USDC 7.12%, TUSD 4.23%)
+                        demo_values = {
+                            'USDT': 8.45,
+                            'USDC': 7.12, 
+                            'TUSD': 4.23
+                        }
                         
-                        if has_demo_metadata:
-                            self.log_test("Binance Real Data Check", False, "Still using demo/fallback data despite API key")
+                        is_demo_data = True
+                        for item in binance_yields:
+                            coin = item.get('stablecoin')
+                            yield_val = item.get('currentYield')
+                            if coin in demo_values and abs(yield_val - demo_values[coin]) > 0.01:
+                                is_demo_data = False
+                                break
+                        
+                        if is_demo_data:
+                            self.log_test("Binance Real Data Check", False, "Still using demo data values (USDT 8.45%, USDC 7.12%, TUSD 4.23%) - API blocked by HTTP 451")
                         else:
-                            self.log_test("Binance Real Data Check", True, f"Found {len(binance_yields)} Binance yields without demo flags")
+                            self.log_test("Binance Real Data Check", True, f"Found {len(binance_yields)} Binance yields with live data")
                     else:
                         self.log_test("Binance Real Data Check", False, "No Binance Earn yields found in response")
                 else:
@@ -224,16 +236,21 @@ class StableYieldTester:
             self.log_test("Binance Real Data Check", False, f"Exception: {str(e)}")
         
         # Test 2: Check individual stablecoin endpoints for Binance data
-        test_coins = ['USDT', 'USDC', 'TUSD']
-        for coin in test_coins:
+        demo_values = {'USDT': 8.45, 'USDC': 7.12, 'TUSD': 4.23}
+        for coin in demo_values.keys():
             try:
                 async with self.session.get(f"{API_BASE}/yields/{coin}") as response:
                     if response.status == 200:
                         data = await response.json()
                         if data.get('source') == 'Binance Earn':
-                            is_demo = data.get('metadata', {}).get('fallback', False)
-                            data_source = "Demo data" if is_demo else "Live data"
-                            self.log_test(f"Binance {coin} Data Source", not is_demo, f"{data_source} - Yield: {data.get('currentYield')}%")
+                            yield_val = data.get('currentYield')
+                            expected_demo = demo_values[coin]
+                            is_demo = abs(yield_val - expected_demo) < 0.01
+                            
+                            if is_demo:
+                                self.log_test(f"Binance {coin} Data Source", False, f"Demo data - Yield: {yield_val}% (expected demo: {expected_demo}%)")
+                            else:
+                                self.log_test(f"Binance {coin} Data Source", True, f"Live data - Yield: {yield_val}% (different from demo: {expected_demo}%)")
                         else:
                             self.log_test(f"Binance {coin} Data Source", False, f"Not from Binance Earn: {data.get('source')}")
                     else:
