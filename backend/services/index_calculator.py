@@ -28,6 +28,8 @@ class StableYieldIndexCalculator:
         self.crypto_compare = CryptoCompareService()
         self.defi_llama = DefiLlamaService()
         self.binance = BinanceService()
+        self.ray_calculator = RAYCalculator()
+        self.syi_compositor = SYICompositor()
         
         # Core stablecoins for Phase 1
         self.constituents = [
