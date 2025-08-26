@@ -415,5 +415,14 @@ async def shutdown_db_client():
     except Exception as e:
         logger.error(f"❌ Error stopping Trading Engine service: {e}")
     
+    # Stop Dashboard service
+    try:
+        from services.dashboard_service import stop_dashboard
+        
+        await stop_dashboard()
+        logger.info("✅ Advanced Analytics Dashboard service stopped")
+    except Exception as e:
+        logger.error(f"❌ Error stopping Dashboard service: {e}")
+    
     client.close()
     logger.info("StableYield Market Intelligence API shutting down...")
