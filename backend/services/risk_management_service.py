@@ -301,6 +301,223 @@ class EnhancedRiskManagementService:
         except Exception as e:
             logger.error(f"❌ Error monitoring portfolio risk {portfolio_id}: {e}")
     
+    async def _check_risk_limits(self, portfolio_id: str, risk_metrics: Dict[str, float]) -> List[RiskLimit]:
+        """Check if portfolio violates any risk limits"""
+        violated_limits = []
+        
+        try:
+            # Get risk limits for portfolio
+            portfolio_limits = self.risk_limits.get(portfolio_id, [])
+            
+            # Add default limits if none exist
+            if not portfolio_limits:
+                portfolio_limits = self._get_default_risk_limits(portfolio_id)
+                self.risk_limits[portfolio_id] = portfolio_limits
+            
+            # Check each limit
+            for limit in portfolio_limits:
+                if not limit.enabled:
+                    continue
+                
+                current_value = risk_metrics.get(limit.risk_type.value, 0)
+                
+                # Check if limit is violated
+                if limit.limit_type == "hard" and current_value > limit.threshold:
+                    violated_limits.append(limit)
+                elif limit.limit_type == "soft" and current_value > limit.threshold * 0.9:
+                    violated_limits.append(limit)
+                elif limit.limit_type == "warning" and current_value > limit.threshold * 0.8:
+                    violated_limits.append(limit)
+            
+            return violated_limits
+            
+        except Exception as e:
+            logger.error(f"❌ Error checking risk limits for {portfolio_id}: {e}")
+            return []
+    
+    def _get_default_risk_limits(self, portfolio_id: str) -> List[RiskLimit]:
+        """Get default risk limits for a portfolio"""
+        return [
+            RiskLimit(
+                portfolio_id=portfolio_id,
+                risk_type=RiskMetricType.CONCENTRATION_RISK,
+                limit_type="hard",
+                threshold=0.25,  # 25% max concentration
+                action="alert"
+            ),
+            RiskLimit(
+                portfolio_id=portfolio_id,
+                risk_type=RiskMetricType.LIQUIDITY_RISK,
+                limit_type="soft",
+                threshold=0.6,  # 60% liquidity risk threshold
+                action="alert"
+            ),
+            RiskLimit(
+                portfolio_id=portfolio_id,
+                risk_type=RiskMetricType.VALUE_AT_RISK,
+                limit_type="warning",
+                threshold=0.05,  # 5% VaR threshold
+                action="alert"
+            )
+        ]
+    
+    async def _generate_risk_alert(self, portfolio_id: str, limit: RiskLimit, risk_metrics: Dict[str, float]):
+        """Generate risk alert for limit violation"""
+        try:
+            current_value = risk_metrics.get(limit.risk_type.value, 0)
+            
+            # Determine severity
+            if limit.limit_type == "hard":
+                severity = RiskSeverity.CRITICAL
+            elif limit.limit_type == "soft":
+                severity = RiskSeverity.HIGH
+            else:
+                severity = RiskSeverity.MEDIUM
+            
+            # Create alert
+            alert = RiskAlert(
+                alert_id=f"alert_{portfolio_id}_{limit.risk_type.value}_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}",
+                portfolio_id=portfolio_id,
+                risk_type=limit.risk_type,
+                severity=severity,
+                message=f"{limit.risk_type.value} exceeded {limit.limit_type} limit",
+                threshold_value=limit.threshold,
+                current_value=current_value,
+                triggered_at=datetime.utcnow()
+            )
+            
+            # Store alert
+            self.active_alerts[alert.alert_id] = alert
+            
+            logger.warning(f"⚠️ Risk alert generated: {alert.message} for portfolio {portfolio_id}")
+            
+        except Exception as e:
+            logger.error(f"❌ Error generating risk alert: {e}")
+    
+    async def _stress_testing_loop(self):
+        """Background task for periodic stress testing"""
+        while self.is_running:
+            try:
+                # Get all portfolios from AI Portfolio service
+                ai_portfolio_service = get_ai_portfolio_service()
+                if ai_portfolio_service and ai_portfolio_service.ai_portfolios:
+                    
+                    for portfolio_id in ai_portfolio_service.ai_portfolios.keys():
+                        # Run stress tests for each scenario
+                        for scenario in self.stress_scenarios:
+                            try:
+                                await self.run_stress_test(portfolio_id, scenario.scenario_id)
+                            except Exception as e:
+                                logger.error(f"❌ Error in stress test {scenario.scenario_id} for {portfolio_id}: {e}")
+                
+                # Wait for next stress test cycle
+                await asyncio.sleep(self.config["stress_test_frequency"])
+                
+            except Exception as e:
+                logger.error(f"❌ Error in stress testing loop: {e}")
+                await asyncio.sleep(300)  # Wait 5 minutes before retry
+    
+    async def _compliance_monitoring_loop(self):
+        """Background task for regulatory compliance monitoring"""
+        while self.is_running:
+            try:
+                # Get all portfolios from AI Portfolio service
+                ai_portfolio_service = get_ai_portfolio_service()
+                if ai_portfolio_service and ai_portfolio_service.ai_portfolios:
+                    
+                    for portfolio_id in ai_portfolio_service.ai_portfolios.keys():
+                        await self._check_regulatory_compliance(portfolio_id)
+                
+                # Check compliance every 30 minutes
+                await asyncio.sleep(1800)
+                
+            except Exception as e:
+                logger.error(f"❌ Error in compliance monitoring loop: {e}")
+                await asyncio.sleep(300)
+    
+    async def _check_regulatory_compliance(self, portfolio_id: str):
+        """Check regulatory compliance for a portfolio"""
+        try:
+            risk_metrics = await self.calculate_risk_metrics(portfolio_id)
+            if not risk_metrics:
+                return
+            
+            config = self.config["regulatory_limits"]
+            violations = []
+            
+            # Check concentration limits
+            if risk_metrics.get("concentration_risk", 0) > config["max_single_issuer"]:
+                violations.append("Single issuer concentration limit exceeded")
+            
+            # Check diversification
+            if risk_metrics.get("diversification_ratio", 1) < config["min_diversification_ratio"]:
+                violations.append("Minimum diversification requirement not met")
+            
+            # Check liquidity coverage
+            liquidity_coverage = 1 - risk_metrics.get("liquidity_risk", 0.5)
+            if liquidity_coverage < config["liquidity_coverage_ratio"]:
+                violations.append("Liquidity coverage ratio below minimum")
+            
+            # Generate compliance alerts if needed
+            if violations:
+                for violation in violations:
+                    await self._generate_compliance_alert(portfolio_id, violation)
+            
+        except Exception as e:
+            logger.error(f"❌ Error checking compliance for {portfolio_id}: {e}")
+    
+    async def _generate_compliance_alert(self, portfolio_id: str, violation: str):
+        """Generate compliance violation alert"""
+        try:
+            alert = RiskAlert(
+                alert_id=f"compliance_{portfolio_id}_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}",
+                portfolio_id=portfolio_id,
+                risk_type=RiskMetricType.OPERATIONAL_RISK,
+                severity=RiskSeverity.HIGH,
+                message=f"Compliance violation: {violation}",
+                threshold_value=0,
+                current_value=1,
+                triggered_at=datetime.utcnow()
+            )
+            
+            self.active_alerts[alert.alert_id] = alert
+            logger.warning(f"⚠️ Compliance alert: {violation} for portfolio {portfolio_id}")
+            
+        except Exception as e:
+            logger.error(f"❌ Error generating compliance alert: {e}")
+    
+    async def _alert_management_loop(self):
+        """Background task for managing and cleaning up alerts"""
+        while self.is_running:
+            try:
+                current_time = datetime.utcnow()
+                
+                # Clean up old resolved alerts (older than 24 hours)
+                alerts_to_remove = []
+                for alert_id, alert in self.active_alerts.items():
+                    if alert.resolved and (current_time - alert.triggered_at).total_seconds() > 86400:
+                        alerts_to_remove.append(alert_id)
+                
+                for alert_id in alerts_to_remove:
+                    del self.active_alerts[alert_id]
+                
+                # Check for alert cooldowns and auto-resolve if conditions improved
+                for alert in self.active_alerts.values():
+                    if not alert.resolved and (current_time - alert.triggered_at).total_seconds() > 900:  # 15 minutes
+                        # Check if condition still exists
+                        risk_metrics = await self.calculate_risk_metrics(alert.portfolio_id)
+                        current_value = risk_metrics.get(alert.risk_type.value, 0)
+                        
+                        if current_value <= alert.threshold_value * 0.9:  # 10% buffer
+                            alert.resolved = True
+                            logger.info(f"✅ Auto-resolved alert {alert.alert_id}")
+                
+                await asyncio.sleep(300)  # Check every 5 minutes
+                
+            except Exception as e:
+                logger.error(f"❌ Error in alert management loop: {e}")
+                await asyncio.sleep(60)
+    
     async def calculate_risk_metrics(self, portfolio_id: str) -> Dict[str, float]:
         """Calculate comprehensive risk metrics for a portfolio"""
         try:
