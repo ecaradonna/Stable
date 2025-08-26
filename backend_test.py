@@ -1069,6 +1069,351 @@ class StableYieldTester:
             self.log_test("Parameter Validation Valid Params", False, f"Exception: {str(e)}")
     
     # ========================================
+    # RISK-ADJUSTED YIELD (RAY) & SYI TESTS (STEP 5)
+    # ========================================
+    
+    async def test_ray_methodology(self):
+        """Test GET /api/ray/methodology endpoint"""
+        try:
+            async with self.session.get(f"{API_BASE}/ray/methodology") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    required_fields = ['methodology_version', 'config', 'supported_risk_factors', 'penalty_curves']
+                    missing_fields = [field for field in required_fields if field not in data]
+                    
+                    if not missing_fields:
+                        version = data['methodology_version']
+                        risk_factors = data['supported_risk_factors']
+                        penalty_curves = data['penalty_curves']
+                        
+                        # Check for expected risk factors
+                        expected_factors = ['peg_stability', 'liquidity_risk', 'counterparty_risk', 'protocol_risk', 'temporal_risk']
+                        found_factors = [f for f in expected_factors if f in risk_factors]
+                        
+                        if len(found_factors) >= 4:
+                            self.log_test("RAY Methodology", True, 
+                                        f"Version {version}: {len(risk_factors)} risk factors, {len(penalty_curves)} penalty curves")
+                        else:
+                            self.log_test("RAY Methodology", False, 
+                                        f"Missing expected risk factors. Found: {found_factors}")
+                    else:
+                        self.log_test("RAY Methodology", False, f"Missing fields: {missing_fields}")
+                else:
+                    self.log_test("RAY Methodology", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("RAY Methodology", False, f"Exception: {str(e)}")
+    
+    async def test_ray_calculate_single(self):
+        """Test POST /api/ray/calculate endpoint"""
+        try:
+            # Test with specific parameters as requested
+            params = {
+                'apy': 5.0,
+                'stablecoin': 'USDT',
+                'protocol': 'aave_v3',
+                'tvl_usd': 100000000,  # $100M
+                'use_market_context': True
+            }
+            
+            async with self.session.post(f"{API_BASE}/ray/calculate", params=params) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    required_fields = ['input', 'ray_result']
+                    missing_fields = [field for field in required_fields if field not in data]
+                    
+                    if not missing_fields:
+                        input_data = data['input']
+                        ray_result = data['ray_result']
+                        
+                        # Check ray_result structure
+                        ray_fields = ['base_apy', 'risk_adjusted_yield', 'risk_penalty', 'confidence_score', 'risk_factors']
+                        missing_ray_fields = [field for field in ray_fields if field not in ray_result]
+                        
+                        if not missing_ray_fields:
+                            base_apy = ray_result['base_apy']
+                            ray = ray_result['risk_adjusted_yield']
+                            risk_penalty = ray_result['risk_penalty']
+                            confidence = ray_result['confidence_score']
+                            risk_factors = ray_result['risk_factors']
+                            
+                            # Check risk factors structure
+                            expected_risk_factors = ['peg_stability_score', 'liquidity_score', 'counterparty_score', 'protocol_reputation', 'temporal_stability']
+                            found_risk_factors = [f for f in expected_risk_factors if f in risk_factors]
+                            
+                            if len(found_risk_factors) >= 4:
+                                self.log_test("RAY Calculate Single", True, 
+                                            f"APY {base_apy}% -> RAY {ray:.2f}%, Risk penalty: {risk_penalty:.1%}, Confidence: {confidence:.2f}, Risk factors: {len(found_risk_factors)}")
+                            else:
+                                self.log_test("RAY Calculate Single", False, 
+                                            f"Missing risk factors. Found: {found_risk_factors}")
+                        else:
+                            self.log_test("RAY Calculate Single", False, f"Missing RAY result fields: {missing_ray_fields}")
+                    else:
+                        self.log_test("RAY Calculate Single", False, f"Missing fields: {missing_fields}")
+                else:
+                    self.log_test("RAY Calculate Single", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("RAY Calculate Single", False, f"Exception: {str(e)}")
+    
+    async def test_ray_market_analysis(self):
+        """Test GET /api/ray/market-analysis endpoint"""
+        try:
+            async with self.session.get(f"{API_BASE}/ray/market-analysis") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    
+                    if 'analysis' in data:
+                        analysis = data['analysis']
+                        required_fields = ['total_yields_analyzed', 'ray_statistics', 'quality_metrics', 'top_ray_yields']
+                        missing_fields = [field for field in required_fields if field not in analysis]
+                        
+                        if not missing_fields:
+                            total_analyzed = analysis['total_yields_analyzed']
+                            ray_stats = analysis['ray_statistics']
+                            quality_metrics = analysis['quality_metrics']
+                            top_rays = analysis['top_ray_yields']
+                            
+                            # Check ray statistics
+                            stats_fields = ['average_ray', 'median_ray', 'min_ray', 'max_ray', 'average_risk_penalty', 'average_confidence']
+                            found_stats = [f for f in stats_fields if f in ray_stats]
+                            
+                            # Check quality metrics
+                            quality_fields = ['high_confidence_rate', 'low_risk_penalty_rate', 'institutional_grade_rate']
+                            found_quality = [f for f in quality_fields if f in quality_metrics]
+                            
+                            if len(found_stats) >= 5 and len(found_quality) >= 2:
+                                avg_ray = ray_stats.get('average_ray', 0)
+                                avg_confidence = ray_stats.get('average_confidence', 0)
+                                institutional_rate = quality_metrics.get('institutional_grade_rate', 0)
+                                
+                                self.log_test("RAY Market Analysis", True, 
+                                            f"Analyzed {total_analyzed} yields: Avg RAY {avg_ray:.2f}%, Avg confidence {avg_confidence:.2f}, Institutional rate {institutional_rate:.1%}, Top yields: {len(top_rays)}")
+                            else:
+                                self.log_test("RAY Market Analysis", False, 
+                                            f"Missing statistics or quality metrics. Stats: {found_stats}, Quality: {found_quality}")
+                        else:
+                            self.log_test("RAY Market Analysis", False, f"Missing analysis fields: {missing_fields}")
+                    else:
+                        # Handle case where no yield data is available
+                        if 'message' in data and 'No yield data available' in data['message']:
+                            self.log_test("RAY Market Analysis", True, "No yield data available for analysis (expected if no yields)")
+                        else:
+                            self.log_test("RAY Market Analysis", False, f"Invalid response structure: {data}")
+                else:
+                    self.log_test("RAY Market Analysis", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("RAY Market Analysis", False, f"Exception: {str(e)}")
+    
+    async def test_syi_composition(self):
+        """Test GET /api/syi/composition endpoint"""
+        try:
+            async with self.session.get(f"{API_BASE}/syi/composition") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    
+                    if 'index_value' in data:
+                        required_fields = ['index_value', 'constituent_count', 'total_weight', 'constituents', 'quality_metrics', 'breakdown']
+                        missing_fields = [field for field in required_fields if field not in data]
+                        
+                        if not missing_fields:
+                            index_value = data['index_value']
+                            constituent_count = data['constituent_count']
+                            total_weight = data['total_weight']
+                            constituents = data['constituents']
+                            quality_metrics = data['quality_metrics']
+                            breakdown = data['breakdown']
+                            
+                            # Check constituents structure
+                            if constituents and len(constituents) > 0:
+                                first_constituent = constituents[0]
+                                constituent_fields = ['stablecoin', 'protocol', 'weight', 'ray', 'base_apy', 'risk_penalty', 'confidence_score']
+                                found_constituent_fields = [f for f in constituent_fields if f in first_constituent]
+                                
+                                if len(found_constituent_fields) >= 6:
+                                    # Check quality metrics
+                                    quality_fields = ['overall_quality', 'avg_confidence', 'avg_ray', 'protocol_diversity', 'stablecoin_diversity']
+                                    found_quality_fields = [f for f in quality_fields if f in quality_metrics]
+                                    
+                                    if len(found_quality_fields) >= 4:
+                                        overall_quality = quality_metrics.get('overall_quality', 0)
+                                        avg_ray = quality_metrics.get('avg_ray', 0)
+                                        protocol_diversity = quality_metrics.get('protocol_diversity', 0)
+                                        
+                                        self.log_test("SYI Composition", True, 
+                                                    f"Index: {index_value:.4f}, {constituent_count} constituents, Weight: {total_weight:.3f}, Quality: {overall_quality:.2f}, Avg RAY: {avg_ray:.2f}%, Protocols: {protocol_diversity}")
+                                    else:
+                                        self.log_test("SYI Composition", False, 
+                                                    f"Missing quality metrics. Found: {found_quality_fields}")
+                                else:
+                                    self.log_test("SYI Composition", False, 
+                                                f"Missing constituent fields. Found: {found_constituent_fields}")
+                            else:
+                                self.log_test("SYI Composition", False, "No constituents in composition")
+                        else:
+                            self.log_test("SYI Composition", False, f"Missing fields: {missing_fields}")
+                    else:
+                        # Handle case where no yield data is available
+                        if 'message' in data and 'No yield data available' in data['message']:
+                            self.log_test("SYI Composition", True, "No yield data available for SYI composition (expected if no yields)")
+                        else:
+                            self.log_test("SYI Composition", False, f"Invalid response structure: {data}")
+                else:
+                    self.log_test("SYI Composition", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("SYI Composition", False, f"Exception: {str(e)}")
+    
+    async def test_syi_methodology(self):
+        """Test GET /api/syi/methodology endpoint"""
+        try:
+            async with self.session.get(f"{API_BASE}/syi/methodology") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    required_fields = ['methodology_version', 'calculation_method', 'weighting_scheme', 'risk_adjustment', 'config']
+                    missing_fields = [field for field in required_fields if field not in data]
+                    
+                    if not missing_fields:
+                        version = data['methodology_version']
+                        calc_method = data['calculation_method']
+                        weighting_scheme = data['weighting_scheme']
+                        risk_adjustment = data['risk_adjustment']
+                        config = data['config']
+                        
+                        # Check config structure
+                        config_sections = ['weighting_methodology', 'inclusion_criteria', 'risk_adjustments', 'index_calculation']
+                        found_config_sections = [s for s in config_sections if s in config]
+                        
+                        if len(found_config_sections) >= 3:
+                            self.log_test("SYI Methodology", True, 
+                                        f"Version {version}: {calc_method}, {weighting_scheme}, {risk_adjustment}, Config sections: {len(found_config_sections)}")
+                        else:
+                            self.log_test("SYI Methodology", False, 
+                                        f"Missing config sections. Found: {found_config_sections}")
+                    else:
+                        self.log_test("SYI Methodology", False, f"Missing fields: {missing_fields}")
+                else:
+                    self.log_test("SYI Methodology", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("SYI Methodology", False, f"Exception: {str(e)}")
+    
+    async def test_ray_parameter_validation(self):
+        """Test parameter validation for RAY calculate endpoint"""
+        # Test 1: Invalid negative APY
+        try:
+            params = {'apy': -5.0, 'stablecoin': 'USDT', 'protocol': 'aave_v3'}
+            async with self.session.post(f"{API_BASE}/ray/calculate", params=params) as response:
+                if response.status == 422:  # Validation error
+                    self.log_test("RAY Parameter Validation Negative APY", True, "Correctly rejected negative APY")
+                elif response.status == 200:
+                    # Some systems might handle negative APY gracefully
+                    data = await response.json()
+                    if 'ray_result' in data:
+                        self.log_test("RAY Parameter Validation Negative APY", True, "Handled negative APY gracefully")
+                    else:
+                        self.log_test("RAY Parameter Validation Negative APY", False, "Should handle negative APY")
+                else:
+                    self.log_test("RAY Parameter Validation Negative APY", False, f"Unexpected status: {response.status}")
+        except Exception as e:
+            self.log_test("RAY Parameter Validation Negative APY", False, f"Exception: {str(e)}")
+        
+        # Test 2: Valid parameters should work
+        try:
+            params = {'apy': 4.5, 'stablecoin': 'USDC', 'protocol': 'compound_v3', 'tvl_usd': 50000000}
+            async with self.session.post(f"{API_BASE}/ray/calculate", params=params) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if 'ray_result' in data and 'risk_adjusted_yield' in data['ray_result']:
+                        ray = data['ray_result']['risk_adjusted_yield']
+                        self.log_test("RAY Parameter Validation Valid Params", True, 
+                                    f"Valid parameters accepted, RAY: {ray:.2f}%")
+                    else:
+                        self.log_test("RAY Parameter Validation Valid Params", False, f"Invalid response structure: {data}")
+                else:
+                    self.log_test("RAY Parameter Validation Valid Params", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("RAY Parameter Validation Valid Params", False, f"Exception: {str(e)}")
+    
+    async def test_ray_integration_with_yields(self):
+        """Test RAY system integration with existing yield data"""
+        try:
+            # First get current yields
+            async with self.session.get(f"{API_BASE}/yields/") as response:
+                if response.status == 200:
+                    yields_data = await response.json()
+                    
+                    if isinstance(yields_data, list) and len(yields_data) > 0:
+                        # Test RAY market analysis with real yield data
+                        async with self.session.get(f"{API_BASE}/ray/market-analysis") as ray_response:
+                            if ray_response.status == 200:
+                                ray_data = await ray_response.json()
+                                
+                                if 'analysis' in ray_data:
+                                    analysis = ray_data['analysis']
+                                    total_analyzed = analysis.get('total_yields_analyzed', 0)
+                                    
+                                    # Check if RAY analysis processed the same number of yields
+                                    if total_analyzed == len(yields_data):
+                                        self.log_test("RAY Integration with Yields", True, 
+                                                    f"RAY system processed all {total_analyzed} yields from yield system")
+                                    elif total_analyzed > 0:
+                                        self.log_test("RAY Integration with Yields", True, 
+                                                    f"RAY system processed {total_analyzed}/{len(yields_data)} yields (some may be filtered)")
+                                    else:
+                                        self.log_test("RAY Integration with Yields", False, 
+                                                    f"RAY system processed 0 yields from {len(yields_data)} available")
+                                else:
+                                    self.log_test("RAY Integration with Yields", False, "No analysis in RAY response")
+                            else:
+                                self.log_test("RAY Integration with Yields", False, f"RAY analysis failed: HTTP {ray_response.status}")
+                    else:
+                        self.log_test("RAY Integration with Yields", True, "No yields available for RAY integration test")
+                else:
+                    self.log_test("RAY Integration with Yields", False, f"Failed to get yields: HTTP {response.status}")
+        except Exception as e:
+            self.log_test("RAY Integration with Yields", False, f"Exception: {str(e)}")
+    
+    async def test_syi_integration_with_ray(self):
+        """Test SYI composition uses RAY calculations correctly"""
+        try:
+            # Get SYI composition
+            async with self.session.get(f"{API_BASE}/syi/composition") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    
+                    if 'constituents' in data and len(data['constituents']) > 0:
+                        constituents = data['constituents']
+                        
+                        # Check that each constituent has RAY values
+                        ray_constituents = [c for c in constituents if 'ray' in c and 'risk_penalty' in c]
+                        
+                        if len(ray_constituents) == len(constituents):
+                            # Check that RAY values are reasonable
+                            ray_values = [c['ray'] for c in ray_constituents]
+                            base_apys = [c['base_apy'] for c in ray_constituents]
+                            risk_penalties = [c['risk_penalty'] for c in ray_constituents]
+                            
+                            # RAY should be <= base APY (due to risk penalties)
+                            valid_ray_adjustments = sum(1 for i, ray in enumerate(ray_values) if ray <= base_apys[i])
+                            
+                            if valid_ray_adjustments == len(ray_values):
+                                avg_ray = sum(ray_values) / len(ray_values)
+                                avg_penalty = sum(risk_penalties) / len(risk_penalties)
+                                
+                                self.log_test("SYI Integration with RAY", True, 
+                                            f"All {len(constituents)} constituents have valid RAY calculations. Avg RAY: {avg_ray:.2f}%, Avg penalty: {avg_penalty:.1%}")
+                            else:
+                                self.log_test("SYI Integration with RAY", False, 
+                                            f"Invalid RAY adjustments: {valid_ray_adjustments}/{len(ray_values)} constituents have RAY > base APY")
+                        else:
+                            self.log_test("SYI Integration with RAY", False, 
+                                        f"Missing RAY data: {len(ray_constituents)}/{len(constituents)} constituents have RAY values")
+                    else:
+                        self.log_test("SYI Integration with RAY", True, "No constituents available for SYI integration test")
+                else:
+                    self.log_test("SYI Integration with RAY", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("SYI Integration with RAY", False, f"Exception: {str(e)}")
+
+    # ========================================
     # YIELD SANITIZATION SYSTEM TESTS (STEP 4)
     # ========================================
     
