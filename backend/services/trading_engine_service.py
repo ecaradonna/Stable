@@ -538,6 +538,29 @@ class TradingEngineService:
         
         return portfolio
     
+    async def create_portfolio_with_id(self, portfolio_id: str, client_id: str, name: str, 
+                                     target_allocation: Dict[str, Decimal], 
+                                     initial_cash: Decimal = Decimal('100000')) -> Portfolio:
+        """Create a new portfolio with a specific ID"""
+        
+        portfolio = Portfolio(
+            portfolio_id=portfolio_id,
+            client_id=client_id,
+            name=name,
+            total_value=initial_cash,
+            cash_balance=initial_cash,
+            positions=[],
+            target_allocation=target_allocation,
+            created_at=datetime.utcnow(),
+            updated_at=datetime.utcnow()
+        )
+        
+        self.portfolios[portfolio_id] = portfolio
+        
+        logger.info(f"📁 Created portfolio {portfolio_id} for {client_id}: {name}")
+        
+        return portfolio
+    
     async def get_portfolio_performance(self, portfolio_id: str) -> Dict[str, Any]:
         """Calculate portfolio performance metrics"""
         if portfolio_id not in self.portfolios:
