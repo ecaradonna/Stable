@@ -194,5 +194,16 @@ async def shutdown_db_client():
     except Exception as e:
         logger.error(f"❌ Error stopping scheduler: {e}")
     
+    # Stop WebSocket services
+    try:
+        from services.realtime_data_integrator import stop_realtime_integration
+        from services.cryptocompare_websocket import stop_cryptocompare_websocket
+        
+        await stop_realtime_integration()
+        await stop_cryptocompare_websocket()
+        logger.info("✅ WebSocket services stopped")
+    except Exception as e:
+        logger.error(f"❌ Error stopping WebSocket services: {e}")
+    
     client.close()
     logger.info("StableYield Market Intelligence API shutting down...")
