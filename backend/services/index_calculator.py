@@ -10,6 +10,7 @@ from services.defi_llama_service import DefiLlamaService
 from services.binance_service import BinanceService
 from services.ray_calculator import RAYCalculator
 from services.syi_compositor import SYICompositor
+from services.yield_aggregator import YieldAggregator
 
 logger = logging.getLogger(__name__)
 
