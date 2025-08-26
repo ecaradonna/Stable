@@ -543,6 +543,9 @@ class AIPortfolioService:
             # Store configuration
             self.ai_portfolios[portfolio_id] = ai_config
             
+            # Create portfolio in Trading Engine
+            await self._create_portfolio_in_trading_engine(portfolio_id, client_id, portfolio_data)
+            
             # Initialize portfolio optimization
             await self._initialize_portfolio_optimization(portfolio_id)
             
@@ -553,6 +556,45 @@ class AIPortfolioService:
         except Exception as e:
             logger.error(f"❌ Error creating AI portfolio: {e}")
             raise
+    
+    async def _create_portfolio_in_trading_engine(self, portfolio_id: str, client_id: str, portfolio_data: Dict[str, Any]):
+        """Create the actual portfolio in the Trading Engine"""
+        try:
+            # Get trading engine service
+            trading_engine = get_trading_engine_service()
+            if not trading_engine:
+                logger.warning("⚠️ Trading Engine not available, portfolio will be created when engine starts")
+                return
+            
+            # Create default target allocation for stablecoins
+            target_allocation = {
+                "USDT": Decimal('0.4'),  # 40%
+                "USDC": Decimal('0.3'),  # 30%
+                "DAI": Decimal('0.2'),   # 20%
+                "TUSD": Decimal('0.1')   # 10%
+            }
+            
+            # Override with provided allocation if available
+            if "target_allocation" in portfolio_data:
+                target_allocation = {k: Decimal(str(v)) for k, v in portfolio_data["target_allocation"].items()}
+            
+            # Set initial cash amount
+            initial_cash = Decimal(str(portfolio_data.get("initial_cash", 100000)))  # $100k default
+            
+            # Create portfolio in trading engine with the specific portfolio_id
+            portfolio = await trading_engine.create_portfolio_with_id(
+                portfolio_id=portfolio_id,
+                client_id=client_id,
+                name=f"AI Portfolio {portfolio_id}",
+                target_allocation=target_allocation,
+                initial_cash=initial_cash
+            )
+            
+            logger.info(f"✅ Created portfolio {portfolio_id} in Trading Engine with ${initial_cash} initial cash")
+            
+        except Exception as e:
+            logger.error(f"❌ Error creating portfolio in Trading Engine: {e}")
+            # Don't raise - AI portfolio can still be created without Trading Engine integration
     
     async def _initialize_portfolio_optimization(self, portfolio_id: str):
         """Initialize portfolio optimization data"""
