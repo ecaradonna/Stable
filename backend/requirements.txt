@@ -27,3 +27,4 @@ aiohttp>=3.8.0
 emergentintegrations
 apscheduler==3.10.4
 PyYAML>=6.0
+websockets>=12.0
