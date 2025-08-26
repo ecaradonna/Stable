@@ -237,7 +237,7 @@ async def get_orders(
         logger.error(f"Error getting orders: {e}")
         raise HTTPException(status_code=500, detail="Failed to get orders")
 
-@router.get("/trading/trades")
+@router.get("/trades")
 async def get_trades(
     client_id: Optional[str] = Query(default=None, description="Filter by client ID"),
     symbol: Optional[str] = Query(default=None, description="Filter by trading symbol"),
