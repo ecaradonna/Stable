@@ -11,7 +11,8 @@ import {
   Tooltip, 
   ResponsiveContainer,
   Area,
-  AreaChart
+  AreaChart,
+  ComposedChart
 } from 'recharts';
 import { 
   TrendingUp, 
@@ -19,7 +20,9 @@ import {
   Calendar,
   BarChart3,
   Activity,
-  Zap
+  Zap,
+  Bitcoin,
+  Coins
 } from 'lucide-react';
 
 const SYIHistoricalChart = () => {
@@ -27,6 +30,8 @@ const SYIHistoricalChart = () => {
   const [timeframe, setTimeframe] = useState('30d');
   const [loading, setLoading] = useState(true);
   const [performance, setPerformance] = useState({});
+  const [showCrypto, setShowCrypto] = useState(true);
+  const [cryptoData, setCryptoData] = useState({ btc: [], eth: [] });
 
   const timeframeOptions = [
     { label: '7D', value: '7d', days: 7 },
