@@ -131,6 +131,7 @@ app.include_router(websocket_router, prefix="/api")  # WebSocket streaming route
 app.include_router(analytics_router, prefix="/api")  # Batch analytics routes (STEP 7)
 app.include_router(ml_router, prefix="/api")  # Machine Learning routes (STEP 8)
 app.include_router(enterprise_router, prefix="/api")  # Enterprise Integration routes (STEP 9)
+app.include_router(devops_router, prefix="/api")  # DevOps & Production routes (STEP 10)
 
 app.add_middleware(
     CORSMiddleware,
