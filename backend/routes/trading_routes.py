@@ -104,7 +104,7 @@ async def start_trading_services() -> Dict[str, Any]:
 async def stop_trading_services() -> Dict[str, Any]:
     """Stop trading engine services"""
     try:
-        from ..services.trading_engine_service import stop_trading_engine
+        from services.trading_engine_service import stop_trading_engine
         
         await stop_trading_engine()
         
