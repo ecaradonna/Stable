@@ -525,14 +525,21 @@ class EnhancedRiskManagementService:
             # Get portfolio data from trading engine
             trading_engine = get_trading_engine_service()
             if not trading_engine:
+                logger.error(f"❌ Trading Engine service not available for portfolio {portfolio_id}")
                 return {}
             
             # Get portfolio performance data
-            portfolio_performance = await trading_engine.get_portfolio_performance(portfolio_id)
+            try:
+                portfolio_performance = await trading_engine.get_portfolio_performance(portfolio_id)
+            except ValueError as e:
+                logger.error(f"❌ Error calculating risk metrics for {portfolio_id}: {e}")
+                return {}
+            
             current_allocation = portfolio_performance.get("current_allocation", {})
             portfolio_value = portfolio_performance.get("total_value", 0)
             
             if not current_allocation or portfolio_value == 0:
+                logger.warning(f"⚠️ Portfolio {portfolio_id} has no allocation or zero value")
                 return {}
             
             # Calculate Value at Risk (VaR)
