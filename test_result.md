@@ -373,6 +373,7 @@ metadata:
 
 test_plan:
   current_focus:
+    - "WebSocket Real-Time Streaming System (STEP 6)"
     - "Risk-Adjusted Yield (RAY) & Aggregation System (STEP 5)"
     - "Yield Sanitization System (STEP 4)"
     - "StableYield Index Hero Integration"
