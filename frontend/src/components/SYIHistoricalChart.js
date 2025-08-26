@@ -115,6 +115,25 @@ const SYIHistoricalChart = () => {
     return { btc: btcData, eth: ethData };
   };
 
+  const mergeCryptoWithSYI = (syiData, cryptoData) => {
+    // Merge SYI data with crypto data by date
+    return syiData.map(syiItem => {
+      const btcItem = cryptoData.btc.find(btc => btc.date === syiItem.date);
+      const ethItem = cryptoData.eth.find(eth => eth.date === syiItem.date);
+      
+      return {
+        ...syiItem,
+        btc_price: btcItem?.price || null,
+        eth_price: ethItem?.price || null,
+        // Calculate percentage changes from first day for comparison
+        btc_change_pct: btcItem && cryptoData.btc[0] ? 
+          ((btcItem.price - cryptoData.btc[0].price) / cryptoData.btc[0].price) * 100 : 0,
+        eth_change_pct: ethItem && cryptoData.eth[0] ? 
+          ((ethItem.price - cryptoData.eth[0].price) / cryptoData.eth[0].price) * 100 : 0
+      };
+    });
+  };
+
   const fetchHistoricalData = async (days) => {
     try {
       setLoading(true);
