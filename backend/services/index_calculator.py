@@ -31,6 +31,12 @@ class StableYieldIndexCalculator:
         self.binance = BinanceService()
         self.ray_calculator = RAYCalculator()
         self.syi_compositor = SYICompositor()
+        self.yield_aggregator = YieldAggregator()
+        
+        # Caching
+        self.cache = {}
+        self.cache_expiry = {}
+        self.cache_duration = timedelta(minutes=5)
         
         # Core stablecoins for Phase 1
         self.constituents = [
