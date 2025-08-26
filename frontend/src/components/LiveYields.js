@@ -390,6 +390,7 @@ const LiveYields = () => {
                 <Button 
                   variant="outline" 
                   className="w-full group-hover:bg-[#4CC1E9] group-hover:text-white group-hover:border-[#4CC1E9] transition-all duration-300"
+                  onClick={() => navigate('/dashboard')}
                 >
                   View Details
                   <ExternalLink className="w-4 h-4 ml-2" />
