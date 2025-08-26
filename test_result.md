@@ -411,7 +411,8 @@ metadata:
   run_ui: true
 
 test_plan:
-  current_focus: []
+  current_focus:
+    - "Enterprise Integration & API Gateway System (STEP 9)"
   stuck_tasks: []
   test_all: true
   test_priority: "complete"
