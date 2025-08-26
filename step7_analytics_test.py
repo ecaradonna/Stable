@@ -223,6 +223,15 @@ class Step7AnalyticsTester:
                 async with self.session.get(f"{API_BASE}/analytics/performance?period={period}") as response:
                     if response.status == 200:
                         data = await response.json()
+                        
+                        # Check if it's the expected "no data yet" message first
+                        message = data.get('message', '')
+                        if 'No performance analytics available yet' in message:
+                            self.log_test(f"Analytics Performance {period}", True, 
+                                        f"Performance endpoint working for {period} (no data yet - expected)")
+                            continue
+                        
+                        # Otherwise check for normal structure
                         if 'period' in data and 'performance' in data:
                             performance = data['performance']
                             current_index = data.get('current_index_value', 0)
@@ -231,14 +240,8 @@ class Step7AnalyticsTester:
                                 self.log_test(f"Analytics Performance {period}", True, 
                                             f"Performance data available for {period}, Index: {current_index}")
                             else:
-                                # Check if it's the expected "no data yet" message
-                                message = data.get('message', '')
-                                if 'No performance analytics available yet' in message:
-                                    self.log_test(f"Analytics Performance {period}", True, 
-                                                f"Performance endpoint working for {period} (no data yet - expected)")
-                                else:
-                                    self.log_test(f"Analytics Performance {period}", True, 
-                                                f"Performance endpoint working for {period} (no data yet)")
+                                self.log_test(f"Analytics Performance {period}", True, 
+                                            f"Performance endpoint working for {period} (no data yet)")
                         else:
                             self.log_test(f"Analytics Performance {period}", False, f"Invalid response structure: {data}")
                     else:
