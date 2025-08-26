@@ -336,6 +336,18 @@ async def startup_event():
     logger.info("  - GET /api/trading/positions (Position management)")
     logger.info("  - GET /api/trading/market-data (Real-time market data)")
     logger.info("  - GET /api/trading/summary (Comprehensive trading summary)")
+    logger.info("NEW STEP 12 (ADVANCED ANALYTICS DASHBOARD) ENDPOINTS:")
+    logger.info("  - GET /api/dashboard/status (Dashboard service status)")
+    logger.info("  - POST /api/dashboard/start (Start dashboard services)")
+    logger.info("  - GET /api/dashboard/portfolio-analytics/{id} (Portfolio analytics dashboard)")
+    logger.info("  - GET /api/dashboard/portfolio-performance/{id} (Performance charts)")
+    logger.info("  - GET /api/dashboard/risk-dashboard/{id} (Risk analytics dashboard)")
+    logger.info("  - GET /api/dashboard/trading-activity/{client_id} (Trading analytics)")
+    logger.info("  - GET /api/dashboard/yield-intelligence (Yield intelligence dashboard)")
+    logger.info("  - GET /api/dashboard/multi-client-overview (Multi-client overview)")
+    logger.info("  - GET /api/dashboard/dashboard-config/{client_id} (Dashboard configuration)")
+    logger.info("  - GET /api/dashboard/export/{portfolio_id} (Data export)")
+    logger.info("  - GET /api/dashboard/summary (Comprehensive dashboard summary)")
 
 @app.on_event("shutdown")
 async def shutdown_db_client():
