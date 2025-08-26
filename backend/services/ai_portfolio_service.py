@@ -633,7 +633,7 @@ class AIPortfolioService:
             raise
     
     async def generate_rebalancing_signal(self, portfolio_id: str) -> Optional[AIRebalancingSignal]:
-        """Generate AI-powered rebalancing signal"""
+        """Generate AI-powered rebalancing signal with production-ready execution plan"""
         try:
             if portfolio_id not in self.ai_portfolios:
                 return None
@@ -674,16 +674,47 @@ class AIPortfolioService:
                 logger.info(f"⚠️ Signal confidence {confidence_score:.2f} below threshold {ai_config.ai_confidence_threshold:.2f}")
                 return None
             
+            # Get current holdings for execution planning
+            current_holdings = await self._get_current_holdings(portfolio_id)
+            target_weights = [
+                TargetWeight(asset=asset, weight=weight)
+                for asset, weight in optimization_result.optimal_allocation.items()
+            ]
+            cash_balance = await self._get_cash_balance(portfolio_id)
+            
+            # Generate production-ready rebalance plan
+            try:
+                assert_weights_valid(target_weights)
+                rebalance_plan = generate_rebalance_plan(
+                    holdings=current_holdings,
+                    targets=target_weights,
+                    quote_cash=cash_balance,
+                    constraints=ai_config.execution_constraints
+                )
+                
+                # Update metrics
+                self.optimization_metrics["total_trades_generated"] += len(rebalance_plan.trades)
+                if rebalance_plan.trades:
+                    avg_cost = (rebalance_plan.est_fees + rebalance_plan.est_slippage_impact) / len(rebalance_plan.trades)
+                    self.optimization_metrics["avg_execution_cost"] = (
+                        (self.optimization_metrics["avg_execution_cost"] * (self.optimization_metrics["total_rebalancing_signals"]) + avg_cost)
+                        / (self.optimization_metrics["total_rebalancing_signals"] + 1)
+                    )
+                
+            except Exception as plan_error:
+                logger.error(f"❌ Error generating rebalance plan: {plan_error}")
+                return None
+            
             # Detect market regime
             market_regime = await self._detect_market_regime()
             
             # Generate reasoning
             reasoning = await self._generate_rebalancing_reasoning(
                 current_allocation, optimization_result.optimal_allocation, 
-                triggered_by[0], market_regime, confidence_score
+                triggered_by[0], market_regime, confidence_score, rebalance_plan
             )
             
-            # Create rebalancing signal
+            # Create rebalancing signal with execution plan
             signal = AIRebalancingSignal(
                 signal_id=f"signal_{portfolio_id}_{int(time.time())}",
                 portfolio_id=portfolio_id,
@@ -695,6 +726,7 @@ class AIPortfolioService:
                 expected_risk=optimization_result.expected_volatility,
                 market_regime=market_regime,
                 reasoning=reasoning,
+                rebalance_plan=rebalance_plan,
                 generated_at=datetime.utcnow(),
                 expires_at=datetime.utcnow() + timedelta(hours=24)
             )
@@ -710,7 +742,8 @@ class AIPortfolioService:
             )
             
             logger.info(f"✅ Generated rebalancing signal for {portfolio_id}: "
-                       f"Confidence: {confidence_score:.2f}, Trigger: {triggered_by[0].value}")
+                       f"Confidence: {confidence_score:.2f}, Trigger: {triggered_by[0].value}, "
+                       f"Trades: {len(rebalance_plan.trades)}, Est Cost: ${rebalance_plan.est_fees + rebalance_plan.est_slippage_impact:.2f}")
             
             return signal
             
