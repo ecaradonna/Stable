@@ -62,7 +62,7 @@ async def get_trading_status() -> Dict[str, Any]:
         logger.error(f"Error getting trading status: {e}")
         raise HTTPException(status_code=500, detail="Failed to get trading status")
 
-@router.post("/trading/start")
+@router.post("/start")
 async def start_trading_services() -> Dict[str, Any]:
     """Start advanced trading engine services"""
     try:
