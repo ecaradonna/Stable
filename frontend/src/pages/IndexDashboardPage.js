@@ -18,6 +18,118 @@ import {
   CheckCircle
 } from "lucide-react";
 
+// Helper functions for stablecoin data
+const getMajorStablecoins = () => [
+  {
+    name: "Tether USD",
+    symbol: "USDT", 
+    type: "Fiat-Backed",
+    marketCap: "83.2B",
+    backing: "USD Reserves"
+  },
+  {
+    name: "USD Coin",
+    symbol: "USDC",
+    type: "Fiat-Backed", 
+    marketCap: "33.4B",
+    backing: "USD Reserves"
+  },
+  {
+    name: "Binance USD",
+    symbol: "BUSD",
+    type: "Fiat-Backed",
+    marketCap: "17.8B", 
+    backing: "USD Reserves"
+  },
+  {
+    name: "Dai",
+    symbol: "DAI",
+    type: "Crypto-Backed",
+    marketCap: "5.3B",
+    backing: "Crypto Collateral"
+  },
+  {
+    name: "TrueUSD", 
+    symbol: "TUSD",
+    type: "Fiat-Backed",
+    marketCap: "2.1B",
+    backing: "USD Reserves"
+  },
+  {
+    name: "Pax Dollar",
+    symbol: "USDP", 
+    type: "Fiat-Backed",
+    marketCap: "1.2B",
+    backing: "USD Reserves"
+  }
+];
+
+const getEmergingStablecoins = () => [
+  {
+    name: "Frax",
+    symbol: "FRAX",
+    type: "Algorithmic",
+    marketCap: "845M",
+    backing: "Hybrid Protocol"
+  },
+  {
+    name: "Liquity USD",
+    symbol: "LUSD", 
+    type: "Crypto-Backed",
+    marketCap: "324M",
+    backing: "ETH Collateral"
+  },
+  {
+    name: "Synthetix USD",
+    symbol: "sUSD",
+    type: "Crypto-Backed", 
+    marketCap: "267M",
+    backing: "SNX Collateral"
+  },
+  {
+    name: "USDD",
+    symbol: "USDD",
+    type: "Algorithmic",
+    marketCap: "725M", 
+    backing: "TRX Protocol"
+  },
+  {
+    name: "Gemini Dollar",
+    symbol: "GUSD",
+    type: "Fiat-Backed",
+    marketCap: "398M",
+    backing: "USD Reserves"  
+  },
+  {
+    name: "PayPal USD",
+    symbol: "PYUSD",
+    type: "Fiat-Backed", 
+    marketCap: "567M",
+    backing: "USD Reserves"
+  },
+  {
+    name: "Curve USD",
+    symbol: "crvUSD",
+    type: "Crypto-Backed",
+    marketCap: "156M",
+    backing: "Curve Protocol"
+  },
+  {
+    name: "Magic Internet Money",
+    symbol: "MIM",
+    type: "Crypto-Backed",
+    marketCap: "234M", 
+    backing: "Multi-Collateral"
+  }
+];
+
+const getTotalMarketCap = () => ({
+  fiatBacked: "138.5",
+  cryptoBacked: "6.8", 
+  algorithmic: "1.6",
+  totalCoins: "50+"
+});
+
 const IndexDashboardPage = () => {
   const [isContactOpen, setIsContactOpen] = useState(false);
   const [isWhitepaperOpen, setIsWhitepaperOpen] = useState(false);
