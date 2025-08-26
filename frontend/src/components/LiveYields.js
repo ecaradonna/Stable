@@ -36,6 +36,7 @@ const LiveYields = () => {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [showRiskAdjusted, setShowRiskAdjusted] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   // Fetch yields and risk data
   const fetchYields = async (showRefreshToast = false) => {
