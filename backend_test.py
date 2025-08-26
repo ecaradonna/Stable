@@ -1112,7 +1112,7 @@ class StableYieldTester:
                 'stablecoin': 'USDT',
                 'protocol': 'aave_v3',
                 'tvl_usd': 100000000,  # $100M
-                'use_market_context': True
+                'use_market_context': 'true'  # Convert boolean to string
             }
             
             async with self.session.post(f"{API_BASE}/ray/calculate", params=params) as response:
