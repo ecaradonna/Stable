@@ -333,5 +333,14 @@ async def shutdown_db_client():
     except Exception as e:
         logger.error(f"❌ Error stopping API Gateway service: {e}")
     
+    # Stop DevOps service
+    try:
+        from services.devops_service import stop_devops
+        
+        await stop_devops()
+        logger.info("✅ DevOps & Production service stopped")
+    except Exception as e:
+        logger.error(f"❌ Error stopping DevOps service: {e}")
+    
     client.close()
     logger.info("StableYield Market Intelligence API shutting down...")
