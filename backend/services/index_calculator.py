@@ -48,6 +48,51 @@ class StableYieldIndexCalculator:
             {"symbol": "USDP", "name": "Pax Dollar"}
         ]
     
+    def _get_fallback_index(self) -> IndexValue:
+        """Return a fallback index value when calculation fails"""
+        fallback_constituents = [
+            StablecoinConstituent(
+                symbol="USDT",
+                weight=0.4,
+                yield_value=3.5,
+                liquidity="$83,000,000,000",
+                risk_score=0.75,
+                source="fallback",
+                last_updated=datetime.utcnow().isoformat()
+            ),
+            StablecoinConstituent(
+                symbol="USDC", 
+                weight=0.35,
+                yield_value=3.2,
+                liquidity="$25,000,000,000",
+                risk_score=0.90,
+                source="fallback",
+                last_updated=datetime.utcnow().isoformat()
+            ),
+            StablecoinConstituent(
+                symbol="DAI",
+                weight=0.25,
+                yield_value=3.0,
+                liquidity="$5,000,000,000", 
+                risk_score=0.85,
+                source="fallback",
+                last_updated=datetime.utcnow().isoformat()
+            )
+        ]
+        
+        return IndexValue(
+            value=1.0325,  # ~3.25% weighted average
+            timestamp=datetime.utcnow().isoformat(),
+            constituents=fallback_constituents,
+            methodology="Fallback Index",
+            metadata={
+                "calculation_timestamp": datetime.utcnow().isoformat(),
+                "constituent_count": 3,
+                "methodology": "Emergency Fallback",
+                "note": "Using fallback values due to data unavailability"
+            }
+        )
+    
     async def calculate_index(self) -> IndexValue:
         """Calculate the current StableYield Index value"""
         try:
