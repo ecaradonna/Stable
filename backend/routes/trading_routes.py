@@ -353,7 +353,7 @@ async def create_portfolio(request: CreatePortfolioRequest) -> Dict[str, Any]:
         logger.error(f"Error creating portfolio: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to create portfolio: {str(e)}")
 
-@router.get("/trading/portfolios")
+@router.get("/portfolios")
 async def get_portfolios(
     client_id: Optional[str] = Query(default=None, description="Filter by client ID")
 ) -> Dict[str, Any]:
