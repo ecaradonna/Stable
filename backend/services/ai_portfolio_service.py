@@ -134,6 +134,7 @@ class AIRebalancingSignal:
     rebalance_plan: RebalancePlan  # Production-ready execution plan
     generated_at: datetime
     expires_at: datetime
+    executed_at: Optional[datetime] = None  # When the signal was executed
 
 @dataclass
 class MarketSentiment:
