@@ -207,7 +207,14 @@ async def startup_event():
     logger.info("  - POST /api/ai-portfolio/rebalancing-signal/{portfolio_id} (Generate rebalancing signal)")
     logger.info("  - POST /api/ai-portfolio/execute-rebalancing/{signal_id} (Execute rebalancing)")
     logger.info("  - GET /api/ai-portfolio/summary (AI Portfolio comprehensive summary)")
-    logger.info("Ready for AI Portfolio Management testing!")
+    logger.info("🛡️ STEP 14 Enhanced Risk Management endpoints available:")
+    logger.info("  - GET /api/risk-management/status (Risk Management service status)")
+    logger.info("  - POST /api/risk-management/start (Start Risk Management service)")
+    logger.info("  - GET /api/risk-management/metrics/{portfolio_id} (Comprehensive risk metrics)")
+    logger.info("  - POST /api/risk-management/stress-test/{portfolio_id} (Run stress tests)")
+    logger.info("  - GET /api/risk-management/compliance/{portfolio_id} (Regulatory compliance)")
+    logger.info("  - GET /api/risk-management/summary (Risk Management comprehensive summary)")
+    logger.info("Ready for AI Portfolio Management and Enhanced Risk Management testing!")
 
 @app.on_event("shutdown")
 async def shutdown_db_client():
