@@ -526,7 +526,7 @@ async def get_rebalance_strategies(
         logger.error(f"Error getting rebalance strategies: {e}")
         raise HTTPException(status_code=500, detail="Failed to get rebalance strategies")
 
-@router.post("/trading/rebalance-strategies/{strategy_id}/execute")
+@router.post("/rebalance-strategies/{strategy_id}/execute")
 async def execute_rebalance(strategy_id: str) -> Dict[str, Any]:
     """Manually execute a rebalancing strategy"""
     try:
