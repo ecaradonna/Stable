@@ -361,6 +361,17 @@ async def startup_event():
     logger.info("  - GET /api/dashboard/dashboard-config/{client_id} (Dashboard configuration)")
     logger.info("  - GET /api/dashboard/export/{portfolio_id} (Data export)")
     logger.info("  - GET /api/dashboard/summary (Comprehensive dashboard summary)")
+    logger.info("NEW STEP 13 (AI-POWERED PORTFOLIO MANAGEMENT) ENDPOINTS:")
+    logger.info("  - GET /api/ai-portfolio/status (AI portfolio service status)")
+    logger.info("  - POST /api/ai-portfolio/start (Start AI portfolio services)")
+    logger.info("  - POST /api/ai-portfolio/portfolios (Create AI-managed portfolios)")
+    logger.info("  - POST /api/ai-portfolio/portfolios/{id}/optimize (AI portfolio optimization)")
+    logger.info("  - POST /api/ai-portfolio/portfolios/{id}/rebalancing-signal (Generate rebalancing signals)")
+    logger.info("  - POST /api/ai-portfolio/rebalancing-signals/{id}/execute (Execute AI rebalancing)")
+    logger.info("  - GET /api/ai-portfolio/market-sentiment (Market sentiment analysis)")
+    logger.info("  - GET /api/ai-portfolio/market-regime (Market regime detection)")
+    logger.info("  - GET /api/ai-portfolio/ai-insights/{id} (AI portfolio insights)")
+    logger.info("  - GET /api/ai-portfolio/summary (Comprehensive AI portfolio summary)")
 
 @app.on_event("shutdown")
 async def shutdown_db_client():
