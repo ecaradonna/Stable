@@ -16,8 +16,8 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv('/app/frontend/.env')
 
-# Get backend URL from environment - use localhost for testing
-BACKEND_URL = 'http://localhost:8001'  # Force localhost for testing
+# Get backend URL from environment - use production URL for testing
+BACKEND_URL = os.getenv('REACT_APP_BACKEND_URL', 'https://stableyield-defi.preview.emergentagent.com')
 API_BASE = f"{BACKEND_URL}/api"
 
 class StableYieldTester:
