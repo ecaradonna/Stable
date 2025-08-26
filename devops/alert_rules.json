@@ -1,0 +1,37 @@
+[
+  {
+    "rule_id": "high_cpu",
+    "metric": "cpu_usage",
+    "threshold": 80.0,
+    "operator": "gt",
+    "severity": "warning",
+    "notification_channels": [
+      "email",
+      "slack"
+    ],
+    "is_active": true
+  },
+  {
+    "rule_id": "high_memory",
+    "metric": "memory_usage",
+    "threshold": 85.0,
+    "operator": "gt",
+    "severity": "warning",
+    "notification_channels": [
+      "email",
+      "slack"
+    ],
+    "is_active": true
+  },
+  {
+    "rule_id": "high_response_time",
+    "metric": "response_time",
+    "threshold": 1.0,
+    "operator": "gt",
+    "severity": "warning",
+    "notification_channels": [
+      "email"
+    ],
+    "is_active": true
+  }
+]
