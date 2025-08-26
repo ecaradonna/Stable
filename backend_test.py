@@ -1069,6 +1069,256 @@ class StableYieldTester:
             self.log_test("Parameter Validation Valid Params", False, f"Exception: {str(e)}")
     
     # ========================================
+    # WEBSOCKET REAL-TIME STREAMING TESTS (STEP 6)
+    # ========================================
+    
+    async def test_websocket_status(self):
+        """Test GET /api/websocket/status endpoint"""
+        try:
+            async with self.session.get(f"{API_BASE}/websocket/status") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    required_fields = ['cryptocompare_websocket', 'realtime_integrator', 'websocket_connections', 'status_timestamp']
+                    missing_fields = [field for field in required_fields if field not in data]
+                    
+                    if not missing_fields:
+                        cc_status = data['cryptocompare_websocket']
+                        rt_status = data['realtime_integrator']
+                        ws_connections = data['websocket_connections']
+                        
+                        # Check CryptoCompare WebSocket status
+                        cc_connected = cc_status.get('is_connected', False)
+                        cc_api_key = cc_status.get('api_key_configured', False)
+                        
+                        # Check real-time integrator status
+                        rt_running = rt_status.get('is_running', False)
+                        
+                        # Check WebSocket connections
+                        total_connections = ws_connections.get('total_connections', 0)
+                        
+                        self.log_test("WebSocket Status", True, 
+                                    f"CC Connected: {cc_connected}, RT Running: {rt_running}, Connections: {total_connections}, API Key: {cc_api_key}")
+                    else:
+                        self.log_test("WebSocket Status", False, f"Missing fields: {missing_fields}")
+                else:
+                    self.log_test("WebSocket Status", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("WebSocket Status", False, f"Exception: {str(e)}")
+    
+    async def test_realtime_peg_metrics(self):
+        """Test GET /api/realtime/peg-metrics endpoint"""
+        try:
+            async with self.session.get(f"{API_BASE}/realtime/peg-metrics") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    required_fields = ['peg_metrics', 'symbols_tracked', 'last_updated', 'data_source']
+                    missing_fields = [field for field in required_fields if field not in data]
+                    
+                    if not missing_fields:
+                        peg_metrics = data['peg_metrics']
+                        symbols_tracked = data['symbols_tracked']
+                        data_source = data['data_source']
+                        
+                        if isinstance(peg_metrics, dict):
+                            # Check if we have peg metrics for any symbols
+                            if peg_metrics:
+                                # Validate structure of first peg metric
+                                first_symbol = list(peg_metrics.keys())[0]
+                                first_metric = peg_metrics[first_symbol]
+                                
+                                expected_fields = ['symbol', 'current_price', 'current_deviation', 'peg_stability_score']
+                                metric_missing = [field for field in expected_fields if field not in first_metric]
+                                
+                                if not metric_missing:
+                                    self.log_test("Realtime Peg Metrics", True, 
+                                                f"Found peg metrics for {len(peg_metrics)} symbols: {symbols_tracked}, Source: {data_source}")
+                                else:
+                                    self.log_test("Realtime Peg Metrics", False, f"Missing metric fields: {metric_missing}")
+                            else:
+                                self.log_test("Realtime Peg Metrics", True, 
+                                            f"No peg metrics available yet (service may be starting), Source: {data_source}")
+                        else:
+                            self.log_test("Realtime Peg Metrics", False, f"Invalid peg_metrics format: {type(peg_metrics)}")
+                    else:
+                        self.log_test("Realtime Peg Metrics", False, f"Missing fields: {missing_fields}")
+                else:
+                    self.log_test("Realtime Peg Metrics", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("Realtime Peg Metrics", False, f"Exception: {str(e)}")
+    
+    async def test_realtime_liquidity_metrics(self):
+        """Test GET /api/realtime/liquidity-metrics endpoint"""
+        try:
+            async with self.session.get(f"{API_BASE}/realtime/liquidity-metrics") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    required_fields = ['liquidity_metrics', 'symbols_tracked', 'last_updated', 'data_source']
+                    missing_fields = [field for field in required_fields if field not in data]
+                    
+                    if not missing_fields:
+                        liquidity_metrics = data['liquidity_metrics']
+                        symbols_tracked = data['symbols_tracked']
+                        data_source = data['data_source']
+                        
+                        if isinstance(liquidity_metrics, dict):
+                            # Check if we have liquidity metrics for any symbols
+                            if liquidity_metrics:
+                                # Validate structure of first liquidity metric
+                                first_symbol = list(liquidity_metrics.keys())[0]
+                                first_metric = liquidity_metrics[first_symbol]
+                                
+                                expected_fields = ['symbol', 'avg_spread_bps', 'total_depth_usd', 'liquidity_score']
+                                metric_missing = [field for field in expected_fields if field not in first_metric]
+                                
+                                if not metric_missing:
+                                    self.log_test("Realtime Liquidity Metrics", True, 
+                                                f"Found liquidity metrics for {len(liquidity_metrics)} symbols: {symbols_tracked}, Source: {data_source}")
+                                else:
+                                    self.log_test("Realtime Liquidity Metrics", False, f"Missing metric fields: {metric_missing}")
+                            else:
+                                self.log_test("Realtime Liquidity Metrics", True, 
+                                            f"No liquidity metrics available yet (service may be starting), Source: {data_source}")
+                        else:
+                            self.log_test("Realtime Liquidity Metrics", False, f"Invalid liquidity_metrics format: {type(liquidity_metrics)}")
+                    else:
+                        self.log_test("Realtime Liquidity Metrics", False, f"Missing fields: {missing_fields}")
+                else:
+                    self.log_test("Realtime Liquidity Metrics", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("Realtime Liquidity Metrics", False, f"Exception: {str(e)}")
+    
+    async def test_websocket_start(self):
+        """Test POST /api/websocket/start endpoint"""
+        try:
+            async with self.session.post(f"{API_BASE}/websocket/start") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    required_fields = ['message', 'services_started', 'timestamp']
+                    missing_fields = [field for field in required_fields if field not in data]
+                    
+                    if not missing_fields:
+                        message = data['message']
+                        services_started = data['services_started']
+                        
+                        expected_services = ['cryptocompare_websocket', 'realtime_data_integrator']
+                        services_found = [s for s in expected_services if s in services_started]
+                        
+                        if len(services_found) >= 2:
+                            self.log_test("WebSocket Start", True, 
+                                        f"Started {len(services_started)} services: {services_started}")
+                        else:
+                            self.log_test("WebSocket Start", False, 
+                                        f"Missing expected services. Started: {services_started}")
+                    else:
+                        self.log_test("WebSocket Start", False, f"Missing fields: {missing_fields}")
+                else:
+                    self.log_test("WebSocket Start", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("WebSocket Start", False, f"Exception: {str(e)}")
+    
+    async def test_websocket_stop(self):
+        """Test POST /api/websocket/stop endpoint"""
+        try:
+            async with self.session.post(f"{API_BASE}/websocket/stop") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    required_fields = ['message', 'services_stopped', 'timestamp']
+                    missing_fields = [field for field in required_fields if field not in data]
+                    
+                    if not missing_fields:
+                        message = data['message']
+                        services_stopped = data['services_stopped']
+                        
+                        expected_services = ['realtime_data_integrator', 'cryptocompare_websocket']
+                        services_found = [s for s in expected_services if s in services_stopped]
+                        
+                        if len(services_found) >= 2:
+                            self.log_test("WebSocket Stop", True, 
+                                        f"Stopped {len(services_stopped)} services: {services_stopped}")
+                        else:
+                            self.log_test("WebSocket Stop", False, 
+                                        f"Missing expected services. Stopped: {services_stopped}")
+                    else:
+                        self.log_test("WebSocket Stop", False, f"Missing fields: {missing_fields}")
+                else:
+                    self.log_test("WebSocket Stop", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("WebSocket Stop", False, f"Exception: {str(e)}")
+    
+    async def test_websocket_test_data(self):
+        """Test GET /api/websocket/test-data endpoint"""
+        try:
+            async with self.session.get(f"{API_BASE}/websocket/test-data") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    required_fields = ['test_syi_update', 'test_peg_update', 'test_liquidity_update']
+                    missing_fields = [field for field in required_fields if field not in data]
+                    
+                    if not missing_fields:
+                        syi_update = data['test_syi_update']
+                        peg_update = data['test_peg_update']
+                        liquidity_update = data['test_liquidity_update']
+                        
+                        # Validate SYI test data structure
+                        syi_valid = ('type' in syi_update and 'data' in syi_update and 
+                                   'index_value' in syi_update['data'])
+                        
+                        # Validate peg test data structure
+                        peg_valid = ('type' in peg_update and 'data' in peg_update and
+                                   'USDT' in peg_update['data'] and 'USDC' in peg_update['data'])
+                        
+                        # Validate liquidity test data structure
+                        liquidity_valid = ('type' in liquidity_update and 'data' in liquidity_update and
+                                         'USDT' in liquidity_update['data'] and 'USDC' in liquidity_update['data'])
+                        
+                        if syi_valid and peg_valid and liquidity_valid:
+                            index_value = syi_update['data']['index_value']
+                            usdt_peg_score = peg_update['data']['USDT']['peg_stability_score']
+                            usdt_liquidity_score = liquidity_update['data']['USDT']['liquidity_score']
+                            
+                            self.log_test("WebSocket Test Data", True, 
+                                        f"Test data generated - SYI: {index_value}, USDT Peg: {usdt_peg_score}, USDT Liquidity: {usdt_liquidity_score}")
+                        else:
+                            self.log_test("WebSocket Test Data", False, 
+                                        f"Invalid test data structure - SYI: {syi_valid}, Peg: {peg_valid}, Liquidity: {liquidity_valid}")
+                    else:
+                        self.log_test("WebSocket Test Data", False, f"Missing fields: {missing_fields}")
+                else:
+                    self.log_test("WebSocket Test Data", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("WebSocket Test Data", False, f"Exception: {str(e)}")
+    
+    async def test_websocket_broadcast_test(self):
+        """Test POST /api/websocket/broadcast-test endpoint"""
+        try:
+            async with self.session.post(f"{API_BASE}/websocket/broadcast-test") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    required_fields = ['message', 'connections_notified', 'streams_updated', 'timestamp']
+                    missing_fields = [field for field in required_fields if field not in data]
+                    
+                    if not missing_fields:
+                        message = data['message']
+                        connections_notified = data['connections_notified']
+                        streams_updated = data['streams_updated']
+                        
+                        expected_streams = ['syi_live', 'peg_metrics']
+                        streams_found = [s for s in expected_streams if s in streams_updated]
+                        
+                        if len(streams_found) >= 2:
+                            self.log_test("WebSocket Broadcast Test", True, 
+                                        f"Broadcasted to {connections_notified} connections, streams: {streams_updated}")
+                        else:
+                            self.log_test("WebSocket Broadcast Test", False, 
+                                        f"Missing expected streams. Updated: {streams_updated}")
+                    else:
+                        self.log_test("WebSocket Broadcast Test", False, f"Missing fields: {missing_fields}")
+                else:
+                    self.log_test("WebSocket Broadcast Test", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("WebSocket Broadcast Test", False, f"Exception: {str(e)}")
+
+    # ========================================
     # RISK-ADJUSTED YIELD (RAY) & SYI TESTS (STEP 5)
     # ========================================
     
