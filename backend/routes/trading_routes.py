@@ -66,7 +66,7 @@ async def get_trading_status() -> Dict[str, Any]:
 async def start_trading_services() -> Dict[str, Any]:
     """Start advanced trading engine services"""
     try:
-        from ..services.trading_engine_service import start_trading_engine
+        from services.trading_engine_service import start_trading_engine
         
         await start_trading_engine()
         
