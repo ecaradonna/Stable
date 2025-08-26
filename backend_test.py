@@ -1549,6 +1549,21 @@ class StableYieldTester:
         await self.test_liquidity_metrics_verification()
         await self.test_parameter_validation()
         
+        # Yield Sanitization System tests (STEP 4)
+        print("\n🧹 Testing Yield Sanitization System (STEP 4)...")
+        await self.test_sanitization_summary()
+        await self.test_sanitization_test_normal_apy()
+        await self.test_sanitization_test_high_apy()
+        await self.test_sanitization_test_extreme_apy()
+        await self.test_sanitization_stats()
+        await self.test_outlier_detection_mad()
+        await self.test_outlier_detection_iqr()
+        await self.test_outlier_detection_custom_threshold()
+        await self.test_yields_sanitization_integration()
+        await self.test_sanitization_risk_score_adjustment()
+        await self.test_sanitization_integration_with_previous_steps()
+        await self.test_winsorization_functionality()
+        
         # Summary
         print("\n" + "=" * 60)
         self.print_summary()
