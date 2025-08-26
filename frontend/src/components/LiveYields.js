@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from 'react-router-dom';
 import { TrendingUp, TrendingDown, ExternalLink, Sparkles, RefreshCw, BarChart3, Shield } from "lucide-react";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
