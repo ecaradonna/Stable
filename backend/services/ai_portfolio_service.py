@@ -254,6 +254,38 @@ class AIPortfolioService:
             logger.error(f"❌ Error creating AI portfolio: {e}")
             raise
     
+    async def _initialize_portfolio_optimization(self, portfolio_id: str):
+        """Initialize portfolio optimization data"""
+        try:
+            # This method initializes any portfolio-specific optimization data
+            # In a production environment, this would set up historical data, 
+            # initialize model parameters, etc.
+            
+            # For now, we'll just log the initialization
+            logger.info(f"🔧 Initialized optimization for portfolio {portfolio_id}")
+            
+            # Optionally perform initial optimization
+            ai_config = self.ai_portfolios.get(portfolio_id)
+            if ai_config and ai_config.use_predictive_rebalancing:
+                # Schedule initial optimization (non-blocking)
+                asyncio.create_task(self._perform_initial_optimization(portfolio_id))
+                
+        except Exception as e:
+            logger.error(f"❌ Error initializing portfolio optimization for {portfolio_id}: {e}")
+    
+    async def _perform_initial_optimization(self, portfolio_id: str):
+        """Perform initial portfolio optimization"""
+        try:
+            # Small delay to allow service to fully initialize
+            await asyncio.sleep(1)
+            
+            # Perform initial optimization
+            result = await self.optimize_portfolio(portfolio_id)
+            logger.info(f"🎯 Initial optimization completed for {portfolio_id}")
+            
+        except Exception as e:
+            logger.error(f"❌ Error in initial optimization for {portfolio_id}: {e}")
+    
     async def optimize_portfolio(self, portfolio_id: str, 
                                optimization_strategy: Optional[OptimizationStrategy] = None) -> PortfolioOptimizationResult:
         """Optimize portfolio allocation using AI algorithms"""
