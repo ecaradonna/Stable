@@ -3207,6 +3207,22 @@ class StableYieldTester:
         await self.test_ml_summary()
         await self.test_ml_stop()
         
+        # Enterprise Integration & API Gateway System tests (STEP 9)
+        print("\n🏢 Testing Enterprise Integration & API Gateway System (STEP 9)...")
+        await self.test_enterprise_status()
+        await self.test_enterprise_start()
+        await self.test_enterprise_create_api_key()
+        await self.test_enterprise_list_api_keys()
+        await self.test_enterprise_create_webhook()
+        await self.test_enterprise_list_webhooks()
+        await self.test_enterprise_create_integration()
+        await self.test_enterprise_list_integrations()
+        await self.test_enterprise_create_jwt_token()
+        await self.test_enterprise_metrics()
+        await self.test_enterprise_health()
+        await self.test_enterprise_summary()
+        await self.test_enterprise_stop()
+        
         # Summary
         print("\n" + "=" * 60)
         self.print_summary()
