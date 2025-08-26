@@ -23,6 +23,7 @@ from routes.websocket_routes import router as websocket_router
 from routes.analytics_routes import router as analytics_router
 from routes.ml_routes import router as ml_router
 from routes.enterprise_routes import router as enterprise_router
+from routes.devops_routes import router as devops_router
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
