@@ -53,15 +53,18 @@ class YieldAggregator:
             # Apply protocol policy filtering
             filtered_yields = self._apply_policy_filtering(combined_yields)
             
+            # Apply yield sanitization and outlier detection
+            sanitized_yields = self._apply_yield_sanitization(filtered_yields)
+            
             # Add 24h change simulation (in production, this would be calculated from historical data)
-            for yield_data in filtered_yields:
+            for yield_data in sanitized_yields:
                 yield_data['change24h'] = self._simulate_24h_change()
             
             # Cache the results
-            self.cache[cache_key] = filtered_yields
+            self.cache[cache_key] = sanitized_yields
             self.cache_expiry[cache_key] = datetime.utcnow() + self.cache_duration
             
-            return filtered_yields
+            return sanitized_yields
             
         except Exception as e:
             logger.error(f"Yield aggregation error: {str(e)}")
