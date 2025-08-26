@@ -302,7 +302,7 @@ async def get_trades(
         raise HTTPException(status_code=500, detail="Failed to get trades")
 
 # Portfolio Management
-@router.post("/trading/portfolios")
+@router.post("/portfolios")
 async def create_portfolio(request: CreatePortfolioRequest) -> Dict[str, Any]:
     """Create a new portfolio for institutional trading"""
     try:
