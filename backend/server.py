@@ -196,6 +196,17 @@ async def startup_event():
         logger.error(f"❌ Failed to start ML insights service: {e}")
         logger.info("⚠️ Continuing without ML features")
     
+    # Start Enterprise API Gateway services (STEP 9)
+    try:
+        from services.api_gateway_service import start_api_gateway
+        
+        # Start API Gateway service
+        await start_api_gateway()
+        logger.info("✅ Enterprise API Gateway service started")
+    except Exception as e:
+        logger.error(f"❌ Failed to start API Gateway service: {e}")
+        logger.info("⚠️ Continuing without enterprise features")
+    
     logger.info("New capabilities enabled:")
     logger.info("  - Real-time StableYield Index calculation")
     logger.info("  - Real-time peg stability monitoring")
