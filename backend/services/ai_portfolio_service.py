@@ -1516,7 +1516,8 @@ class AIPortfolioService:
                                             recommended_allocation: Dict[str, float], 
                                             trigger_type: RebalancingTrigger, 
                                             market_regime: MarketRegime, 
-                                            confidence_score: float) -> str:
+                                            confidence_score: float,
+                                            rebalance_plan: Optional[RebalancePlan] = None) -> str:
         """Generate human-readable reasoning for rebalancing"""
         try:
             # Calculate biggest changes
@@ -1536,6 +1537,11 @@ class AIPortfolioService:
             
             if changes:
                 reasoning_parts.append(f"Recommended changes: {', '.join(changes[:3])}")
+            
+            # Add execution plan details if available
+            if rebalance_plan:
+                reasoning_parts.append(f"Execution plan: {len(rebalance_plan.trades)} trades, "
+                                     f"est. cost ${rebalance_plan.est_fees + rebalance_plan.est_slippage_impact:.2f}")
             
             reasoning_parts.append(f"AI confidence: {confidence_score:.1%}")
             
