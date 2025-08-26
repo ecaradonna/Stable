@@ -135,6 +135,7 @@ app.include_router(ml_router, prefix="/api")  # Machine Learning routes (STEP 8)
 app.include_router(enterprise_router, prefix="/api")  # Enterprise Integration routes (STEP 9)
 app.include_router(devops_router, prefix="/api")  # DevOps & Production routes (STEP 10)
 app.include_router(trading_router, prefix="/api/trading")  # Advanced Trading Engine routes (STEP 11)
+app.include_router(dashboard_router, prefix="/api/dashboard")  # Advanced Analytics Dashboard routes (STEP 12)
 
 app.add_middleware(
     CORSMiddleware,
