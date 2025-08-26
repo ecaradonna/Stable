@@ -9,6 +9,7 @@ import MethodologyPage from "./pages/MethodologyPage";
 import YieldIndicesPage from "./pages/YieldIndicesPage";
 import RiskAnalyticsPage from "./pages/RiskAnalyticsPage";
 import IndexDashboardPage from "./pages/IndexDashboardPage";
+import ApiDocumentationPage from "./pages/ApiDocumentationPage";
 import { Toaster } from "./components/ui/toaster";
 
 function App() {
