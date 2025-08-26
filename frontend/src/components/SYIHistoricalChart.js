@@ -354,10 +354,22 @@ const SYIHistoricalChart = () => {
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center">
             <BarChart3 className="w-6 h-6 mr-2 text-[#4CC1E9]" />
-            StableYield Index (SYI) Historical Performance
+            SYI vs Bitcoin & Ethereum Performance
           </CardTitle>
           
           <div className="flex items-center space-x-2">
+            <Button
+              variant={showCrypto ? "default" : "outline"}
+              size="sm"
+              onClick={() => setShowCrypto(!showCrypto)}
+              className={showCrypto ? "bg-orange-500 hover:bg-orange-600" : "text-orange-500 border-orange-500"}
+            >
+              <Coins className="w-4 h-4 mr-1" />
+              Crypto
+            </Button>
+            
+            <div className="w-px h-6 bg-gray-300"></div>
+            
             {timeframeOptions.map((option) => (
               <Button
                 key={option.value}
