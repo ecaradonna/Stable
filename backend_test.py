@@ -1069,6 +1069,359 @@ class StableYieldTester:
             self.log_test("Parameter Validation Valid Params", False, f"Exception: {str(e)}")
     
     # ========================================
+    # MACHINE LEARNING & AI INSIGHTS TESTS (STEP 8)
+    # ========================================
+    
+    async def test_ml_status(self):
+        """Test GET /api/ml/status endpoint"""
+        try:
+            async with self.session.get(f"{API_BASE}/ml/status") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    required_fields = ['service_initialized', 'models_trained', 'cache_statistics']
+                    missing_fields = [field for field in required_fields if field not in data]
+                    
+                    if not missing_fields:
+                        service_init = data['service_initialized']
+                        models_trained = data['models_trained']
+                        cache_stats = data['cache_statistics']
+                        
+                        self.log_test("ML Status", True, 
+                                    f"Service initialized: {service_init}, Models: {len(models_trained) if isinstance(models_trained, dict) else 0}, Cache entries: {len(cache_stats) if isinstance(cache_stats, dict) else 0}")
+                    else:
+                        self.log_test("ML Status", False, f"Missing fields: {missing_fields}")
+                else:
+                    self.log_test("ML Status", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("ML Status", False, f"Exception: {str(e)}")
+    
+    async def test_ml_start(self):
+        """Test POST /api/ml/start endpoint"""
+        try:
+            async with self.session.post(f"{API_BASE}/ml/start") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if 'message' in data and 'capabilities' in data and 'models' in data:
+                        capabilities = data['capabilities']
+                        models = data['models']
+                        
+                        if isinstance(capabilities, list) and len(capabilities) >= 4:
+                            self.log_test("ML Start", True, 
+                                        f"Service started with {len(capabilities)} capabilities and {len(models)} models")
+                        else:
+                            self.log_test("ML Start", False, f"Expected 4+ capabilities, got: {capabilities}")
+                    else:
+                        self.log_test("ML Start", False, f"Invalid response structure: {data}")
+                else:
+                    self.log_test("ML Start", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("ML Start", False, f"Exception: {str(e)}")
+    
+    async def test_ml_stop(self):
+        """Test POST /api/ml/stop endpoint"""
+        try:
+            async with self.session.post(f"{API_BASE}/ml/stop") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if 'message' in data and 'stopped' in data['message'].lower():
+                        self.log_test("ML Stop", True, f"Service stopped: {data['message']}")
+                    else:
+                        self.log_test("ML Stop", False, f"Unexpected response: {data}")
+                else:
+                    self.log_test("ML Stop", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("ML Stop", False, f"Exception: {str(e)}")
+    
+    async def test_ml_predictions(self):
+        """Test GET /api/ml/predictions endpoint"""
+        try:
+            async with self.session.get(f"{API_BASE}/ml/predictions") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if 'predictions' in data and 'total_symbols' in data:
+                        predictions = data['predictions']
+                        total_symbols = data['total_symbols']
+                        summary_stats = data.get('summary_statistics', {})
+                        
+                        if isinstance(predictions, list) and total_symbols > 0:
+                            # Check prediction structure
+                            if predictions:
+                                first_pred = predictions[0]
+                                required_pred_fields = ['symbol', 'current_yield', 'predictions', 'trend_direction']
+                                missing_pred_fields = [field for field in required_pred_fields if field not in first_pred]
+                                
+                                if not missing_pred_fields:
+                                    # Check horizons
+                                    horizons = first_pred['predictions']
+                                    expected_horizons = ['1_day', '7_day', '30_day']
+                                    found_horizons = [h for h in expected_horizons if h in horizons]
+                                    
+                                    if len(found_horizons) == 3:
+                                        avg_conf = summary_stats.get('average_confidence', {})
+                                        self.log_test("ML Predictions", True, 
+                                                    f"Got {total_symbols} predictions with 3 horizons, avg confidence 7d: {avg_conf.get('7_day', 0):.2f}")
+                                    else:
+                                        self.log_test("ML Predictions", False, f"Missing horizons: {found_horizons}")
+                                else:
+                                    self.log_test("ML Predictions", False, f"Missing prediction fields: {missing_pred_fields}")
+                            else:
+                                self.log_test("ML Predictions", True, f"Service ready but no predictions yet (expected for new service)")
+                        else:
+                            self.log_test("ML Predictions", False, f"Invalid predictions format: {type(predictions)}")
+                    else:
+                        self.log_test("ML Predictions", False, f"Invalid response structure: {data}")
+                elif response.status == 503:
+                    self.log_test("ML Predictions", False, "ML service not running")
+                else:
+                    self.log_test("ML Predictions", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("ML Predictions", False, f"Exception: {str(e)}")
+    
+    async def test_ml_anomalies(self):
+        """Test GET /api/ml/anomalies endpoint"""
+        try:
+            async with self.session.get(f"{API_BASE}/ml/anomalies") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if 'anomalies' in data and 'total_anomalies' in data:
+                        anomalies = data['anomalies']
+                        total_anomalies = data['total_anomalies']
+                        summary_stats = data.get('summary_statistics', {})
+                        
+                        if isinstance(anomalies, list):
+                            # Check anomaly structure if any exist
+                            if anomalies:
+                                first_anomaly = anomalies[0]
+                                required_anomaly_fields = ['symbol', 'anomaly_type', 'severity', 'confidence_score']
+                                missing_anomaly_fields = [field for field in required_anomaly_fields if field not in first_anomaly]
+                                
+                                if not missing_anomaly_fields:
+                                    severity_dist = summary_stats.get('severity_distribution', {})
+                                    self.log_test("ML Anomalies", True, 
+                                                f"Found {total_anomalies} anomalies, severity distribution: {severity_dist}")
+                                else:
+                                    self.log_test("ML Anomalies", False, f"Missing anomaly fields: {missing_anomaly_fields}")
+                            else:
+                                self.log_test("ML Anomalies", True, f"Anomaly detection ready, {total_anomalies} anomalies found")
+                        else:
+                            self.log_test("ML Anomalies", False, f"Invalid anomalies format: {type(anomalies)}")
+                    else:
+                        self.log_test("ML Anomalies", False, f"Invalid response structure: {data}")
+                elif response.status == 503:
+                    self.log_test("ML Anomalies", False, "ML service not running")
+                else:
+                    self.log_test("ML Anomalies", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("ML Anomalies", False, f"Exception: {str(e)}")
+    
+    async def test_ml_insights(self):
+        """Test GET /api/ml/insights endpoint"""
+        try:
+            async with self.session.get(f"{API_BASE}/ml/insights") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if 'insights' in data and 'total_insights' in data:
+                        insights = data['insights']
+                        total_insights = data['total_insights']
+                        summary_stats = data.get('summary_statistics', {})
+                        categories = data.get('categories', {})
+                        
+                        if isinstance(insights, list):
+                            # Check insight structure if any exist
+                            if insights:
+                                first_insight = insights[0]
+                                required_insight_fields = ['insight_type', 'title', 'description', 'impact_level', 'confidence']
+                                missing_insight_fields = [field for field in required_insight_fields if field not in first_insight]
+                                
+                                if not missing_insight_fields:
+                                    avg_confidence = summary_stats.get('average_confidence', 0)
+                                    opportunities = categories.get('opportunities', 0)
+                                    risks = categories.get('risks', 0)
+                                    self.log_test("ML Insights", True, 
+                                                f"Generated {total_insights} insights (opportunities: {opportunities}, risks: {risks}), avg confidence: {avg_confidence:.2f}")
+                                else:
+                                    self.log_test("ML Insights", False, f"Missing insight fields: {missing_insight_fields}")
+                            else:
+                                self.log_test("ML Insights", True, f"AI insights ready, {total_insights} insights generated")
+                        else:
+                            self.log_test("ML Insights", False, f"Invalid insights format: {type(insights)}")
+                    else:
+                        self.log_test("ML Insights", False, f"Invalid response structure: {data}")
+                elif response.status == 503:
+                    self.log_test("ML Insights", False, "ML service not running")
+                else:
+                    self.log_test("ML Insights", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("ML Insights", False, f"Exception: {str(e)}")
+    
+    async def test_ml_predictions_usdt(self):
+        """Test GET /api/ml/predictions/USDT endpoint"""
+        try:
+            async with self.session.get(f"{API_BASE}/ml/predictions/USDT") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if 'symbol' in data and data['symbol'] == 'USDT':
+                        if 'predictions' in data:
+                            predictions = data['predictions']
+                            expected_horizons = ['1_day', '7_day', '30_day']
+                            found_horizons = [h for h in expected_horizons if h in predictions]
+                            
+                            if len(found_horizons) == 3:
+                                current_yield = data.get('current_yield', 0)
+                                trend = data.get('trend_direction', 'unknown')
+                                self.log_test("ML Predictions USDT", True, 
+                                            f"USDT prediction: current {current_yield}%, trend: {trend}, 3 horizons available")
+                            else:
+                                self.log_test("ML Predictions USDT", False, f"Missing horizons: {found_horizons}")
+                        else:
+                            # No prediction available yet
+                            if 'message' in data and 'No prediction available' in data['message']:
+                                self.log_test("ML Predictions USDT", True, "No cached prediction for USDT (expected for new service)")
+                            else:
+                                self.log_test("ML Predictions USDT", False, f"Unexpected response: {data}")
+                    else:
+                        self.log_test("ML Predictions USDT", False, f"Wrong symbol or missing symbol: {data}")
+                elif response.status == 503:
+                    self.log_test("ML Predictions USDT", False, "ML service not running")
+                else:
+                    self.log_test("ML Predictions USDT", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("ML Predictions USDT", False, f"Exception: {str(e)}")
+    
+    async def test_ml_retrain(self):
+        """Test POST /api/ml/retrain endpoint"""
+        try:
+            async with self.session.post(f"{API_BASE}/ml/retrain") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if 'message' in data and 'models_updated' in data:
+                        models_updated = data['models_updated']
+                        retrain_timestamp = data.get('retrain_timestamp')
+                        
+                        if isinstance(models_updated, list) and len(models_updated) >= 4:
+                            expected_models = ['yield_predictor', 'anomaly_detector', 'risk_predictor', 'market_segmentation']
+                            found_models = [m for m in expected_models if m in models_updated]
+                            
+                            if len(found_models) >= 4:
+                                self.log_test("ML Retrain", True, 
+                                            f"Retrained {len(models_updated)} models: {', '.join(found_models)}")
+                            else:
+                                self.log_test("ML Retrain", False, f"Missing expected models: {found_models}")
+                        else:
+                            self.log_test("ML Retrain", False, f"Expected 4+ models, got: {models_updated}")
+                    else:
+                        self.log_test("ML Retrain", False, f"Invalid response structure: {data}")
+                elif response.status == 503:
+                    self.log_test("ML Retrain", False, "ML service not running")
+                else:
+                    self.log_test("ML Retrain", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("ML Retrain", False, f"Exception: {str(e)}")
+    
+    async def test_ml_model_performance(self):
+        """Test GET /api/ml/model-performance endpoint"""
+        try:
+            async with self.session.get(f"{API_BASE}/ml/model-performance") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    required_fields = ['model_performance', 'model_status', 'cache_statistics']
+                    missing_fields = [field for field in required_fields if field not in data]
+                    
+                    if not missing_fields:
+                        model_performance = data['model_performance']
+                        model_status = data['model_status']
+                        cache_stats = data['cache_statistics']
+                        
+                        # Check model status
+                        expected_models = ['yield_predictor', 'anomaly_detector', 'risk_predictor', 'market_segmentation']
+                        active_models = [m for m in expected_models if model_status.get(m, False)]
+                        
+                        predictions_cached = cache_stats.get('predictions_cached', 0)
+                        insights_cached = cache_stats.get('insights_cached', 0)
+                        
+                        self.log_test("ML Model Performance", True, 
+                                    f"Active models: {len(active_models)}/{len(expected_models)}, Cache: {predictions_cached} predictions, {insights_cached} insights")
+                    else:
+                        self.log_test("ML Model Performance", False, f"Missing fields: {missing_fields}")
+                elif response.status == 503:
+                    self.log_test("ML Model Performance", False, "ML service not running")
+                else:
+                    self.log_test("ML Model Performance", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("ML Model Performance", False, f"Exception: {str(e)}")
+    
+    async def test_ml_feature_importance(self):
+        """Test GET /api/ml/feature-importance endpoint"""
+        try:
+            async with self.session.get(f"{API_BASE}/ml/feature-importance") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if 'feature_importance' in data and 'interpretation' in data:
+                        feature_importance = data['feature_importance']
+                        interpretation = data['interpretation']
+                        
+                        # Check if we have feature importance for key models
+                        yield_predictor_features = feature_importance.get('yield_predictor', [])
+                        risk_predictor_features = feature_importance.get('risk_predictor', [])
+                        
+                        total_features = len(yield_predictor_features) + len(risk_predictor_features)
+                        
+                        if total_features > 0:
+                            # Check feature structure
+                            if yield_predictor_features:
+                                first_feature = yield_predictor_features[0]
+                                if 'feature' in first_feature and 'importance' in first_feature:
+                                    top_feature = first_feature['feature']
+                                    top_importance = first_feature['importance']
+                                    self.log_test("ML Feature Importance", True, 
+                                                f"Feature analysis available: {total_features} features, top yield predictor feature: {top_feature} ({top_importance:.3f})")
+                                else:
+                                    self.log_test("ML Feature Importance", False, f"Invalid feature structure: {first_feature}")
+                            else:
+                                self.log_test("ML Feature Importance", True, f"Feature importance service ready, {total_features} features analyzed")
+                        else:
+                            self.log_test("ML Feature Importance", True, "Feature importance service ready (models may need training)")
+                    else:
+                        self.log_test("ML Feature Importance", False, f"Invalid response structure: {data}")
+                elif response.status == 503:
+                    self.log_test("ML Feature Importance", False, "ML service not running")
+                else:
+                    self.log_test("ML Feature Importance", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("ML Feature Importance", False, f"Exception: {str(e)}")
+    
+    async def test_ml_summary(self):
+        """Test GET /api/ml/summary endpoint"""
+        try:
+            async with self.session.get(f"{API_BASE}/ml/summary") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    required_fields = ['service_status', 'capabilities', 'api_endpoints']
+                    missing_fields = [field for field in required_fields if field not in data]
+                    
+                    if not missing_fields:
+                        service_status = data['service_status']
+                        capabilities = data['capabilities']
+                        api_endpoints = data['api_endpoints']
+                        recent_activity = data.get('recent_activity', {})
+                        
+                        if isinstance(capabilities, list) and len(capabilities) >= 6:
+                            predictions_available = recent_activity.get('predictions_available', 0)
+                            insights_24h = recent_activity.get('insights_generated_24h', 0)
+                            anomalies_24h = recent_activity.get('anomalies_detected_24h', 0)
+                            
+                            self.log_test("ML Summary", True, 
+                                        f"Service: {service_status}, {len(capabilities)} capabilities, {len(api_endpoints)} endpoints, Recent: {predictions_available} predictions, {insights_24h} insights, {anomalies_24h} anomalies")
+                        else:
+                            self.log_test("ML Summary", False, f"Expected 6+ capabilities, got: {len(capabilities) if isinstance(capabilities, list) else 0}")
+                    else:
+                        self.log_test("ML Summary", False, f"Missing fields: {missing_fields}")
+                else:
+                    self.log_test("ML Summary", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("ML Summary", False, f"Exception: {str(e)}")
+
+    # ========================================
     # BATCH ANALYTICS & PERFORMANCE REPORTING TESTS (STEP 7)
     # ========================================
     
