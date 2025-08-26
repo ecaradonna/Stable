@@ -2,6 +2,7 @@ import asyncio
 from typing import List, Dict, Any, Optional
 from datetime import datetime, timedelta
 import logging
+import statistics
 from .defi_llama_service import DefiLlamaService
 from .binance_service import BinanceService
 from .protocol_policy_service import ProtocolPolicyService
