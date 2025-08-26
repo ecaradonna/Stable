@@ -387,11 +387,11 @@ const SYIHistoricalChart = () => {
       
       <CardContent>
         {/* Performance Summary */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mb-6">
           <div className="text-center p-3 bg-white rounded-lg border">
             <div className="flex items-center justify-center mb-1">
               <Activity className="w-4 h-4 text-[#4CC1E9] mr-1" />
-              <span className="text-sm text-gray-600">Current Yield</span>
+              <span className="text-sm text-gray-600">SYI Yield</span>
             </div>
             <div className="text-lg font-bold text-[#0E1A2B]">
               {performance.current?.toFixed(3)}%
@@ -405,17 +405,47 @@ const SYIHistoricalChart = () => {
               ) : (
                 <TrendingDown className="w-4 h-4 text-red-500 mr-1" />
               )}
-              <span className="text-sm text-gray-600">Change</span>
+              <span className="text-sm text-gray-600">SYI Change</span>
             </div>
             <div className={`text-lg font-bold ${performance.change >= 0 ? 'text-green-600' : 'text-red-600'}`}>
               {performance.change >= 0 ? '+' : ''}{performance.change?.toFixed(3)}%
             </div>
           </div>
+
+          {showCrypto && (
+            <>
+              <div className="text-center p-3 bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg border border-orange-200">
+                <div className="flex items-center justify-center mb-1">
+                  <Bitcoin className="w-4 h-4 text-orange-500 mr-1" />
+                  <span className="text-sm text-gray-600">BTC</span>
+                </div>
+                <div className={`text-lg font-bold ${(performance.btc_performance || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                  {(performance.btc_performance || 0) >= 0 ? '+' : ''}{(performance.btc_performance || 0)?.toFixed(1)}%
+                </div>
+                <div className="text-xs text-gray-500">
+                  ${(performance.btc_current || 0).toLocaleString()}
+                </div>
+              </div>
+              
+              <div className="text-center p-3 bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg border border-blue-200">
+                <div className="flex items-center justify-center mb-1">
+                  <Coins className="w-4 h-4 text-blue-500 mr-1" />
+                  <span className="text-sm text-gray-600">ETH</span>
+                </div>
+                <div className={`text-lg font-bold ${(performance.eth_performance || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                  {(performance.eth_performance || 0) >= 0 ? '+' : ''}{(performance.eth_performance || 0)?.toFixed(1)}%
+                </div>
+                <div className="text-xs text-gray-500">
+                  ${(performance.eth_current || 0).toLocaleString()}
+                </div>
+              </div>
+            </>
+          )}
           
           <div className="text-center p-3 bg-white rounded-lg border">
             <div className="flex items-center justify-center mb-1">
               <BarChart3 className="w-4 h-4 text-[#007A99] mr-1" />
-              <span className="text-sm text-gray-600">Average</span>
+              <span className="text-sm text-gray-600">SYI Average</span>
             </div>
             <div className="text-lg font-bold text-[#0E1A2B]">
               {performance.average?.toFixed(3)}%
