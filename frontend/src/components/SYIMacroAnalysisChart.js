@@ -75,6 +75,14 @@ const SYIMacroAnalysisChart = () => {
     }
   };
 
+  const generateMockMacroData = (days) => {
+    const syiData = generateMockSYIData(days);
+    const treasuryData = generateMockTreasuryData(days);
+    const ssiData = generateMockSSIData(days);
+    
+    return mergeMacroData(syiData, treasuryData, ssiData);
+  };
+
   const fetchSYIData = async (days) => {
     // Dynamic backend URL detection
     const getBackendURL = () => {
