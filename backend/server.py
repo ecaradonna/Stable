@@ -234,6 +234,17 @@ async def startup_event():
     logger.info("  - GET /api/analytics/compliance-report (Compliance reporting)")
     logger.info("  - GET /api/analytics/historical-data (Historical data export)")
     logger.info("  - GET /api/analytics/summary (Comprehensive analytics summary)")
+    logger.info("NEW STEP 8 (MACHINE LEARNING & AI) ENDPOINTS:")
+    logger.info("  - GET /api/ml/status (ML service status and model information)")
+    logger.info("  - POST /api/ml/start (Start ML insights service)")
+    logger.info("  - GET /api/ml/predictions (Multi-horizon yield predictions)")
+    logger.info("  - GET /api/ml/anomalies (AI-powered anomaly detection)")
+    logger.info("  - GET /api/ml/insights (AI market insights & recommendations)")
+    logger.info("  - GET /api/ml/predictions/{symbol} (Symbol-specific predictions)")
+    logger.info("  - POST /api/ml/retrain (Retrain ML models)")
+    logger.info("  - GET /api/ml/model-performance (Model performance metrics)")
+    logger.info("  - GET /api/ml/feature-importance (Feature importance analysis)")
+    logger.info("  - GET /api/ml/summary (Comprehensive ML service summary)")
 
 @app.on_event("shutdown")
 async def shutdown_db_client():
