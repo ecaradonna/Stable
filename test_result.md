@@ -459,8 +459,7 @@ metadata:
   run_ui: true
 
 test_plan:
-  current_focus:
-    - "Advanced Analytics Dashboard for Institutional Clients (STEP 12)"
+  current_focus: []
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
