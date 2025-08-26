@@ -1076,6 +1076,424 @@ class StableYieldTester:
             self.log_test("Parameter Validation Valid Params", False, f"Exception: {str(e)}")
     
     # ========================================
+    # AI-POWERED PORTFOLIO MANAGEMENT TESTS (STEP 13)
+    # ========================================
+    
+    async def test_ai_portfolio_status(self):
+        """Test GET /api/ai-portfolio/status endpoint"""
+        try:
+            async with self.session.get(f"{API_BASE}/ai-portfolio/status") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    required_fields = ['service_running', 'ai_portfolios', 'capabilities']
+                    missing_fields = [field for field in required_fields if field not in data]
+                    
+                    if not missing_fields:
+                        service_running = data.get('service_running', False)
+                        ai_portfolios = data.get('ai_portfolios', 0)
+                        capabilities = data.get('capabilities', [])
+                        self.log_test("AI Portfolio Status", True, 
+                                    f"Service: {service_running}, Portfolios: {ai_portfolios}, Capabilities: {len(capabilities)}")
+                    else:
+                        self.log_test("AI Portfolio Status", False, f"Missing fields: {missing_fields}")
+                else:
+                    self.log_test("AI Portfolio Status", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("AI Portfolio Status", False, f"Exception: {str(e)}")
+    
+    async def test_ai_portfolio_start(self):
+        """Test POST /api/ai-portfolio/start endpoint"""
+        try:
+            async with self.session.post(f"{API_BASE}/ai-portfolio/start") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if 'message' in data and 'ai_capabilities' in data:
+                        capabilities = data.get('ai_capabilities', [])
+                        strategies = data.get('optimization_strategies', [])
+                        triggers = data.get('rebalancing_triggers', [])
+                        self.log_test("AI Portfolio Start", True, 
+                                    f"Started with {len(capabilities)} capabilities, {len(strategies)} strategies, {len(triggers)} triggers")
+                    else:
+                        self.log_test("AI Portfolio Start", False, f"Invalid response structure: {data}")
+                else:
+                    self.log_test("AI Portfolio Start", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("AI Portfolio Start", False, f"Exception: {str(e)}")
+    
+    async def test_ai_portfolio_create(self):
+        """Test POST /api/ai-portfolio/portfolios endpoint (portfolio creation)"""
+        try:
+            portfolio_data = {
+                "portfolio_id": f"ai_portfolio_{uuid.uuid4().hex[:8]}",
+                "client_id": f"client_{uuid.uuid4().hex[:8]}",
+                "optimization_strategy": "ai_enhanced",
+                "risk_tolerance": 0.6,
+                "performance_target": 0.08,
+                "max_drawdown_limit": 0.15,
+                "rebalancing_frequency": "weekly",
+                "ai_confidence_threshold": 0.7,
+                "use_sentiment_analysis": True,
+                "use_market_regime_detection": True,
+                "use_predictive_rebalancing": True
+            }
+            
+            async with self.session.post(f"{API_BASE}/ai-portfolio/portfolios", json=portfolio_data) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if 'ai_portfolio' in data and 'ai_features' in data:
+                        ai_portfolio = data['ai_portfolio']
+                        ai_features = data['ai_features']
+                        
+                        # Store portfolio ID for later tests
+                        self.test_portfolio_id = ai_portfolio.get('portfolio_id')
+                        
+                        self.log_test("AI Portfolio Create", True, 
+                                    f"Created portfolio: {ai_portfolio.get('portfolio_id')}, Strategy: {ai_portfolio.get('optimization_strategy')}")
+                    else:
+                        self.log_test("AI Portfolio Create", False, f"Invalid response structure: {data}")
+                else:
+                    self.log_test("AI Portfolio Create", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("AI Portfolio Create", False, f"Exception: {str(e)}")
+    
+    async def test_ai_portfolio_list(self):
+        """Test GET /api/ai-portfolio/portfolios endpoint"""
+        try:
+            async with self.session.get(f"{API_BASE}/ai-portfolio/portfolios") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if 'ai_portfolios' in data and 'total_portfolios' in data:
+                        portfolios = data['ai_portfolios']
+                        total = data['total_portfolios']
+                        strategies = data.get('optimization_strategies_used', [])
+                        
+                        self.log_test("AI Portfolio List", True, 
+                                    f"Found {total} AI portfolios, Strategies: {strategies}")
+                    else:
+                        self.log_test("AI Portfolio List", False, f"Invalid response structure: {data}")
+                else:
+                    self.log_test("AI Portfolio List", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("AI Portfolio List", False, f"Exception: {str(e)}")
+    
+    async def test_ai_portfolio_optimize(self):
+        """Test POST /api/ai-portfolio/portfolios/{portfolio_id}/optimize endpoint"""
+        try:
+            # Use test portfolio ID if available, otherwise create a test ID
+            portfolio_id = getattr(self, 'test_portfolio_id', 'test_portfolio_001')
+            
+            optimization_data = {
+                "optimization_strategy": "ai_enhanced"
+            }
+            
+            async with self.session.post(f"{API_BASE}/ai-portfolio/portfolios/{portfolio_id}/optimize", 
+                                       json=optimization_data) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if 'optimization_result' in data and 'optimization_insights' in data:
+                        result = data['optimization_result']
+                        insights = data['optimization_insights']
+                        
+                        performance = result.get('performance_metrics', {})
+                        expected_return = performance.get('expected_return', 0)
+                        sharpe_ratio = performance.get('sharpe_ratio', 0)
+                        
+                        self.log_test("AI Portfolio Optimize", True, 
+                                    f"Portfolio: {result.get('portfolio_id')}, Expected Return: {expected_return:.2%}, Sharpe: {sharpe_ratio:.2f}")
+                    else:
+                        self.log_test("AI Portfolio Optimize", False, f"Invalid response structure: {data}")
+                elif response.status == 404:
+                    self.log_test("AI Portfolio Optimize", False, f"Portfolio not found: {portfolio_id}")
+                else:
+                    self.log_test("AI Portfolio Optimize", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("AI Portfolio Optimize", False, f"Exception: {str(e)}")
+    
+    async def test_ai_portfolio_rebalancing_signal(self):
+        """Test POST /api/ai-portfolio/portfolios/{portfolio_id}/rebalancing-signal endpoint"""
+        try:
+            portfolio_id = getattr(self, 'test_portfolio_id', 'test_portfolio_001')
+            
+            async with self.session.post(f"{API_BASE}/ai-portfolio/portfolios/{portfolio_id}/rebalancing-signal") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    signal_generated = data.get('signal_generated', False)
+                    
+                    if signal_generated:
+                        signal = data.get('rebalancing_signal', {})
+                        allocation_changes = data.get('allocation_changes', {})
+                        
+                        # Store signal ID for execution test
+                        self.test_signal_id = signal.get('signal_id')
+                        
+                        confidence = signal.get('confidence_score', 0)
+                        trigger_type = signal.get('trigger_type', 'unknown')
+                        
+                        self.log_test("AI Rebalancing Signal Generation", True, 
+                                    f"Signal: {signal.get('signal_id')}, Confidence: {confidence:.2f}, Trigger: {trigger_type}")
+                    else:
+                        reasons = data.get('reasons', [])
+                        self.log_test("AI Rebalancing Signal Generation", True, 
+                                    f"No signal generated - Reasons: {len(reasons)} conditions not met")
+                else:
+                    self.log_test("AI Rebalancing Signal Generation", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("AI Rebalancing Signal Generation", False, f"Exception: {str(e)}")
+    
+    async def test_ai_portfolio_rebalancing_signals_list(self):
+        """Test GET /api/ai-portfolio/portfolios/{portfolio_id}/rebalancing-signals endpoint"""
+        try:
+            portfolio_id = getattr(self, 'test_portfolio_id', 'test_portfolio_001')
+            
+            async with self.session.get(f"{API_BASE}/ai-portfolio/portfolios/{portfolio_id}/rebalancing-signals") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if 'rebalancing_signals' in data and 'total_signals' in data:
+                        signals = data['rebalancing_signals']
+                        total = data['total_signals']
+                        active = data.get('active_signals', 0)
+                        executed = data.get('executed_signals', 0)
+                        avg_confidence = data.get('avg_confidence', 0)
+                        
+                        self.log_test("AI Rebalancing Signals List", True, 
+                                    f"Total: {total}, Active: {active}, Executed: {executed}, Avg Confidence: {avg_confidence:.2f}")
+                    else:
+                        self.log_test("AI Rebalancing Signals List", False, f"Invalid response structure: {data}")
+                else:
+                    self.log_test("AI Rebalancing Signals List", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("AI Rebalancing Signals List", False, f"Exception: {str(e)}")
+    
+    async def test_ai_portfolio_execute_rebalancing(self):
+        """Test POST /api/ai-portfolio/rebalancing-signals/{signal_id}/execute endpoint"""
+        try:
+            signal_id = getattr(self, 'test_signal_id', 'test_signal_001')
+            
+            async with self.session.post(f"{API_BASE}/ai-portfolio/rebalancing-signals/{signal_id}/execute") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if 'execution_result' in data and 'trading_execution' in data:
+                        result = data['execution_result']
+                        execution = data['trading_execution']
+                        summary = data.get('execution_summary', {})
+                        
+                        confidence = result.get('confidence_score', 0)
+                        expected_return = result.get('expected_return', 0)
+                        status = summary.get('status', 'unknown')
+                        
+                        self.log_test("AI Rebalancing Execution", True, 
+                                    f"Signal: {result.get('signal_id')}, Status: {status}, Expected Return: {expected_return:.2%}")
+                    else:
+                        self.log_test("AI Rebalancing Execution", False, f"Invalid response structure: {data}")
+                elif response.status == 404:
+                    self.log_test("AI Rebalancing Execution", False, f"Signal not found: {signal_id}")
+                else:
+                    self.log_test("AI Rebalancing Execution", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("AI Rebalancing Execution", False, f"Exception: {str(e)}")
+    
+    async def test_ai_market_sentiment(self):
+        """Test GET /api/ai-portfolio/market-sentiment endpoint"""
+        try:
+            # Test with specific symbols
+            symbols = "USDT,USDC,DAI,TUSD,PYUSD"
+            async with self.session.get(f"{API_BASE}/ai-portfolio/market-sentiment?symbols={symbols}") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if 'market_sentiment' in data:
+                        sentiment_data = data['market_sentiment']
+                        individual = sentiment_data.get('individual_sentiments', [])
+                        overview = sentiment_data.get('market_overview', {})
+                        
+                        avg_sentiment = overview.get('average_sentiment', 0)
+                        avg_confidence = overview.get('average_confidence', 0)
+                        market_mood = overview.get('market_mood', 'unknown')
+                        
+                        self.log_test("AI Market Sentiment", True, 
+                                    f"Analyzed {len(individual)} symbols, Avg Sentiment: {avg_sentiment:.2f}, Mood: {market_mood}")
+                    else:
+                        self.log_test("AI Market Sentiment", False, f"Invalid response structure: {data}")
+                else:
+                    self.log_test("AI Market Sentiment", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("AI Market Sentiment", False, f"Exception: {str(e)}")
+    
+    async def test_ai_market_regime(self):
+        """Test GET /api/ai-portfolio/market-regime endpoint"""
+        try:
+            async with self.session.get(f"{API_BASE}/ai-portfolio/market-regime") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if 'market_regime' in data and 'market_indicators' in data:
+                        regime = data['market_regime']
+                        indicators = data['market_indicators']
+                        implications = data.get('regime_implications', {})
+                        
+                        current_regime = regime.get('current_regime', 'unknown')
+                        confidence = regime.get('confidence', 'unknown')
+                        yield_volatility = indicators.get('yield_volatility', 0)
+                        syi_value = indicators.get('syi_value', 0)
+                        
+                        self.log_test("AI Market Regime Detection", True, 
+                                    f"Regime: {current_regime}, Confidence: {confidence}, Volatility: {yield_volatility:.3f}, SYI: {syi_value:.4f}")
+                    else:
+                        self.log_test("AI Market Regime Detection", False, f"Invalid response structure: {data}")
+                else:
+                    self.log_test("AI Market Regime Detection", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("AI Market Regime Detection", False, f"Exception: {str(e)}")
+    
+    async def test_ai_portfolio_insights(self):
+        """Test GET /api/ai-portfolio/ai-insights/{portfolio_id} endpoint"""
+        try:
+            portfolio_id = getattr(self, 'test_portfolio_id', 'test_portfolio_001')
+            
+            async with self.session.get(f"{API_BASE}/ai-portfolio/ai-insights/{portfolio_id}") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if 'ai_insights' in data and 'portfolio_ai_status' in data:
+                        insights = data['ai_insights']
+                        ai_status = data['portfolio_ai_status']
+                        market_context = data.get('market_context', {})
+                        
+                        insights_list = insights.get('insights', [])
+                        insights_count = insights.get('insights_count', 0)
+                        optimization_strategy = ai_status.get('optimization_strategy', 'unknown')
+                        current_regime = market_context.get('current_regime', 'unknown')
+                        
+                        self.log_test("AI Portfolio Insights", True, 
+                                    f"Portfolio: {portfolio_id}, Insights: {insights_count}, Strategy: {optimization_strategy}, Regime: {current_regime}")
+                    else:
+                        self.log_test("AI Portfolio Insights", False, f"Invalid response structure: {data}")
+                elif response.status == 404:
+                    self.log_test("AI Portfolio Insights", False, f"Portfolio not found: {portfolio_id}")
+                else:
+                    self.log_test("AI Portfolio Insights", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("AI Portfolio Insights", False, f"Exception: {str(e)}")
+    
+    async def test_ai_portfolio_summary(self):
+        """Test GET /api/ai-portfolio/summary endpoint"""
+        try:
+            async with self.session.get(f"{API_BASE}/ai-portfolio/summary") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if 'service_status' in data and 'ai_portfolio_management' in data:
+                        service_status = data.get('service_status', 'unknown')
+                        management = data.get('ai_portfolio_management', {})
+                        performance = data.get('optimization_performance', {})
+                        capabilities = data.get('ai_capabilities', [])
+                        integration = data.get('integration_status', {})
+                        
+                        ai_portfolios = management.get('ai_portfolios', 0)
+                        optimization_results = management.get('optimization_results', 0)
+                        success_rate = performance.get('success_rate', 0)
+                        
+                        self.log_test("AI Portfolio Summary", True, 
+                                    f"Status: {service_status}, Portfolios: {ai_portfolios}, Results: {optimization_results}, Success Rate: {success_rate:.1f}%")
+                    else:
+                        self.log_test("AI Portfolio Summary", False, f"Invalid response structure: {data}")
+                else:
+                    self.log_test("AI Portfolio Summary", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("AI Portfolio Summary", False, f"Exception: {str(e)}")
+    
+    async def test_ai_portfolio_integration_verification(self):
+        """Test integration with other services (Trading Engine, ML Insights, Dashboard, RAY Calculator, Yield Aggregator)"""
+        try:
+            # Test Trading Engine integration
+            async with self.session.get(f"{API_BASE}/trading/status") as response:
+                trading_status = response.status == 200
+            
+            # Test ML Insights integration
+            async with self.session.get(f"{API_BASE}/ml/status") as response:
+                ml_status = response.status == 200
+            
+            # Test Dashboard integration
+            async with self.session.get(f"{API_BASE}/dashboard/status") as response:
+                dashboard_status = response.status == 200
+            
+            # Test RAY Calculator integration (via SYI endpoint)
+            async with self.session.get(f"{API_BASE}/syi/composition") as response:
+                ray_status = response.status == 200
+            
+            # Test Yield Aggregator integration
+            async with self.session.get(f"{API_BASE}/yields/") as response:
+                yield_status = response.status == 200
+            
+            integrations = {
+                "Trading Engine": trading_status,
+                "ML Insights": ml_status,
+                "Dashboard Service": dashboard_status,
+                "RAY Calculator": ray_status,
+                "Yield Aggregator": yield_status
+            }
+            
+            working_integrations = sum(integrations.values())
+            total_integrations = len(integrations)
+            
+            integration_details = ", ".join([f"{name}: {'✓' if status else '✗'}" for name, status in integrations.items()])
+            
+            if working_integrations >= 4:  # At least 4 out of 5 integrations working
+                self.log_test("AI Portfolio Service Integrations", True, 
+                            f"{working_integrations}/{total_integrations} integrations working - {integration_details}")
+            else:
+                self.log_test("AI Portfolio Service Integrations", False, 
+                            f"Only {working_integrations}/{total_integrations} integrations working - {integration_details}")
+                
+        except Exception as e:
+            self.log_test("AI Portfolio Service Integrations", False, f"Exception: {str(e)}")
+    
+    async def test_ai_portfolio_production_ready_features(self):
+        """Test production-ready features like generateRebalancePlan function"""
+        try:
+            # Test that rebalancing signals include proper RebalancePlan with real-world constraints
+            portfolio_id = getattr(self, 'test_portfolio_id', 'test_portfolio_001')
+            
+            async with self.session.post(f"{API_BASE}/ai-portfolio/portfolios/{portfolio_id}/rebalancing-signal") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    signal_generated = data.get('signal_generated', False)
+                    
+                    if signal_generated:
+                        signal = data.get('rebalancing_signal', {})
+                        
+                        # Check for production-ready features
+                        has_confidence_score = 'confidence_score' in signal
+                        has_expected_return = 'expected_return' in signal
+                        has_expected_risk = 'expected_risk' in signal
+                        has_market_regime = 'market_regime' in signal
+                        has_reasoning = 'reasoning' in signal
+                        has_allocation_changes = 'allocation_changes' in data
+                        
+                        production_features = [
+                            has_confidence_score,
+                            has_expected_return,
+                            has_expected_risk,
+                            has_market_regime,
+                            has_reasoning,
+                            has_allocation_changes
+                        ]
+                        
+                        working_features = sum(production_features)
+                        total_features = len(production_features)
+                        
+                        if working_features >= 5:  # At least 5 out of 6 features
+                            self.log_test("AI Portfolio Production Features", True, 
+                                        f"{working_features}/{total_features} production features present in rebalancing signal")
+                        else:
+                            self.log_test("AI Portfolio Production Features", False, 
+                                        f"Only {working_features}/{total_features} production features present")
+                    else:
+                        # Even if no signal generated, the endpoint should work properly
+                        self.log_test("AI Portfolio Production Features", True, 
+                                    "Production-ready rebalancing signal endpoint working (no signal generated due to conditions)")
+                else:
+                    self.log_test("AI Portfolio Production Features", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("AI Portfolio Production Features", False, f"Exception: {str(e)}")
+
+    # ========================================
     # ADVANCED ANALYTICS DASHBOARD TESTS (STEP 12)
     # ========================================
     
