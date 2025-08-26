@@ -2857,6 +2857,20 @@ class StableYieldTester:
         await self.test_analytics_summary()
         await self.test_analytics_stop()
         
+        # Machine Learning & AI Insights System tests (STEP 8)
+        print("\n🧠 Testing Machine Learning & AI Insights System (STEP 8)...")
+        await self.test_ml_status()
+        await self.test_ml_start()
+        await self.test_ml_predictions()
+        await self.test_ml_anomalies()
+        await self.test_ml_insights()
+        await self.test_ml_predictions_usdt()
+        await self.test_ml_retrain()
+        await self.test_ml_model_performance()
+        await self.test_ml_feature_importance()
+        await self.test_ml_summary()
+        await self.test_ml_stop()
+        
         # Summary
         print("\n" + "=" * 60)
         self.print_summary()
