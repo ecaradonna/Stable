@@ -260,7 +260,9 @@ const LiveYields = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
           {yieldsData.map((yieldItem, index) => {
             const risk = riskMetrics[yieldItem.stablecoin] || {};
-            const displayYield = showRiskAdjusted && risk.ry_apy ? risk.ry_apy : yieldItem.currentYield;
+            // Handle both mock data (currentYield) and backend data (apy values that need to be divided by 100)
+            const baseYield = yieldItem.currentYield || (risk.apy ? risk.apy / 100 : 0);
+            const displayYield = showRiskAdjusted && risk.ry_apy ? risk.ry_apy / 100 : baseYield;
             
             return (
               <div 
