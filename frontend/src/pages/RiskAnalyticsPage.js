@@ -201,6 +201,24 @@ const RiskAnalyticsPage = () => {
         </div>
       </section>
 
+      {/* Interactive Risk Analytics Dashboard */}
+      <section className="py-20 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-[#0E1A2B] mb-4">
+              Interactive Risk Analytics Dashboard
+            </h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              Explore real-time risk-adjusted yield data, peg stability metrics, and liquidity analysis 
+              across major stablecoin protocols and platforms.
+            </p>
+          </div>
+          
+          {/* Risk Analytics Dashboard Component */}
+          <RiskAnalyticsDashboard />
+        </div>
+      </section>
+
       {/* Value Proposition Section */}
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
