@@ -3599,6 +3599,22 @@ class StableYieldTester:
         await self.test_enterprise_summary()
         await self.test_enterprise_stop()
         
+        # DevOps & Production Deployment System tests (STEP 10)
+        print("\n🚀 Testing DevOps & Production Deployment System (STEP 10)...")
+        await self.test_devops_status()
+        await self.test_devops_start()
+        await self.test_devops_deploy()
+        await self.test_devops_deployments()
+        await self.test_devops_metrics()
+        await self.test_devops_alerts()
+        await self.test_devops_create_alert_rule()
+        await self.test_devops_backups()
+        await self.test_devops_create_backup()
+        await self.test_devops_infrastructure()
+        await self.test_devops_health()
+        await self.test_devops_summary()
+        await self.test_devops_stop()
+        
         # Summary
         print("\n" + "=" * 60)
         self.print_summary()
