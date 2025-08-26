@@ -397,7 +397,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Batch Analytics & Performance Reporting System (STEP 7)"
+    - "Machine Learning & AI Insights System (STEP 8)"
   stuck_tasks: []
   test_all: true
   test_priority: "complete"
