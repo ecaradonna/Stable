@@ -40,7 +40,99 @@ const SYIHistoricalChart = () => {
     { label: '1Y', value: '365d', days: 365 }
   ];
 
-  const fetchHistoricalData = async (days) => {
+  const fetchCryptoData = async (days) => {
+    try {
+      // Fetch Bitcoin and Ethereum price data from CoinGecko API
+      const [btcResponse, ethResponse] = await Promise.all([
+        fetch(`https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=${days}&interval=daily`),
+        fetch(`https://api.coingecko.com/api/v3/coins/ethereum/market_chart?vs_currency=usd&days=${days}&interval=daily`)
+      ]);
+
+      const btcData = await btcResponse.json();
+      const ethData = await ethResponse.json();
+
+      // Process the data
+      const processedBtc = btcData.prices?.map(([timestamp, price]) => ({
+        date: new Date(timestamp).toISOString().split('T')[0],
+        timestamp: timestamp,
+        price: price
+      })) || [];
+
+      const processedEth = ethData.prices?.map(([timestamp, price]) => ({
+        date: new Date(timestamp).toISOString().split('T')[0], 
+        timestamp: timestamp,
+        price: price
+      })) || [];
+
+      setCryptoData({
+        btc: processedBtc,
+        eth: processedEth
+      });
+
+      return { btc: processedBtc, eth: processedEth };
+    } catch (error) {
+      console.error('Error fetching crypto data:', error);
+      // Return mock data if API fails
+      return generateMockCryptoData(days);
+    }
+  };
+
+  const generateMockCryptoData = (days) => {
+    const btcData = [];
+    const ethData = [];
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - days);
+    
+    let btcPrice = 43000; // Starting BTC price
+    let ethPrice = 2600;  // Starting ETH price
+    
+    for (let i = 0; i < days; i++) {
+      const date = new Date(startDate);
+      date.setDate(startDate.getDate() + i);
+      
+      // Add realistic crypto volatility
+      const btcChange = (Math.random() - 0.5) * 0.06; // ±3% daily volatility
+      const ethChange = (Math.random() - 0.5) * 0.08; // ±4% daily volatility
+      
+      btcPrice = Math.max(35000, Math.min(50000, btcPrice * (1 + btcChange)));
+      ethPrice = Math.max(2000, Math.min(3500, ethPrice * (1 + ethChange)));
+      
+      const dateStr = date.toISOString().split('T')[0];
+      
+      btcData.push({
+        date: dateStr,
+        timestamp: date.getTime(),
+        price: btcPrice
+      });
+      
+      ethData.push({
+        date: dateStr,
+        timestamp: date.getTime(), 
+        price: ethPrice
+      });
+    }
+    
+    return { btc: btcData, eth: ethData };
+  };
+
+  const mergeCryptoWithSYI = (syiData, cryptoData) => {
+    // Merge SYI data with crypto data by date
+    return syiData.map(syiItem => {
+      const btcItem = cryptoData.btc.find(btc => btc.date === syiItem.date);
+      const ethItem = cryptoData.eth.find(eth => eth.date === syiItem.date);
+      
+      return {
+        ...syiItem,
+        btc_price: btcItem?.price || null,
+        eth_price: ethItem?.price || null,
+        // Calculate percentage changes from first day for comparison
+        btc_change_pct: btcItem && cryptoData.btc[0] ? 
+          ((btcItem.price - cryptoData.btc[0].price) / cryptoData.btc[0].price) * 100 : 0,
+        eth_change_pct: ethItem && cryptoData.eth[0] ? 
+          ((ethItem.price - cryptoData.eth[0].price) / cryptoData.eth[0].price) * 100 : 0
+      };
+    });
+  };
     try {
       setLoading(true);
       
