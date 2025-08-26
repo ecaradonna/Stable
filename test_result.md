@@ -399,8 +399,7 @@ metadata:
   run_ui: true
 
 test_plan:
-  current_focus:
-    - "Machine Learning & AI Insights System (STEP 8)"
+  current_focus: []
   stuck_tasks: []
   test_all: true
   test_priority: "complete"
