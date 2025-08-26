@@ -170,6 +170,17 @@ async def startup_event():
         logger.error(f"❌ Failed to start WebSocket services: {e}")
         logger.info("⚠️ Continuing without real-time WebSocket features")
     
+    # Start Batch Analytics services (STEP 7)
+    try:
+        from services.batch_analytics_service import start_batch_analytics
+        
+        # Start batch analytics scheduler
+        await start_batch_analytics()
+        logger.info("✅ Batch analytics service started")
+    except Exception as e:
+        logger.error(f"❌ Failed to start batch analytics service: {e}")
+        logger.info("⚠️ Continuing without batch analytics features")
+    
     logger.info("New capabilities enabled:")
     logger.info("  - Real-time StableYield Index calculation")
     logger.info("  - Real-time peg stability monitoring")
