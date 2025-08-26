@@ -506,10 +506,12 @@ metadata:
   run_ui: true
 
 test_plan:
-  current_focus: []
-  stuck_tasks: []
+  current_focus:
+    - "SYI Macro Analysis Implementation"
+  stuck_tasks:
+    - "SYI Macro Analysis Implementation"
   test_all: false
-  test_priority: "complete"
+  test_priority: "high_first"
 
 agent_communication:
     - agent: "main"
