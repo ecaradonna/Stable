@@ -15,10 +15,10 @@
     "max_drawdown": -0.05,
     "optimization_score": 0.14,
     "constraints_satisfied": true,
-    "optimization_time": 0.00020456314086914062,
+    "optimization_time": 0.0002143383026123047,
     "metadata": {
       "market_regime": "low_volatility",
-      "sentiment_score": 0.19468449681768857,
+      "sentiment_score": 0.12586604856937947,
       "features_used": 10,
       "optimization_iterations": 100
     }
