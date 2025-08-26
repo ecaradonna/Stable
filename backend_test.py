@@ -1076,6 +1076,575 @@ class StableYieldTester:
             self.log_test("Parameter Validation Valid Params", False, f"Exception: {str(e)}")
     
     # ========================================
+    # ADVANCED TRADING & EXECUTION ENGINE TESTS (STEP 11)
+    # ========================================
+    
+    async def test_trading_status(self):
+        """Test GET /api/trading/status endpoint"""
+        try:
+            async with self.session.get(f"{API_BASE}/trading/status") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    required_fields = ['service_running', 'trading_pairs', 'orders', 'trades', 'positions', 'portfolios']
+                    missing_fields = [field for field in required_fields if field not in data]
+                    
+                    if not missing_fields:
+                        service_running = data['service_running']
+                        trading_pairs = data['trading_pairs']
+                        total_orders = data['orders']['total_orders']
+                        
+                        self.log_test("Trading Status", True, 
+                                    f"Service running: {service_running}, Trading pairs: {trading_pairs}, Orders: {total_orders}")
+                    else:
+                        self.log_test("Trading Status", False, f"Missing fields: {missing_fields}")
+                else:
+                    self.log_test("Trading Status", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("Trading Status", False, f"Exception: {str(e)}")
+    
+    async def test_trading_start(self):
+        """Test POST /api/trading/start endpoint"""
+        try:
+            async with self.session.post(f"{API_BASE}/trading/start") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if 'message' in data and 'capabilities' in data and 'supported_assets' in data:
+                        capabilities = data['capabilities']
+                        assets = data['supported_assets']
+                        
+                        if isinstance(capabilities, list) and len(capabilities) >= 5:
+                            self.log_test("Trading Start", True, 
+                                        f"Started with {len(capabilities)} capabilities, {len(assets)} supported assets")
+                        else:
+                            self.log_test("Trading Start", False, f"Expected 5+ capabilities, got: {capabilities}")
+                    else:
+                        self.log_test("Trading Start", False, f"Invalid response structure: {data}")
+                else:
+                    self.log_test("Trading Start", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("Trading Start", False, f"Exception: {str(e)}")
+    
+    async def test_trading_stop(self):
+        """Test POST /api/trading/stop endpoint"""
+        try:
+            async with self.session.post(f"{API_BASE}/trading/stop") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if 'message' in data and 'stopped' in data['message'].lower():
+                        self.log_test("Trading Stop", True, f"Service stopped: {data['message']}")
+                    else:
+                        self.log_test("Trading Stop", False, f"Unexpected response: {data}")
+                else:
+                    self.log_test("Trading Stop", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("Trading Stop", False, f"Exception: {str(e)}")
+    
+    async def test_create_trading_order(self):
+        """Test POST /api/trading/orders endpoint"""
+        try:
+            # Test market order
+            payload = {
+                "client_id": f"test_client_{uuid.uuid4().hex[:8]}",
+                "symbol": "USDT/USD",
+                "side": "buy",
+                "order_type": "market",
+                "quantity": 1000.0
+            }
+            
+            async with self.session.post(f"{API_BASE}/trading/orders", json=payload) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if 'order' in data and 'message' in data:
+                        order = data['order']
+                        required_order_fields = ['order_id', 'client_id', 'symbol', 'side', 'order_type', 'quantity', 'status']
+                        missing_fields = [field for field in required_order_fields if field not in order]
+                        
+                        if not missing_fields:
+                            self.test_order_id = order['order_id']  # Store for later tests
+                            self.test_client_id = order['client_id']  # Store for later tests
+                            self.log_test("Create Trading Order", True, 
+                                        f"Order created: {order['order_id']}, {order['side']} {order['quantity']} {order['symbol']}")
+                        else:
+                            self.log_test("Create Trading Order", False, f"Missing order fields: {missing_fields}")
+                    else:
+                        self.log_test("Create Trading Order", False, f"Invalid response structure: {data}")
+                elif response.status == 503:
+                    self.log_test("Create Trading Order", False, "Trading engine not running (expected if not started)")
+                else:
+                    self.log_test("Create Trading Order", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("Create Trading Order", False, f"Exception: {str(e)}")
+    
+    async def test_create_limit_order(self):
+        """Test POST /api/trading/orders endpoint with limit order"""
+        try:
+            payload = {
+                "client_id": f"test_client_{uuid.uuid4().hex[:8]}",
+                "symbol": "USDC/USD",
+                "side": "sell",
+                "order_type": "limit",
+                "quantity": 500.0,
+                "price": 1.0001
+            }
+            
+            async with self.session.post(f"{API_BASE}/trading/orders", json=payload) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if 'order' in data:
+                        order = data['order']
+                        if order['order_type'] == 'limit' and order['price'] == 1.0001:
+                            self.log_test("Create Limit Order", True, 
+                                        f"Limit order created: {order['order_id']} @ ${order['price']}")
+                        else:
+                            self.log_test("Create Limit Order", False, f"Invalid limit order data: {order}")
+                    else:
+                        self.log_test("Create Limit Order", False, f"Invalid response: {data}")
+                elif response.status == 503:
+                    self.log_test("Create Limit Order", False, "Trading engine not running")
+                else:
+                    self.log_test("Create Limit Order", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("Create Limit Order", False, f"Exception: {str(e)}")
+    
+    async def test_create_stop_loss_order(self):
+        """Test POST /api/trading/orders endpoint with stop loss order"""
+        try:
+            payload = {
+                "client_id": f"test_client_{uuid.uuid4().hex[:8]}",
+                "symbol": "DAI/USD",
+                "side": "sell",
+                "order_type": "stop_loss",
+                "quantity": 750.0,
+                "stop_price": 0.9995
+            }
+            
+            async with self.session.post(f"{API_BASE}/trading/orders", json=payload) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if 'order' in data:
+                        order = data['order']
+                        if order['order_type'] == 'stop_loss' and 'stop_price' in str(data):
+                            self.log_test("Create Stop Loss Order", True, 
+                                        f"Stop loss order created: {order['order_id']}")
+                        else:
+                            self.log_test("Create Stop Loss Order", False, f"Invalid stop loss order: {order}")
+                    else:
+                        self.log_test("Create Stop Loss Order", False, f"Invalid response: {data}")
+                elif response.status == 503:
+                    self.log_test("Create Stop Loss Order", False, "Trading engine not running")
+                else:
+                    self.log_test("Create Stop Loss Order", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("Create Stop Loss Order", False, f"Exception: {str(e)}")
+    
+    async def test_get_orders(self):
+        """Test GET /api/trading/orders endpoint"""
+        try:
+            async with self.session.get(f"{API_BASE}/trading/orders") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if 'orders' in data and 'total_orders' in data:
+                        orders = data['orders']
+                        total_orders = data['total_orders']
+                        
+                        self.log_test("Get Orders", True, 
+                                    f"Retrieved {total_orders} orders, {len(orders)} in response")
+                    else:
+                        self.log_test("Get Orders", False, f"Invalid response structure: {data}")
+                elif response.status == 503:
+                    self.log_test("Get Orders", False, "Trading engine not running")
+                else:
+                    self.log_test("Get Orders", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("Get Orders", False, f"Exception: {str(e)}")
+    
+    async def test_get_orders_with_filters(self):
+        """Test GET /api/trading/orders endpoint with filters"""
+        try:
+            # Test with client_id filter
+            test_client = getattr(self, 'test_client_id', 'test_client_123')
+            async with self.session.get(f"{API_BASE}/trading/orders?client_id={test_client}&status=filled") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if 'orders' in data and 'filters_applied' in data:
+                        filters = data['filters_applied']
+                        orders = data['orders']
+                        
+                        self.log_test("Get Orders with Filters", True, 
+                                    f"Filtered orders: {len(orders)} orders, filters: {filters}")
+                    else:
+                        self.log_test("Get Orders with Filters", False, f"Invalid response: {data}")
+                elif response.status == 503:
+                    self.log_test("Get Orders with Filters", False, "Trading engine not running")
+                else:
+                    self.log_test("Get Orders with Filters", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("Get Orders with Filters", False, f"Exception: {str(e)}")
+    
+    async def test_get_trades(self):
+        """Test GET /api/trading/trades endpoint"""
+        try:
+            async with self.session.get(f"{API_BASE}/trading/trades?limit=50") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if 'trades' in data and 'total_trades' in data:
+                        trades = data['trades']
+                        total_trades = data['total_trades']
+                        
+                        self.log_test("Get Trades", True, 
+                                    f"Retrieved {total_trades} trades, {len(trades)} in response")
+                    else:
+                        self.log_test("Get Trades", False, f"Invalid response structure: {data}")
+                elif response.status == 503:
+                    self.log_test("Get Trades", False, "Trading engine not running")
+                else:
+                    self.log_test("Get Trades", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("Get Trades", False, f"Exception: {str(e)}")
+    
+    async def test_create_portfolio(self):
+        """Test POST /api/trading/portfolios endpoint"""
+        try:
+            payload = {
+                "client_id": f"portfolio_client_{uuid.uuid4().hex[:8]}",
+                "name": "Diversified Stablecoin Portfolio",
+                "target_allocation": {
+                    "USDT": 0.4,
+                    "USDC": 0.3,
+                    "DAI": 0.3
+                },
+                "initial_cash": 50000.0
+            }
+            
+            async with self.session.post(f"{API_BASE}/trading/portfolios", json=payload) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if 'portfolio' in data and 'message' in data:
+                        portfolio = data['portfolio']
+                        required_fields = ['portfolio_id', 'client_id', 'name', 'total_value', 'target_allocation']
+                        missing_fields = [field for field in required_fields if field not in portfolio]
+                        
+                        if not missing_fields:
+                            self.test_portfolio_id = portfolio['portfolio_id']  # Store for later tests
+                            self.log_test("Create Portfolio", True, 
+                                        f"Portfolio created: {portfolio['portfolio_id']}, Value: ${portfolio['total_value']:,.0f}")
+                        else:
+                            self.log_test("Create Portfolio", False, f"Missing portfolio fields: {missing_fields}")
+                    else:
+                        self.log_test("Create Portfolio", False, f"Invalid response: {data}")
+                elif response.status == 503:
+                    self.log_test("Create Portfolio", False, "Trading engine not running")
+                else:
+                    self.log_test("Create Portfolio", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("Create Portfolio", False, f"Exception: {str(e)}")
+    
+    async def test_get_portfolios(self):
+        """Test GET /api/trading/portfolios endpoint"""
+        try:
+            async with self.session.get(f"{API_BASE}/trading/portfolios") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if 'portfolios' in data and 'total_portfolios' in data:
+                        portfolios = data['portfolios']
+                        total_portfolios = data['total_portfolios']
+                        
+                        self.log_test("Get Portfolios", True, 
+                                    f"Retrieved {total_portfolios} portfolios")
+                    else:
+                        self.log_test("Get Portfolios", False, f"Invalid response: {data}")
+                elif response.status == 503:
+                    self.log_test("Get Portfolios", False, "Trading engine not running")
+                else:
+                    self.log_test("Get Portfolios", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("Get Portfolios", False, f"Exception: {str(e)}")
+    
+    async def test_portfolio_performance(self):
+        """Test GET /api/trading/portfolios/{id}/performance endpoint"""
+        try:
+            # Use test portfolio ID if available, otherwise use a dummy ID
+            portfolio_id = getattr(self, 'test_portfolio_id', 'test_portfolio_123')
+            
+            async with self.session.get(f"{API_BASE}/trading/portfolios/{portfolio_id}/performance") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if 'performance' in data and 'risk_metrics' in data:
+                        performance = data['performance']
+                        risk_metrics = data['risk_metrics']
+                        
+                        required_perf_fields = ['total_value', 'total_pnl', 'current_allocation', 'target_allocation']
+                        missing_fields = [field for field in required_perf_fields if field not in performance]
+                        
+                        if not missing_fields:
+                            self.log_test("Portfolio Performance", True, 
+                                        f"Performance data: Total value ${performance['total_value']:,.0f}, PnL ${performance['total_pnl']:,.2f}")
+                        else:
+                            self.log_test("Portfolio Performance", False, f"Missing performance fields: {missing_fields}")
+                    else:
+                        self.log_test("Portfolio Performance", False, f"Invalid response: {data}")
+                elif response.status == 404:
+                    self.log_test("Portfolio Performance", False, f"Portfolio not found: {portfolio_id}")
+                elif response.status == 503:
+                    self.log_test("Portfolio Performance", False, "Trading engine not running")
+                else:
+                    self.log_test("Portfolio Performance", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("Portfolio Performance", False, f"Exception: {str(e)}")
+    
+    async def test_create_rebalance_strategy(self):
+        """Test POST /api/trading/rebalance-strategies endpoint"""
+        try:
+            # Use test portfolio ID if available, otherwise use a dummy ID
+            portfolio_id = getattr(self, 'test_portfolio_id', 'test_portfolio_123')
+            
+            payload = {
+                "portfolio_id": portfolio_id,
+                "name": "RAY-ML Rebalancing Strategy",
+                "frequency": "weekly",
+                "threshold": 0.05,
+                "use_ray_signals": True,
+                "use_ml_predictions": True
+            }
+            
+            async with self.session.post(f"{API_BASE}/trading/rebalance-strategies", json=payload) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if 'strategy' in data and 'message' in data:
+                        strategy = data['strategy']
+                        required_fields = ['strategy_id', 'portfolio_id', 'name', 'frequency', 'threshold']
+                        missing_fields = [field for field in required_fields if field not in strategy]
+                        
+                        if not missing_fields:
+                            self.test_strategy_id = strategy['strategy_id']  # Store for later tests
+                            self.log_test("Create Rebalance Strategy", True, 
+                                        f"Strategy created: {strategy['strategy_id']}, Frequency: {strategy['frequency']}")
+                        else:
+                            self.log_test("Create Rebalance Strategy", False, f"Missing strategy fields: {missing_fields}")
+                    else:
+                        self.log_test("Create Rebalance Strategy", False, f"Invalid response: {data}")
+                elif response.status == 503:
+                    self.log_test("Create Rebalance Strategy", False, "Trading engine not running")
+                else:
+                    self.log_test("Create Rebalance Strategy", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("Create Rebalance Strategy", False, f"Exception: {str(e)}")
+    
+    async def test_get_rebalance_strategies(self):
+        """Test GET /api/trading/rebalance-strategies endpoint"""
+        try:
+            async with self.session.get(f"{API_BASE}/trading/rebalance-strategies") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if 'strategies' in data and 'total_strategies' in data:
+                        strategies = data['strategies']
+                        total_strategies = data['total_strategies']
+                        active_strategies = data.get('active_strategies', 0)
+                        
+                        self.log_test("Get Rebalance Strategies", True, 
+                                    f"Retrieved {total_strategies} strategies, {active_strategies} active")
+                    else:
+                        self.log_test("Get Rebalance Strategies", False, f"Invalid response: {data}")
+                elif response.status == 503:
+                    self.log_test("Get Rebalance Strategies", False, "Trading engine not running")
+                else:
+                    self.log_test("Get Rebalance Strategies", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("Get Rebalance Strategies", False, f"Exception: {str(e)}")
+    
+    async def test_execute_rebalance(self):
+        """Test POST /api/trading/rebalance-strategies/{id}/execute endpoint"""
+        try:
+            # Use test strategy ID if available, otherwise use a dummy ID
+            strategy_id = getattr(self, 'test_strategy_id', 'test_strategy_123')
+            
+            async with self.session.post(f"{API_BASE}/trading/rebalance-strategies/{strategy_id}/execute") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if 'rebalance_result' in data and 'execution_timestamp' in data:
+                        result = data['rebalance_result']
+                        
+                        if 'rebalance_needed' in result:
+                            rebalance_needed = result['rebalance_needed']
+                            trades_executed = result.get('trades_executed', 0)
+                            
+                            self.log_test("Execute Rebalance", True, 
+                                        f"Rebalance executed: needed={rebalance_needed}, trades={trades_executed}")
+                        else:
+                            self.log_test("Execute Rebalance", False, f"Invalid rebalance result: {result}")
+                    else:
+                        self.log_test("Execute Rebalance", False, f"Invalid response: {data}")
+                elif response.status == 404:
+                    self.log_test("Execute Rebalance", False, f"Strategy not found: {strategy_id}")
+                elif response.status == 503:
+                    self.log_test("Execute Rebalance", False, "Trading engine not running")
+                else:
+                    self.log_test("Execute Rebalance", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("Execute Rebalance", False, f"Exception: {str(e)}")
+    
+    async def test_get_market_data(self):
+        """Test GET /api/trading/market-data endpoint"""
+        try:
+            async with self.session.get(f"{API_BASE}/trading/market-data") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if 'market_data' in data and 'symbols_count' in data:
+                        market_data = data['market_data']
+                        symbols_count = data['symbols_count']
+                        
+                        # Check if we have expected stablecoin pairs
+                        expected_symbols = ['USDT/USD', 'USDC/USD', 'DAI/USD']
+                        found_symbols = [sym for sym in expected_symbols if sym in market_data]
+                        
+                        if len(found_symbols) >= 3:
+                            # Check data structure for one symbol
+                            sample_symbol = found_symbols[0]
+                            sample_data = market_data[sample_symbol]
+                            required_fields = ['price', 'bid', 'ask', 'spread']
+                            missing_fields = [field for field in required_fields if field not in sample_data]
+                            
+                            if not missing_fields:
+                                self.log_test("Get Market Data", True, 
+                                            f"Market data for {symbols_count} symbols, {sample_symbol} @ ${sample_data['price']}")
+                            else:
+                                self.log_test("Get Market Data", False, f"Missing market data fields: {missing_fields}")
+                        else:
+                            self.log_test("Get Market Data", False, f"Expected stablecoin pairs not found. Found: {list(market_data.keys())}")
+                    else:
+                        self.log_test("Get Market Data", False, f"Invalid response: {data}")
+                elif response.status == 503:
+                    self.log_test("Get Market Data", False, "Trading engine not running")
+                else:
+                    self.log_test("Get Market Data", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("Get Market Data", False, f"Exception: {str(e)}")
+    
+    async def test_get_positions(self):
+        """Test GET /api/trading/positions endpoint"""
+        try:
+            async with self.session.get(f"{API_BASE}/trading/positions") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if 'positions' in data and 'total_positions' in data and 'summary' in data:
+                        positions = data['positions']
+                        total_positions = data['total_positions']
+                        summary = data['summary']
+                        
+                        self.log_test("Get Positions", True, 
+                                    f"Retrieved {total_positions} positions, Total PnL: ${summary.get('total_pnl', 0):,.2f}")
+                    else:
+                        self.log_test("Get Positions", False, f"Invalid response: {data}")
+                elif response.status == 503:
+                    self.log_test("Get Positions", False, "Trading engine not running")
+                else:
+                    self.log_test("Get Positions", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("Get Positions", False, f"Exception: {str(e)}")
+    
+    async def test_trading_summary(self):
+        """Test GET /api/trading/summary endpoint"""
+        try:
+            async with self.session.get(f"{API_BASE}/trading/summary") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if 'service_status' in data and 'trading_capabilities' in data:
+                        service_status = data['service_status']
+                        capabilities = data['trading_capabilities']
+                        
+                        # Check for expected capability sections
+                        expected_sections = ['order_management', 'portfolio_management', 'trading_pairs', 'execution_engine']
+                        found_sections = [section for section in expected_sections if section in capabilities]
+                        
+                        if len(found_sections) >= 4:
+                            order_mgmt = capabilities['order_management']
+                            portfolio_mgmt = capabilities['portfolio_management']
+                            
+                            self.log_test("Trading Summary", True, 
+                                        f"Service: {service_status}, Orders: {order_mgmt['total_orders']}, Portfolios: {portfolio_mgmt['total_portfolios']}")
+                        else:
+                            self.log_test("Trading Summary", False, f"Missing capability sections. Found: {found_sections}")
+                    else:
+                        self.log_test("Trading Summary", False, f"Invalid response structure: {data}")
+                else:
+                    self.log_test("Trading Summary", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("Trading Summary", False, f"Exception: {str(e)}")
+    
+    async def test_order_validation(self):
+        """Test order validation with invalid parameters"""
+        try:
+            # Test 1: Invalid order side
+            payload = {
+                "client_id": "test_client",
+                "symbol": "USDT/USD",
+                "side": "invalid_side",
+                "order_type": "market",
+                "quantity": 1000.0
+            }
+            
+            async with self.session.post(f"{API_BASE}/trading/orders", json=payload) as response:
+                if response.status == 400:
+                    self.log_test("Order Validation Invalid Side", True, "Correctly rejected invalid order side")
+                elif response.status == 503:
+                    self.log_test("Order Validation Invalid Side", False, "Trading engine not running")
+                else:
+                    self.log_test("Order Validation Invalid Side", False, f"Should reject invalid side but got: {response.status}")
+            
+            # Test 2: Invalid order type
+            payload["side"] = "buy"
+            payload["order_type"] = "invalid_type"
+            
+            async with self.session.post(f"{API_BASE}/trading/orders", json=payload) as response:
+                if response.status == 400:
+                    self.log_test("Order Validation Invalid Type", True, "Correctly rejected invalid order type")
+                elif response.status == 503:
+                    self.log_test("Order Validation Invalid Type", False, "Trading engine not running")
+                else:
+                    self.log_test("Order Validation Invalid Type", False, f"Should reject invalid type but got: {response.status}")
+            
+            # Test 3: Zero quantity
+            payload["order_type"] = "market"
+            payload["quantity"] = 0.0
+            
+            async with self.session.post(f"{API_BASE}/trading/orders", json=payload) as response:
+                if response.status == 400:
+                    self.log_test("Order Validation Zero Quantity", True, "Correctly rejected zero quantity")
+                elif response.status == 503:
+                    self.log_test("Order Validation Zero Quantity", False, "Trading engine not running")
+                else:
+                    self.log_test("Order Validation Zero Quantity", False, f"Should reject zero quantity but got: {response.status}")
+                    
+        except Exception as e:
+            self.log_test("Order Validation", False, f"Exception: {str(e)}")
+    
+    async def test_portfolio_allocation_validation(self):
+        """Test portfolio creation with invalid allocation"""
+        try:
+            # Test invalid allocation (doesn't sum to 100%)
+            payload = {
+                "client_id": "test_client",
+                "name": "Invalid Portfolio",
+                "target_allocation": {
+                    "USDT": 0.6,
+                    "USDC": 0.3,
+                    "DAI": 0.2  # Total = 110%
+                },
+                "initial_cash": 10000.0
+            }
+            
+            async with self.session.post(f"{API_BASE}/trading/portfolios", json=payload) as response:
+                if response.status == 400:
+                    self.log_test("Portfolio Allocation Validation", True, "Correctly rejected invalid allocation")
+                elif response.status == 503:
+                    self.log_test("Portfolio Allocation Validation", False, "Trading engine not running")
+                else:
+                    self.log_test("Portfolio Allocation Validation", False, f"Should reject invalid allocation but got: {response.status}")
+                    
+        except Exception as e:
+            self.log_test("Portfolio Allocation Validation", False, f"Exception: {str(e)}")
+    
+    # ========================================
     # DEVOPS & PRODUCTION DEPLOYMENT TESTS (STEP 10)
     # ========================================
     
