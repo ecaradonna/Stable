@@ -139,6 +139,91 @@ class YieldAggregator:
             # Return original yields if policy filtering fails
             return yields
     
+    def _apply_yield_sanitization(self, yields: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """Apply statistical outlier detection and yield sanitization"""
+        try:
+            if not yields:
+                return yields
+            
+            logger.info(f"Applying yield sanitization to {len(yields)} yields")
+            
+            # Prepare yields for sanitization
+            sanitization_input = []
+            for yield_data in yields:
+                sanitization_data = {
+                    'apy': yield_data['currentYield'],
+                    'source': yield_data['source'],
+                    'canonical_protocol_id': yield_data.get('metadata', {}).get('protocol_info', {}).get('protocol_id'),
+                    'stablecoin': yield_data['stablecoin']
+                }
+                sanitization_input.append(sanitization_data)
+            
+            # Run batch sanitization
+            sanitization_results = self.yield_sanitizer.sanitize_yield_batch(sanitization_input)
+            
+            # Apply sanitization results
+            sanitized_yields = []
+            for i, (yield_data, result) in enumerate(zip(yields, sanitization_results)):
+                # Skip rejected yields
+                if result.action_taken == SanitizationAction.REJECT:
+                    logger.warning(f"Rejecting yield for {yield_data['stablecoin']} from {yield_data['source']}: {result.warnings}")
+                    continue
+                
+                # Update yield with sanitized value
+                original_yield = yield_data['currentYield']
+                sanitized_yield_data = yield_data.copy()
+                sanitized_yield_data['currentYield'] = result.sanitized_apy
+                
+                # Add sanitization metadata
+                if 'metadata' not in sanitized_yield_data:
+                    sanitized_yield_data['metadata'] = {}
+                
+                sanitized_yield_data['metadata']['sanitization'] = {
+                    'original_apy': result.original_apy,
+                    'sanitized_apy': result.sanitized_apy,
+                    'action_taken': result.action_taken.value,
+                    'confidence_score': result.confidence_score,
+                    'outlier_score': result.outlier_score,
+                    'warnings': result.warnings,
+                    'adjustment_magnitude': abs(result.sanitized_apy - result.original_apy)
+                }
+                
+                # Add warning flags for flagged yields
+                if result.action_taken == SanitizationAction.FLAG:
+                    sanitized_yield_data['metadata']['yield_warning'] = "Yield flagged by sanitization system"
+                
+                # Update risk score based on sanitization confidence
+                if result.confidence_score < 0.70:
+                    original_risk = sanitized_yield_data.get('riskScore', 'Medium')
+                    if original_risk == 'Low':
+                        sanitized_yield_data['riskScore'] = 'Medium'
+                    elif original_risk == 'Medium':
+                        sanitized_yield_data['riskScore'] = 'High'
+                
+                sanitized_yields.append(sanitized_yield_data)
+            
+            # Log sanitization summary
+            original_count = len(yields)
+            sanitized_count = len(sanitized_yields)
+            rejected_count = original_count - sanitized_count
+            
+            if sanitization_results:
+                avg_confidence = statistics.mean([r.confidence_score for r in sanitization_results])
+                flagged_count = sum(1 for r in sanitization_results if r.action_taken == SanitizationAction.FLAG)
+                capped_count = sum(1 for r in sanitization_results if r.action_taken == SanitizationAction.CAP)
+                winsorized_count = sum(1 for r in sanitization_results if r.action_taken == SanitizationAction.WINSORIZE)
+                
+                logger.info(f"Sanitization complete: {sanitized_count}/{original_count} yields kept, "
+                          f"{rejected_count} rejected, {flagged_count} flagged, {capped_count} capped, "
+                          f"{winsorized_count} winsorized. Avg confidence: {avg_confidence:.2f}")
+            
+            return sanitized_yields
+            
+        except Exception as e:
+            logger.error(f"Yield sanitization error: {e}")
+            # Return original yields if sanitization fails
+            return yields
+    
     def _map_source_to_protocol_id(self, source: str) -> str:
         """Map yield source to protocol ID for policy checking"""
         source_lower = source.lower()
