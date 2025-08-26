@@ -177,6 +177,17 @@ async def startup_event():
         logger.error(f"❌ Failed to start AI Portfolio service: {e}")
         logger.info("⚠️ Continuing without AI portfolio features")
     
+    # Start Enhanced Risk Management services (STEP 14)
+    try:
+        from services.risk_management_service import start_risk_management
+        
+        # Start Risk Management service
+        await start_risk_management()
+        logger.info("✅ Enhanced Risk Management service started")
+    except Exception as e:
+        logger.error(f"❌ Failed to start Risk Management service: {e}")
+        logger.info("⚠️ Continuing without enhanced risk management features")
+    
     # Start Trading Engine (needed for AI Portfolio integration)
     try:
         from services.trading_engine_service import start_trading_engine
