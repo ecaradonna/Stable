@@ -138,89 +138,58 @@ const SYIHistoricalChart = () => {
     try {
       setLoading(true);
       
-      // Dynamic backend URL detection
-      const getBackendURL = () => {
-        if (window.location.hostname === 'localhost') {
-          return 'http://localhost:8001';
-        }
-        const envBackendUrl = process.env.REACT_APP_BACKEND_URL || import.meta.env.REACT_APP_BACKEND_URL;
-        if (envBackendUrl) {
-          return envBackendUrl;
-        }
-        const protocol = window.location.protocol === 'https:' ? 'https:' : window.location.protocol;
-        const hostname = window.location.hostname;
-        return `${protocol}//${hostname}`;
-      };
-
-      const backendUrl = getBackendURL();
-      const response = await fetch(`${backendUrl}/api/index/history?days=${days}`);
+      // Fetch both SYI data and crypto data in parallel
+      const [syiDataPromise, cryptoDataPromise] = await Promise.all([
+        fetchSYIData(days),
+        fetchCryptoData(days)
+      ]);
       
-      if (response.ok) {
-        const data = await response.json();
+      // Merge the data
+      const mergedData = mergeCryptoWithSYI(syiDataPromise, cryptoDataPromise);
+      
+      // Calculate performance metrics for SYI
+      if (mergedData.length > 0) {
+        const latestValue = mergedData[mergedData.length - 1].yield_percentage;
+        const earliestValue = mergedData[0].yield_percentage;
+        const change = latestValue - earliestValue;
+        const changePercent = earliestValue !== 0 ? (change / Math.abs(earliestValue)) * 100 : 0;
         
-        // Process data for chart
-        const processedData = data.map((item, index) => {
-          const date = new Date(item.timestamp);
-          const yieldPercentage = ((item.value - 1) * 100); // Convert index value to yield percentage
-          
-          return {
-            date: date.toISOString().split('T')[0],
-            timestamp: item.timestamp,
-            index_value: item.value,
-            yield_percentage: yieldPercentage,
-            formatted_date: date.toLocaleDateString('en-US', { 
-              month: 'short', 
-              day: 'numeric' 
-            }),
-            full_date: date.toLocaleDateString('en-US', {
-              weekday: 'short',
-              year: 'numeric',
-              month: 'short', 
-              day: 'numeric'
-            })
-          };
+        const yieldValues = mergedData.map(d => d.yield_percentage);
+        const maxValue = Math.max(...yieldValues);
+        const minValue = Math.min(...yieldValues);
+        const avgValue = yieldValues.reduce((sum, d) => sum + d, 0) / yieldValues.length;
+        
+        // Calculate crypto performance
+        const cryptoPerf = calculateCryptoPerformance(mergedData);
+        
+        setPerformance({
+          current: latestValue,
+          change: change,
+          changePercent: changePercent,
+          max: maxValue,
+          min: minValue,
+          average: avgValue,
+          volatility: calculateVolatility(yieldValues),
+          ...cryptoPerf
         });
-
-        // Sort by date
-        processedData.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
-        
-        // Calculate performance metrics
-        if (processedData.length > 0) {
-          const latestValue = processedData[processedData.length - 1].yield_percentage;
-          const earliestValue = processedData[0].yield_percentage;
-          const change = latestValue - earliestValue;
-          const changePercent = earliestValue !== 0 ? (change / Math.abs(earliestValue)) * 100 : 0;
-          
-          const maxValue = Math.max(...processedData.map(d => d.yield_percentage));
-          const minValue = Math.min(...processedData.map(d => d.yield_percentage));
-          const avgValue = processedData.reduce((sum, d) => sum + d.yield_percentage, 0) / processedData.length;
-          
-          setPerformance({
-            current: latestValue,
-            change: change,
-            changePercent: changePercent,
-            max: maxValue,
-            min: minValue,
-            average: avgValue,
-            volatility: calculateVolatility(processedData.map(d => d.yield_percentage))
-          });
-        }
-        
-        setChartData(processedData);
-      } else {
-        // Fallback to mock data
-        setChartData(generateMockData(days));
-        setPerformance(generateMockPerformance());
       }
+      
+      setChartData(mergedData);
     } catch (error) {
-      console.error('Error fetching historical data:', error);
+      console.error('Error fetching data:', error);
       // Fallback to mock data
-      setChartData(generateMockData(days));
+      const mockSYI = generateMockData(days);
+      const mockCrypto = generateMockCryptoData(days);
+      const mergedMockData = mergeCryptoWithSYI(mockSYI, mockCrypto);
+      
+      setChartData(mergedMockData);
       setPerformance(generateMockPerformance());
     } finally {
       setLoading(false);
     }
   };
+
+  const fetchSYIData = async (days) => {
 
   const calculateVolatility = (values) => {
     if (values.length < 2) return 0;
