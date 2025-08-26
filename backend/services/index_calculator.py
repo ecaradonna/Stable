@@ -94,57 +94,91 @@ class StableYieldIndexCalculator:
         )
     
     async def calculate_index(self) -> IndexValue:
-        """Calculate the current StableYield Index value"""
+        """Calculate the current StableYield Index using RAY methodology"""
         try:
-            logger.info("Starting StableYield Index calculation")
+            # Check cache first
+            cache_key = "current_index"
+            if cache_key in self.cache and datetime.utcnow() < self.cache_expiry[cache_key]:
+                logger.debug("Returning cached index value")
+                return self.cache[cache_key]
             
-            # Gather data for all constituents
-            constituents_data = []
-            total_market_cap = 0
+            logger.info("Calculating StableYield Index using enhanced RAY methodology")
             
-            for coin in self.constituents:
-                try:
-                    constituent = await self._calculate_constituent_data(coin)
-                    if constituent:
-                        constituents_data.append(constituent)
-                        total_market_cap += constituent.market_cap
-                except Exception as e:
-                    logger.warning(f"Failed to calculate data for {coin['symbol']}: {e}")
-                    continue
+            # Get current yield data through the aggregator (already filtered and sanitized)
+            yields_data = await self.yield_aggregator.get_all_yields()
             
-            if not constituents_data:
-                raise Exception("No valid constituent data available")
+            if not yields_data:
+                logger.warning("No yield data available for index calculation")
+                return self._get_fallback_index()
             
-            # Calculate weights and final index value
-            index_value = 0
-            for constituent in constituents_data:
-                if total_market_cap > 0:
-                    constituent.weight = constituent.market_cap / total_market_cap
-                    index_value += constituent.weight * constituent.ray
-                else:
-                    # Equal weight fallback
-                    constituent.weight = 1.0 / len(constituents_data)
-                    index_value += constituent.weight * constituent.ray
+            logger.info(f"Processing {len(yields_data)} yield sources for SYI calculation")
             
-            # Create index record
-            result = IndexValue(
-                timestamp=datetime.utcnow(),
-                index_id="SYI",
-                value=round(index_value, 4),
-                constituents=constituents_data,
-                metadata={
-                    "total_market_cap": total_market_cap,
-                    "constituent_count": len(constituents_data),
-                    "calculation_method": "market_cap_weighted_ray"
+            # Use the new SYI Compositor with RAY calculations
+            syi_composition = self.syi_compositor.compose_syi(yields_data)
+            
+            # Convert to IndexValue format for backward compatibility
+            constituents = []
+            for constituent in syi_composition.constituents:
+                # Create StablecoinConstituent objects
+                stablecoin_constituent = StablecoinConstituent(
+                    symbol=constituent.stablecoin,
+                    weight=constituent.weight,
+                    yield_value=constituent.ray,  # Use RAY instead of raw APY
+                    liquidity=f"${constituent.tvl_usd:,.0f}",
+                    risk_score=1 - constituent.risk_penalty,  # Convert penalty to score
+                    source=constituent.protocol,
+                    last_updated=datetime.utcnow().isoformat()
+                )
+                constituents.append(stablecoin_constituent)
+            
+            # Create enhanced metadata
+            metadata = {
+                "methodology_version": syi_composition.methodology_version,
+                "calculation_method": "risk_adjusted_yield_weighted",
+                "calculation_timestamp": syi_composition.calculation_timestamp,
+                "constituent_count": syi_composition.constituent_count,
+                "total_weight": syi_composition.total_weight,
+                "quality_metrics": syi_composition.quality_metrics,
+                "risk_adjustment_applied": True,
+                "data_sources": {
+                    "defi_sources": len([c for c in syi_composition.constituents if "DeFi" in str(c.metadata.get('original_yield_data', {}).get('sourceType', ''))]),
+                    "cefi_sources": len([c for c in syi_composition.constituents if "CeFi" in str(c.metadata.get('original_yield_data', {}).get('sourceType', ''))]),
+                    "total_sources": len(syi_composition.constituents)
+                },
+                "ray_statistics": {
+                    "average_ray": syi_composition.breakdown.get("weighted_average_ray", 0),
+                    "average_risk_penalty": syi_composition.breakdown.get("total_risk_penalty", 0),
+                    "average_confidence": syi_composition.quality_metrics.get("avg_confidence", 0)
+                },
+                "diversification": {
+                    "protocol_count": syi_composition.quality_metrics.get("protocol_diversity", 0),
+                    "stablecoin_count": syi_composition.quality_metrics.get("stablecoin_diversity", 0),
+                    "max_constituent_weight": syi_composition.quality_metrics.get("max_constituent_weight", 0)
                 }
+            }
+            
+            # Create final IndexValue
+            index_value = IndexValue(
+                value=syi_composition.index_value,
+                timestamp=datetime.utcnow().isoformat(),
+                constituents=constituents,
+                methodology="Risk-Adjusted Yield Weighted",
+                metadata=metadata
             )
             
-            logger.info(f"StableYield Index calculated: {result.value}%")
-            return result
+            # Cache the result
+            self.cache[cache_key] = index_value
+            self.cache_expiry[cache_key] = datetime.utcnow() + self.cache_duration
+            
+            logger.info(f"SYI calculated: {syi_composition.index_value:.4f} with {len(constituents)} constituents")
+            logger.info(f"Quality metrics: Overall={syi_composition.quality_metrics.get('overall_quality', 0):.2f}, "
+                       f"Avg confidence={syi_composition.quality_metrics.get('avg_confidence', 0):.2f}")
+            
+            return index_value
             
         except Exception as e:
-            logger.error(f"Index calculation failed: {e}")
-            raise
+            logger.error(f"Error calculating StableYield Index: {str(e)}")
+            return self._get_fallback_index()
     
     async def _calculate_constituent_data(self, coin: Dict) -> Optional[StablecoinConstituent]:
         """Calculate all metrics for a single stablecoin constituent"""
