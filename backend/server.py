@@ -152,6 +152,22 @@ async def startup_event():
     except Exception as e:
         logger.error(f"❌ Failed to start index scheduler: {e}")
     
+    # Start WebSocket services for real-time streaming (STEP 6)
+    try:
+        from services.cryptocompare_websocket import start_cryptocompare_websocket
+        from services.realtime_data_integrator import start_realtime_integration
+        
+        # Start CryptoCompare WebSocket client
+        await start_cryptocompare_websocket()
+        logger.info("✅ CryptoCompare WebSocket client started")
+        
+        # Start real-time data integrator
+        await start_realtime_integration()
+        logger.info("✅ Real-time data integrator started")
+    except Exception as e:
+        logger.error(f"❌ Failed to start WebSocket services: {e}")
+        logger.info("⚠️ Continuing without real-time WebSocket features")
+    
     logger.info("New capabilities enabled:")
     logger.info("  - Real-time StableYield Index calculation")
     logger.info("  - Real-time peg stability monitoring")
