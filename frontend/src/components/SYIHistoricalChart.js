@@ -466,7 +466,7 @@ const SYIHistoricalChart = () => {
         {/* Chart */}
         <div className="h-80 w-full">
           <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={chartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+            <ComposedChart data={chartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
               <defs>
                 <linearGradient id="syiGradient" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#4CC1E9" stopOpacity={0.3}/>
@@ -480,20 +480,59 @@ const SYIHistoricalChart = () => {
                 fontSize={12}
               />
               <YAxis 
+                yAxisId="yield"
                 stroke="#6B7280"
                 fontSize={12}
                 domain={['dataMin - 0.1', 'dataMax + 0.1']}
                 tickFormatter={(value) => `${value.toFixed(2)}%`}
+                orientation="left"
               />
+              {showCrypto && (
+                <YAxis 
+                  yAxisId="crypto"
+                  stroke="#F97316"
+                  fontSize={12}
+                  tickFormatter={(value) => `${value.toFixed(1)}%`}
+                  orientation="right"
+                />
+              )}
               <Tooltip content={<CustomTooltip />} />
+              
+              {/* SYI Area Chart */}
               <Area
+                yAxisId="yield"
                 type="monotone"
                 dataKey="yield_percentage"
                 stroke="#4CC1E9"
-                strokeWidth={2}
+                strokeWidth={3}
                 fill="url(#syiGradient)"
+                name="SYI Yield"
               />
-            </AreaChart>
+              
+              {/* Bitcoin and Ethereum Lines */}
+              {showCrypto && (
+                <>
+                  <Line
+                    yAxisId="crypto"
+                    type="monotone"
+                    dataKey="btc_change_pct"
+                    stroke="#F97316"
+                    strokeWidth={2}
+                    dot={false}
+                    name="Bitcoin"
+                  />
+                  <Line
+                    yAxisId="crypto"
+                    type="monotone"
+                    dataKey="eth_change_pct"
+                    stroke="#3B82F6"
+                    strokeWidth={2}
+                    dot={false}
+                    name="Ethereum"
+                  />
+                </>
+              )}
+            </ComposedChart>
           </ResponsiveContainer>
         </div>
 
