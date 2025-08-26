@@ -1,0 +1,9 @@
+{
+  "api_gateway": "healthy",
+  "webhook_queue_size": 0,
+  "active_api_keys": 0,
+  "active_webhooks": 0,
+  "active_integrations": 0,
+  "rate_limit_buckets": 0,
+  "last_check": "2025-08-26T09:34:23.962492"
+}
