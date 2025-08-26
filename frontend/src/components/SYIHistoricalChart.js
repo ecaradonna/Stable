@@ -190,6 +190,74 @@ const SYIHistoricalChart = () => {
   };
 
   const fetchSYIData = async (days) => {
+    // Dynamic backend URL detection
+    const getBackendURL = () => {
+      if (window.location.hostname === 'localhost') {
+        return 'http://localhost:8001';
+      }
+      const envBackendUrl = process.env.REACT_APP_BACKEND_URL || import.meta.env.REACT_APP_BACKEND_URL;
+      if (envBackendUrl) {
+        return envBackendUrl;
+      }
+      const protocol = window.location.protocol === 'https:' ? 'https:' : window.location.protocol;
+      const hostname = window.location.hostname;
+      return `${protocol}//${hostname}`;
+    };
+
+    const backendUrl = getBackendURL();
+    const response = await fetch(`${backendUrl}/api/index/history?days=${days}`);
+    
+    if (response.ok) {
+      const data = await response.json();
+      
+      // Process data for chart
+      const processedData = data.map((item, index) => {
+        const date = new Date(item.timestamp);
+        const yieldPercentage = ((item.value - 1) * 100); // Convert index value to yield percentage
+        
+        return {
+          date: date.toISOString().split('T')[0],
+          timestamp: item.timestamp,
+          index_value: item.value,
+          yield_percentage: yieldPercentage,
+          formatted_date: date.toLocaleDateString('en-US', { 
+            month: 'short', 
+            day: 'numeric' 
+          }),
+          full_date: date.toLocaleDateString('en-US', {
+            weekday: 'short',
+            year: 'numeric',
+            month: 'short', 
+            day: 'numeric'
+          })
+        };
+      });
+
+      // Sort by date
+      processedData.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+      return processedData;
+    } else {
+      // Return mock data
+      return generateMockData(days);
+    }
+  };
+
+  const calculateCryptoPerformance = (mergedData) => {
+    if (mergedData.length === 0) return {};
+    
+    const latestData = mergedData[mergedData.length - 1];
+    const firstData = mergedData[0];
+    
+    const btcChange = latestData.btc_change_pct || 0;
+    const ethChange = latestData.eth_change_pct || 0;
+    
+    return {
+      btc_performance: btcChange,
+      eth_performance: ethChange,
+      btc_current: latestData.btc_price,
+      eth_current: latestData.eth_price
+    };
+  };
 
   const calculateVolatility = (values) => {
     if (values.length < 2) return 0;
