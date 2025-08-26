@@ -589,7 +589,7 @@ async def get_market_data() -> Dict[str, Any]:
         logger.error(f"Error getting market data: {e}")
         raise HTTPException(status_code=500, detail="Failed to get market data")
 
-@router.get("/trading/positions")
+@router.get("/positions")
 async def get_positions(
     client_id: Optional[str] = Query(default=None, description="Filter by client ID")
 ) -> Dict[str, Any]:
