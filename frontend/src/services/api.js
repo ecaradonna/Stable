@@ -7,14 +7,14 @@ const getBackendURL = () => {
     return 'http://localhost:8001';
   }
   
-  // For production/preview, use the environment variable or construct from current URL
-  const envBackendUrl = process.env.REACT_APP_BACKEND_URL;
+  // For production/preview, use the environment variable first
+  const envBackendUrl = process.env.REACT_APP_BACKEND_URL || import.meta.env.REACT_APP_BACKEND_URL;
   if (envBackendUrl) {
     return envBackendUrl;
   }
   
-  // Fallback: construct backend URL from current window location
-  const protocol = window.location.protocol;
+  // Fallback: construct backend URL from current window location (always use HTTPS in production)
+  const protocol = window.location.protocol === 'https:' ? 'https:' : window.location.protocol;
   const hostname = window.location.hostname;
   return `${protocol}//${hostname}`;
 };
