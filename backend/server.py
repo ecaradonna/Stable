@@ -125,6 +125,7 @@ app.include_router(liquidity_router, prefix="/api")  # Liquidity filtering route
 app.include_router(sanitization_router, prefix="/api")  # Yield sanitization routes
 app.include_router(ray_router, prefix="/api")  # Risk-Adjusted Yield (RAY) and SYI routes
 app.include_router(websocket_router, prefix="/api")  # WebSocket streaming routes (STEP 6)
+app.include_router(analytics_router, prefix="/api")  # Batch analytics routes (STEP 7)
 
 app.add_middleware(
     CORSMiddleware,
