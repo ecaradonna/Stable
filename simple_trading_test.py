@@ -13,8 +13,8 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv('/app/frontend/.env')
 
-# Get backend URL from environment
-BACKEND_URL = os.getenv('REACT_APP_BACKEND_URL', 'https://stableyield-trade.preview.emergentagent.com')
+# Get backend URL from environment - use localhost for direct testing
+BACKEND_URL = "http://localhost:8001"
 API_BASE = f"{BACKEND_URL}/api"
 
 async def test_trading_endpoints():
