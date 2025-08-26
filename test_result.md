@@ -471,10 +471,11 @@ metadata:
   run_ui: true
 
 test_plan:
-  current_focus: []
+  current_focus:
+    - "AI-Powered Portfolio Management & Automated Rebalancing (STEP 13)"
   stuck_tasks: []
   test_all: false
-  test_priority: "complete"
+  test_priority: "high_first"
 
 agent_communication:
     - agent: "main"
