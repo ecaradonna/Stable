@@ -852,6 +852,52 @@ class AIPortfolioService:
         except Exception as e:
             logger.error(f"❌ Error executing AI rebalancing {signal_id}: {e}")
             raise
+
+    # Helper methods for production execution
+    async def _get_current_holdings(self, portfolio_id: str) -> List[Holding]:
+        """Get current portfolio holdings"""
+        try:
+            trading_engine = get_trading_engine_service()
+            if not trading_engine:
+                return []
+            
+            # Get positions from trading engine
+            positions = [p for p in trading_engine.positions.values() if p.client_id == portfolio_id]
+            
+            holdings = []
+            for position in positions:
+                if position.quantity > 0:  # Only include non-zero positions
+                    # Extract asset from symbol (e.g., "USDT/USD" -> "USDT")
+                    asset = position.symbol.split('/')[0]
+                    holdings.append(Holding(
+                        asset=asset,
+                        quantity=float(position.quantity),
+                        price=float(position.current_price)
+                    ))
+            
+            return holdings
+            
+        except Exception as e:
+            logger.error(f"❌ Error getting current holdings: {e}")
+            return []
+    
+    async def _get_cash_balance(self, portfolio_id: str) -> float:
+        """Get available cash balance"""
+        try:
+            trading_engine = get_trading_engine_service()
+            if not trading_engine:
+                return 0.0
+            
+            # Get portfolio cash balance
+            if portfolio_id in trading_engine.portfolios:
+                portfolio = trading_engine.portfolios[portfolio_id]
+                return float(portfolio.cash_balance)
+            
+            return 0.0
+            
+        except Exception as e:
+            logger.error(f"❌ Error getting cash balance: {e}")
+            return 0.0
     
     # Market Sentiment Analysis
     async def analyze_market_sentiment(self, symbols: Optional[List[str]] = None) -> Dict[str, MarketSentiment]:
