@@ -408,7 +408,10 @@ const LiveYields = () => {
           <p className="text-gray-600 mb-8 max-w-2xl mx-auto">
             Access comprehensive risk analytics, peg stability monitoring, and institutional-grade yield intelligence across 50+ platforms.
           </p>
-          <Button className="bg-gradient-to-r from-[#4CC1E9] to-[#007A99] hover:from-[#007A99] hover:to-[#4CC1E9] text-white font-semibold px-8 py-3 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl">
+          <Button 
+            className="bg-gradient-to-r from-[#4CC1E9] to-[#007A99] hover:from-[#007A99] hover:to-[#4CC1E9] text-white font-semibold px-8 py-3 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl"
+            onClick={() => navigate('/risk-analytics')}
+          >
             Get Professional Access
           </Button>
         </div>
