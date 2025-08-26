@@ -118,7 +118,7 @@ async def stop_trading_services() -> Dict[str, Any]:
         raise HTTPException(status_code=500, detail="Failed to stop trading services")
 
 # Order Management
-@router.post("/trading/orders")
+@router.post("/orders")
 async def create_order(request: CreateOrderRequest) -> Dict[str, Any]:
     """Create a new trading order"""
     try:
