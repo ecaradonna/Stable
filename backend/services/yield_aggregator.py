@@ -14,6 +14,7 @@ class YieldAggregator:
         self.defi_llama = DefiLlamaService()
         self.binance = BinanceService()
         self.policy_service = ProtocolPolicyService()
+        self.yield_sanitizer = YieldSanitizer()
         self.cache = {}
         self.cache_expiry = {}
         self.cache_duration = timedelta(minutes=5)  # Cache for 5 minutes
