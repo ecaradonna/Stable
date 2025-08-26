@@ -209,6 +209,17 @@ async def startup_event():
         logger.error(f"❌ Failed to start API Gateway service: {e}")
         logger.info("⚠️ Continuing without enterprise features")
     
+    # Start DevOps & Production services (STEP 10)
+    try:
+        from services.devops_service import start_devops
+        
+        # Start DevOps service
+        await start_devops()
+        logger.info("✅ DevOps & Production service started")
+    except Exception as e:
+        logger.error(f"❌ Failed to start DevOps service: {e}")
+        logger.info("⚠️ Continuing without DevOps features")
+    
     logger.info("New capabilities enabled:")
     logger.info("  - Real-time StableYield Index calculation")
     logger.info("  - Real-time peg stability monitoring")
