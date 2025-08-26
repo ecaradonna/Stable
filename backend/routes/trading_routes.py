@@ -649,7 +649,7 @@ async def get_positions(
         logger.error(f"Error getting positions: {e}")
         raise HTTPException(status_code=500, detail="Failed to get positions")
 
-@router.get("/trading/summary")
+@router.get("/summary")
 async def get_trading_summary() -> Dict[str, Any]:
     """Get comprehensive trading system summary"""
     try:
