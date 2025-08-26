@@ -464,6 +464,47 @@ class AIPortfolioService:
         
         logger.info("🛑 AI-Powered Portfolio Management Service stopped")
     
+    def get_ai_portfolio_status(self) -> Dict[str, Any]:
+        """Get AI portfolio service status"""
+        try:
+            return {
+                "service_running": self.is_running,
+                "ai_portfolios": len(self.ai_portfolios),
+                "optimization_results": len(self.optimization_results),
+                "rebalancing_signals": len(self.rebalancing_signals),
+                "market_sentiments": len(self.market_sentiments),
+                "capabilities": [
+                    "AI-Enhanced Portfolio Optimization",
+                    "Mean-Variance Optimization", 
+                    "Risk Parity Optimization",
+                    "Black-Litterman Optimization",
+                    "Hierarchical Risk Parity",
+                    "Automated Rebalancing",
+                    "Market Sentiment Analysis",
+                    "Market Regime Detection"
+                ],
+                "optimization_strategies": [strategy.value for strategy in OptimizationStrategy],
+                "rebalancing_triggers": [trigger.value for trigger in RebalancingTrigger],
+                "optimization_metrics": self.optimization_metrics,
+                "background_tasks": len([task for task in self.background_tasks if not task.done()]),
+                "last_updated": datetime.utcnow().isoformat()
+            }
+        except Exception as e:
+            logger.error(f"❌ Error getting AI portfolio status: {e}")
+            return {
+                "service_running": False,
+                "ai_portfolios": 0,
+                "optimization_results": 0,
+                "rebalancing_signals": 0,
+                "market_sentiments": 0,
+                "capabilities": [],
+                "optimization_strategies": [],
+                "rebalancing_triggers": [],
+                "optimization_metrics": {},
+                "background_tasks": 0,
+                "last_updated": datetime.utcnow().isoformat()
+            }
+    
     # AI Portfolio Management
     async def create_ai_portfolio(self, portfolio_data: Dict[str, Any]) -> AIPortfolioConfig:
         """Create a new AI-managed portfolio with production-ready execution constraints"""
