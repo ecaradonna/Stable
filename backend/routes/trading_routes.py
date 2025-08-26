@@ -100,7 +100,7 @@ async def start_trading_services() -> Dict[str, Any]:
         logger.error(f"Error starting trading services: {e}")
         raise HTTPException(status_code=500, detail="Failed to start trading services")
 
-@router.post("/trading/stop")
+@router.post("/stop")
 async def stop_trading_services() -> Dict[str, Any]:
     """Stop trading engine services"""
     try:
