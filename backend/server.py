@@ -248,6 +248,17 @@ async def startup_event():
         logger.error(f"❌ Failed to start Dashboard service: {e}")
         logger.info("⚠️ Continuing without dashboard features")
     
+    # Start AI-Powered Portfolio Management services (STEP 13)
+    try:
+        from services.ai_portfolio_service import start_ai_portfolio
+        
+        # Start AI Portfolio service
+        await start_ai_portfolio()
+        logger.info("✅ AI-Powered Portfolio Management service started")
+    except Exception as e:
+        logger.error(f"❌ Failed to start AI Portfolio service: {e}")
+        logger.info("⚠️ Continuing without AI portfolio features")
+    
     logger.info("New capabilities enabled:")
     logger.info("  - Real-time StableYield Index calculation")
     logger.info("  - Real-time peg stability monitoring")
