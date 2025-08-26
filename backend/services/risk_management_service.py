@@ -596,7 +596,6 @@ class EnhancedRiskManagementService:
             horizon_volatility = volatility * np.sqrt(horizon_days / 252)
             
             # Calculate VaR using normal distribution approximation
-            from scipy.stats import norm
             var_multiplier = norm.ppf(1 - confidence)  # Z-score for confidence level
             
             # Get portfolio value
