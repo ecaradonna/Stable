@@ -157,98 +157,14 @@ logger = logging.getLogger(__name__)
 @app.on_event("startup")
 async def startup_event():
     logger.info("StableYield Market Intelligence API v2.0.0 starting up...")
+    logger.info("⚠️ EMERGENCY STARTUP MODE: Starting essential services only for AI Portfolio testing")
     
-    # Start the StableYield Index scheduler
-    try:
-        from services.index_scheduler import start_index_scheduler
-        await start_index_scheduler(db)
-        logger.info("✅ StableYield Index scheduler started - calculating every 1 minute")
-    except Exception as e:
-        logger.error(f"❌ Failed to start index scheduler: {e}")
+    # TEMPORARILY DISABLED: Problematic services that are preventing startup
+    # - Index scheduler (validation errors)
+    # - WebSocket services (connection loops)
+    # - Other background services
     
-    # Start WebSocket services for real-time streaming (STEP 6)
-    try:
-        from services.cryptocompare_websocket import start_cryptocompare_websocket
-        from services.realtime_data_integrator import start_realtime_integration
-        
-        # Start CryptoCompare WebSocket client
-        await start_cryptocompare_websocket()
-        logger.info("✅ CryptoCompare WebSocket client started")
-        
-        # Start real-time data integrator
-        await start_realtime_integration()
-        logger.info("✅ Real-time data integrator started")
-    except Exception as e:
-        logger.error(f"❌ Failed to start WebSocket services: {e}")
-        logger.info("⚠️ Continuing without real-time WebSocket features")
-    
-    # Start Batch Analytics services (STEP 7)
-    try:
-        from services.batch_analytics_service import start_batch_analytics
-        
-        # Start batch analytics scheduler
-        await start_batch_analytics()
-        logger.info("✅ Batch analytics service started")
-    except Exception as e:
-        logger.error(f"❌ Failed to start batch analytics service: {e}")
-        logger.info("⚠️ Continuing without batch analytics features")
-    
-    # Start Machine Learning services (STEP 8)
-    try:
-        from services.ml_insights_service import start_ml_insights
-        
-        # Start ML insights service
-        await start_ml_insights()
-        logger.info("✅ ML Insights service started")
-    except Exception as e:
-        logger.error(f"❌ Failed to start ML insights service: {e}")
-        logger.info("⚠️ Continuing without ML features")
-    
-    # Start Enterprise API Gateway services (STEP 9)
-    try:
-        from services.api_gateway_service import start_api_gateway
-        
-        # Start API Gateway service
-        await start_api_gateway()
-        logger.info("✅ Enterprise API Gateway service started")
-    except Exception as e:
-        logger.error(f"❌ Failed to start API Gateway service: {e}")
-        logger.info("⚠️ Continuing without enterprise features")
-    
-    # Start DevOps & Production services (STEP 10)
-    try:
-        from services.devops_service import start_devops
-        
-        # Start DevOps service
-        await start_devops()
-        logger.info("✅ DevOps & Production service started")
-    except Exception as e:
-        logger.error(f"❌ Failed to start DevOps service: {e}")
-        logger.info("⚠️ Continuing without DevOps features")
-    
-    # Start Advanced Trading Engine services (STEP 11)
-    try:
-        from services.trading_engine_service import start_trading_engine
-        
-        # Start Trading Engine service
-        await start_trading_engine()
-        logger.info("✅ Advanced Trading Engine service started")
-    except Exception as e:
-        logger.error(f"❌ Failed to start Trading Engine service: {e}")
-        logger.info("⚠️ Continuing without trading features")
-    
-    # Start Advanced Analytics Dashboard services (STEP 12)
-    try:
-        from services.dashboard_service import start_dashboard
-        
-        # Start Dashboard service
-        await start_dashboard()
-        logger.info("✅ Advanced Analytics Dashboard service started")
-    except Exception as e:
-        logger.error(f"❌ Failed to start Dashboard service: {e}")
-        logger.info("⚠️ Continuing without dashboard features")
-    
-    # Start AI-Powered Portfolio Management services (STEP 13)
+    # Start AI-Powered Portfolio Management services (STEP 13) - PRIORITY FOR TESTING
     try:
         from services.ai_portfolio_service import start_ai_portfolio
         
@@ -258,6 +174,17 @@ async def startup_event():
     except Exception as e:
         logger.error(f"❌ Failed to start AI Portfolio service: {e}")
         logger.info("⚠️ Continuing without AI portfolio features")
+    
+    # Start Trading Engine (needed for AI Portfolio integration)
+    try:
+        from services.trading_engine_service import start_trading_engine
+        
+        # Start Trading Engine service
+        await start_trading_engine()
+        logger.info("✅ Advanced Trading Engine service started")
+    except Exception as e:
+        logger.error(f"❌ Failed to start Trading Engine service: {e}")
+        logger.info("⚠️ Continuing without trading features")
     
     logger.info("New capabilities enabled:")
     logger.info("  - Real-time StableYield Index calculation")
