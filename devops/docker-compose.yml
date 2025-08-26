@@ -1,0 +1,92 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: devops/docker/Dockerfile.backend
+    ports:
+      - "8001:8001"
+    environment:
+      - MONGO_URL=mongodb://mongodb:27017/stableyield
+      - ENVIRONMENT=production
+    depends_on:
+      - mongodb
+      - redis
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped
+    
+  frontend:
+    build:
+      context: .
+      dockerfile: devops/docker/Dockerfile.frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    restart: unless-stopped
+    
+  mongodb:
+    image: mongo:7.0
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=stableyield
+      - MONGO_INITDB_ROOT_PASSWORD=stableyield_prod_2025
+    volumes:
+      - mongodb_data:/data/db
+      - ./devops/mongodb/init.js:/docker-entrypoint-initdb.d/init.js
+    restart: unless-stopped
+    
+  redis:
+    image: redis:7.2-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./devops/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./devops/ssl:/etc/nginx/ssl
+    depends_on:
+      - frontend
+      - backend
+    restart: unless-stopped
+    
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./devops/monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+    restart: unless-stopped
+    
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=stableyield_admin_2025
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./devops/monitoring/grafana:/etc/grafana/provisioning
+    restart: unless-stopped
+
+volumes:
+  mongodb_data:
+  redis_data:
+  prometheus_data:
+  grafana_data:

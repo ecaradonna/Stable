@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: stableyield-backend
+  name: stableyield-backend
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: stableyield-backend
+  template:
+    metadata:
+      labels:
+        app: stableyield-backend
+    spec:
+      containers:
+      - env:
+        - name: MONGO_URL
+          value: mongodb://mongodb:27017/stableyield
+        - name: ENVIRONMENT
+          value: production
+        - name: REDIS_URL
+          value: redis://redis:6379
+        image: stableyield/backend:latest
+        livenessProbe:
+          httpGet:
+            path: /api/health
+            port: 8001
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        name: backend
+        ports:
+        - containerPort: 8001
+        readinessProbe:
+          httpGet:
+            path: /api/health
+            port: 8001
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        resources:
+          limits:
+            cpu: 500m
+            memory: 1Gi
+          requests:
+            cpu: 250m
+            memory: 512Mi

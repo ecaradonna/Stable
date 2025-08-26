@@ -1,0 +1,35 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/rate-limit: '100'
+  name: stableyield-ingress
+spec:
+  rules:
+  - host: stableyield.com
+    http:
+      paths:
+      - backend:
+          service:
+            name: stableyield-frontend-service
+            port:
+              number: 3000
+        path: /
+        pathType: Prefix
+  - host: api.stableyield.com
+    http:
+      paths:
+      - backend:
+          service:
+            name: stableyield-backend-service
+            port:
+              number: 8001
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - stableyield.com
+    - api.stableyield.com
+    secretName: stableyield-tls
