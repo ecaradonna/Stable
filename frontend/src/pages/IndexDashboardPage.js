@@ -347,7 +347,7 @@ const IndexDashboardPage = () => {
             </p>
           </div>
           
-          <SYIHistoricalChart />
+          <SYIMacroAnalysisChart />
         </div>
       </section>
 
