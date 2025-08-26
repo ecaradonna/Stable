@@ -429,7 +429,7 @@ async def get_portfolio_performance(portfolio_id: str) -> Dict[str, Any]:
         raise HTTPException(status_code=500, detail="Failed to get portfolio performance")
 
 # Rebalancing System
-@router.post("/trading/rebalance-strategies")
+@router.post("/rebalance-strategies")
 async def create_rebalance_strategy(request: CreateRebalanceStrategyRequest) -> Dict[str, Any]:
     """Create an automated rebalancing strategy"""
     try:
