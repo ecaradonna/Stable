@@ -1076,6 +1076,420 @@ class StableYieldTester:
             self.log_test("Parameter Validation Valid Params", False, f"Exception: {str(e)}")
     
     # ========================================
+    # ADVANCED ANALYTICS DASHBOARD TESTS (STEP 12)
+    # ========================================
+    
+    async def test_dashboard_status(self):
+        """Test GET /api/dashboard/status endpoint"""
+        try:
+            async with self.session.get(f"{API_BASE}/dashboard/status") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    required_fields = ['service_running', 'cache_statistics', 'capabilities']
+                    missing_fields = [field for field in required_fields if field not in data]
+                    
+                    if not missing_fields:
+                        cache_stats = data.get('cache_statistics', {})
+                        capabilities = data.get('capabilities', [])
+                        self.log_test("Dashboard Status", True, 
+                                    f"Service running: {data['service_running']}, Capabilities: {len(capabilities)}")
+                    else:
+                        self.log_test("Dashboard Status", False, f"Missing fields: {missing_fields}")
+                else:
+                    self.log_test("Dashboard Status", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("Dashboard Status", False, f"Exception: {str(e)}")
+    
+    async def test_dashboard_start(self):
+        """Test POST /api/dashboard/start endpoint"""
+        try:
+            async with self.session.post(f"{API_BASE}/dashboard/start") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if 'message' in data and 'capabilities_enabled' in data:
+                        capabilities = data.get('capabilities_enabled', [])
+                        features = data.get('dashboard_features', [])
+                        self.log_test("Dashboard Start", True, 
+                                    f"Started with {len(capabilities)} capabilities, {len(features)} features")
+                    else:
+                        self.log_test("Dashboard Start", False, f"Invalid response structure: {data}")
+                else:
+                    self.log_test("Dashboard Start", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("Dashboard Start", False, f"Exception: {str(e)}")
+    
+    async def test_dashboard_stop(self):
+        """Test POST /api/dashboard/stop endpoint"""
+        try:
+            async with self.session.post(f"{API_BASE}/dashboard/stop") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if 'message' in data and 'status' in data:
+                        status = data.get('status')
+                        self.log_test("Dashboard Stop", True, f"Service stopped, status: {status}")
+                    else:
+                        self.log_test("Dashboard Stop", False, f"Invalid response structure: {data}")
+                else:
+                    self.log_test("Dashboard Stop", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("Dashboard Stop", False, f"Exception: {str(e)}")
+    
+    async def test_portfolio_analytics(self):
+        """Test GET /api/dashboard/portfolio-analytics/{portfolio_id} endpoint"""
+        test_portfolio_id = "portfolio_001"
+        try:
+            async with self.session.get(f"{API_BASE}/dashboard/portfolio-analytics/{test_portfolio_id}") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if 'portfolio_analytics' in data and 'dashboard_metadata' in data:
+                        analytics = data['portfolio_analytics']
+                        basic_info = analytics.get('basic_info', {})
+                        financial_metrics = analytics.get('financial_metrics', {})
+                        
+                        if 'portfolio_id' in basic_info and 'total_value' in financial_metrics:
+                            self.log_test("Portfolio Analytics", True, 
+                                        f"Portfolio: {basic_info['portfolio_id']}, Value: ${financial_metrics.get('total_value', 0):,.2f}")
+                        else:
+                            self.log_test("Portfolio Analytics", False, "Missing required analytics fields")
+                    else:
+                        self.log_test("Portfolio Analytics", False, f"Invalid response structure: {data}")
+                elif response.status == 404:
+                    self.log_test("Portfolio Analytics", True, f"Portfolio {test_portfolio_id} not found (expected for test)")
+                elif response.status == 503:
+                    self.log_test("Portfolio Analytics", False, "Dashboard service not available")
+                else:
+                    self.log_test("Portfolio Analytics", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("Portfolio Analytics", False, f"Exception: {str(e)}")
+    
+    async def test_portfolio_performance_charts(self):
+        """Test GET /api/dashboard/portfolio-performance/{portfolio_id} endpoint"""
+        test_portfolio_id = "portfolio_001"
+        try:
+            async with self.session.get(f"{API_BASE}/dashboard/portfolio-performance/{test_portfolio_id}?period=30d") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if 'performance_charts' in data and 'chart_metadata' in data:
+                        charts = data['performance_charts']
+                        metadata = data['chart_metadata']
+                        
+                        chart_types = list(charts.keys())
+                        data_points = metadata.get('data_points', 0)
+                        
+                        self.log_test("Portfolio Performance Charts", True, 
+                                    f"Charts: {len(chart_types)}, Data points: {data_points}")
+                    else:
+                        self.log_test("Portfolio Performance Charts", False, f"Invalid response structure: {data}")
+                elif response.status == 404:
+                    self.log_test("Portfolio Performance Charts", True, f"Portfolio {test_portfolio_id} not found (expected for test)")
+                elif response.status == 503:
+                    self.log_test("Portfolio Performance Charts", False, "Dashboard service not available")
+                else:
+                    self.log_test("Portfolio Performance Charts", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("Portfolio Performance Charts", False, f"Exception: {str(e)}")
+    
+    async def test_risk_dashboard(self):
+        """Test GET /api/dashboard/risk-dashboard/{portfolio_id} endpoint"""
+        test_portfolio_id = "portfolio_001"
+        try:
+            async with self.session.get(f"{API_BASE}/dashboard/risk-dashboard/{test_portfolio_id}") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if 'risk_dashboard' in data and 'dashboard_metadata' in data:
+                        risk_data = data['risk_dashboard']
+                        risk_metrics = risk_data.get('risk_metrics', {})
+                        
+                        var_data = risk_metrics.get('value_at_risk', {})
+                        volatility = risk_metrics.get('volatility_metrics', {})
+                        
+                        if 'var_1d' in var_data and 'annualized_volatility' in volatility:
+                            self.log_test("Risk Dashboard", True, 
+                                        f"VaR 1d: ${var_data.get('var_1d', 0):,.2f}, Volatility: {volatility.get('annualized_volatility', 0):.2%}")
+                        else:
+                            self.log_test("Risk Dashboard", False, "Missing required risk metrics")
+                    else:
+                        self.log_test("Risk Dashboard", False, f"Invalid response structure: {data}")
+                elif response.status == 404:
+                    self.log_test("Risk Dashboard", True, f"Risk data for portfolio {test_portfolio_id} not found (expected for test)")
+                elif response.status == 503:
+                    self.log_test("Risk Dashboard", False, "Dashboard service not available")
+                else:
+                    self.log_test("Risk Dashboard", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("Risk Dashboard", False, f"Exception: {str(e)}")
+    
+    async def test_trading_activity_dashboard(self):
+        """Test GET /api/dashboard/trading-activity/{client_id} endpoint"""
+        test_client_id = "client_001"
+        try:
+            async with self.session.get(f"{API_BASE}/dashboard/trading-activity/{test_client_id}?period=30d") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if 'trading_dashboard' in data and 'dashboard_metadata' in data:
+                        trading_data = data['trading_dashboard']
+                        summary = trading_data.get('trading_summary', {})
+                        execution = trading_data.get('execution_quality', {})
+                        
+                        total_trades = summary.get('total_trades', 0)
+                        total_volume = summary.get('total_volume', 0)
+                        fill_rate = summary.get('fill_rate', 0)
+                        
+                        self.log_test("Trading Activity Dashboard", True, 
+                                    f"Trades: {total_trades}, Volume: ${total_volume:,.2f}, Fill rate: {fill_rate:.1f}%")
+                    else:
+                        self.log_test("Trading Activity Dashboard", False, f"Invalid response structure: {data}")
+                elif response.status == 404:
+                    self.log_test("Trading Activity Dashboard", True, f"Trading data for client {test_client_id} not found (expected for test)")
+                elif response.status == 503:
+                    self.log_test("Trading Activity Dashboard", False, "Dashboard service not available")
+                else:
+                    self.log_test("Trading Activity Dashboard", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("Trading Activity Dashboard", False, f"Exception: {str(e)}")
+    
+    async def test_yield_intelligence_dashboard(self):
+        """Test GET /api/dashboard/yield-intelligence endpoint"""
+        try:
+            async with self.session.get(f"{API_BASE}/dashboard/yield-intelligence") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if 'yield_intelligence' in data and 'market_intelligence' in data:
+                        yield_data = data['yield_intelligence']
+                        market_overview = yield_data.get('market_overview', {})
+                        opportunities = yield_data.get('opportunities', {})
+                        rankings = yield_data.get('risk_adjusted_rankings', {})
+                        
+                        total_pools = market_overview.get('total_pools', 0)
+                        avg_yield = market_overview.get('avg_yield', 0)
+                        opportunity_count = opportunities.get('opportunity_count', 0)
+                        
+                        self.log_test("Yield Intelligence Dashboard", True, 
+                                    f"Pools: {total_pools}, Avg yield: {avg_yield:.2f}%, Opportunities: {opportunity_count}")
+                    else:
+                        self.log_test("Yield Intelligence Dashboard", False, f"Invalid response structure: {data}")
+                elif response.status == 404:
+                    self.log_test("Yield Intelligence Dashboard", False, "Yield intelligence data not available")
+                elif response.status == 503:
+                    self.log_test("Yield Intelligence Dashboard", False, "Dashboard service not available")
+                else:
+                    self.log_test("Yield Intelligence Dashboard", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("Yield Intelligence Dashboard", False, f"Exception: {str(e)}")
+    
+    async def test_multi_client_overview(self):
+        """Test GET /api/dashboard/multi-client-overview endpoint"""
+        test_client_ids = "client_001,client_002,client_003"
+        try:
+            async with self.session.get(f"{API_BASE}/dashboard/multi-client-overview?client_ids={test_client_ids}") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if 'multi_client_dashboard' in data and 'dashboard_metadata' in data:
+                        dashboard_data = data['multi_client_dashboard']
+                        overview = dashboard_data.get('overview', {})
+                        aggregated = dashboard_data.get('aggregated_analytics', {})
+                        
+                        total_clients = overview.get('total_clients', 0)
+                        total_aum = aggregated.get('total_aum', 0)
+                        avg_return = aggregated.get('avg_return', 0)
+                        
+                        self.log_test("Multi-Client Overview", True, 
+                                    f"Clients: {total_clients}, AUM: ${total_aum:,.0f}, Avg return: {avg_return:.2f}%")
+                    else:
+                        self.log_test("Multi-Client Overview", False, f"Invalid response structure: {data}")
+                elif response.status == 503:
+                    self.log_test("Multi-Client Overview", False, "Dashboard service not available")
+                else:
+                    self.log_test("Multi-Client Overview", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("Multi-Client Overview", False, f"Exception: {str(e)}")
+    
+    async def test_dashboard_config_get(self):
+        """Test GET /api/dashboard/dashboard-config/{client_id} endpoint"""
+        test_client_id = "client_001"
+        try:
+            async with self.session.get(f"{API_BASE}/dashboard/dashboard-config/{test_client_id}") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if 'dashboard_configuration' in data and 'available_widgets' in data:
+                        config = data['dashboard_configuration']
+                        widgets = data.get('available_widgets', [])
+                        customization = data.get('customization_options', {})
+                        
+                        client_id = config.get('client_id')
+                        preferences = config.get('dashboard_preferences', {})
+                        
+                        self.log_test("Dashboard Config Get", True, 
+                                    f"Client: {client_id}, Widgets: {len(widgets)}, Themes: {len(customization.get('themes', []))}")
+                    else:
+                        self.log_test("Dashboard Config Get", False, f"Invalid response structure: {data}")
+                else:
+                    self.log_test("Dashboard Config Get", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("Dashboard Config Get", False, f"Exception: {str(e)}")
+    
+    async def test_dashboard_config_update(self):
+        """Test POST /api/dashboard/dashboard-config/{client_id} endpoint"""
+        test_client_id = "client_001"
+        config_update = {
+            "dashboard_preferences": {
+                "default_period": "7d",
+                "preferred_charts": ["portfolio_value", "risk_metrics"],
+                "theme": "dark"
+            },
+            "notification_settings": {
+                "email_alerts": True,
+                "alert_frequency": "daily"
+            }
+        }
+        
+        try:
+            async with self.session.post(f"{API_BASE}/dashboard/dashboard-config/{test_client_id}", 
+                                       json=config_update) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if 'message' in data and 'updated_configuration' in data:
+                        updated_config = data.get('updated_configuration', {})
+                        applied_changes = data.get('applied_changes', [])
+                        
+                        self.log_test("Dashboard Config Update", True, 
+                                    f"Updated config for {test_client_id}, Changes: {len(applied_changes)}")
+                    else:
+                        self.log_test("Dashboard Config Update", False, f"Invalid response structure: {data}")
+                else:
+                    self.log_test("Dashboard Config Update", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("Dashboard Config Update", False, f"Exception: {str(e)}")
+    
+    async def test_dashboard_export_portfolio(self):
+        """Test GET /api/dashboard/export/{portfolio_id} endpoint for portfolio data"""
+        test_portfolio_id = "portfolio_001"
+        try:
+            async with self.session.get(f"{API_BASE}/dashboard/export/{test_portfolio_id}?format=json&data_type=portfolio") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if 'export_data' in data and 'export_metadata' in data:
+                        export_data = data.get('export_data', {})
+                        metadata = data.get('export_metadata', {})
+                        
+                        report_type = export_data.get('report_type')
+                        portfolio_id = export_data.get('portfolio_id')
+                        
+                        self.log_test("Dashboard Export Portfolio", True, 
+                                    f"Report: {report_type}, Portfolio: {portfolio_id}")
+                    else:
+                        self.log_test("Dashboard Export Portfolio", False, f"Invalid response structure: {data}")
+                elif response.status == 404:
+                    self.log_test("Dashboard Export Portfolio", True, f"Portfolio {test_portfolio_id} not found (expected for test)")
+                elif response.status == 503:
+                    self.log_test("Dashboard Export Portfolio", False, "Dashboard service not available")
+                else:
+                    self.log_test("Dashboard Export Portfolio", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("Dashboard Export Portfolio", False, f"Exception: {str(e)}")
+    
+    async def test_dashboard_export_risk(self):
+        """Test GET /api/dashboard/export/{portfolio_id} endpoint for risk data"""
+        test_portfolio_id = "portfolio_001"
+        try:
+            async with self.session.get(f"{API_BASE}/dashboard/export/{test_portfolio_id}?format=json&data_type=risk") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if 'export_data' in data and 'export_metadata' in data:
+                        export_data = data.get('export_data', {})
+                        metadata = data.get('export_metadata', {})
+                        
+                        report_type = export_data.get('report_type')
+                        risk_data = export_data.get('data', {})
+                        
+                        self.log_test("Dashboard Export Risk", True, 
+                                    f"Report: {report_type}, Risk sections: {len(risk_data)}")
+                    else:
+                        self.log_test("Dashboard Export Risk", False, f"Invalid response structure: {data}")
+                elif response.status == 404:
+                    self.log_test("Dashboard Export Risk", True, f"Risk data for portfolio {test_portfolio_id} not found (expected for test)")
+                elif response.status == 503:
+                    self.log_test("Dashboard Export Risk", False, "Dashboard service not available")
+                else:
+                    self.log_test("Dashboard Export Risk", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("Dashboard Export Risk", False, f"Exception: {str(e)}")
+    
+    async def test_dashboard_export_csv(self):
+        """Test GET /api/dashboard/export/{portfolio_id} endpoint for CSV format"""
+        test_portfolio_id = "portfolio_001"
+        try:
+            async with self.session.get(f"{API_BASE}/dashboard/export/{test_portfolio_id}?format=csv&data_type=portfolio") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if 'message' in data and 'export_info' in data:
+                        export_info = data.get('export_info', {})
+                        format_type = export_info.get('format')
+                        estimated_size = export_info.get('estimated_size')
+                        
+                        self.log_test("Dashboard Export CSV", True, 
+                                    f"Format: {format_type}, Size: {estimated_size}")
+                    else:
+                        self.log_test("Dashboard Export CSV", False, f"Invalid response structure: {data}")
+                elif response.status == 404:
+                    self.log_test("Dashboard Export CSV", True, f"Portfolio {test_portfolio_id} not found (expected for test)")
+                elif response.status == 503:
+                    self.log_test("Dashboard Export CSV", False, "Dashboard service not available")
+                else:
+                    self.log_test("Dashboard Export CSV", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("Dashboard Export CSV", False, f"Exception: {str(e)}")
+    
+    async def test_dashboard_export_pdf(self):
+        """Test GET /api/dashboard/export/{portfolio_id} endpoint for PDF format"""
+        test_portfolio_id = "portfolio_001"
+        try:
+            async with self.session.get(f"{API_BASE}/dashboard/export/{test_portfolio_id}?format=pdf&data_type=risk") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if 'message' in data and 'export_info' in data:
+                        export_info = data.get('export_info', {})
+                        format_type = export_info.get('format')
+                        estimated_size = export_info.get('estimated_size')
+                        
+                        self.log_test("Dashboard Export PDF", True, 
+                                    f"Format: {format_type}, Size: {estimated_size}")
+                    else:
+                        self.log_test("Dashboard Export PDF", False, f"Invalid response structure: {data}")
+                elif response.status == 404:
+                    self.log_test("Dashboard Export PDF", True, f"Risk data for portfolio {test_portfolio_id} not found (expected for test)")
+                elif response.status == 503:
+                    self.log_test("Dashboard Export PDF", False, "Dashboard service not available")
+                else:
+                    self.log_test("Dashboard Export PDF", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("Dashboard Export PDF", False, f"Exception: {str(e)}")
+    
+    async def test_dashboard_summary(self):
+        """Test GET /api/dashboard/summary endpoint"""
+        try:
+            async with self.session.get(f"{API_BASE}/dashboard/summary") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if 'service_status' in data and 'dashboard_capabilities' in data:
+                        service_status = data.get('service_status')
+                        capabilities = data.get('dashboard_capabilities', {})
+                        api_endpoints = data.get('api_endpoints', {})
+                        integration_status = data.get('integration_status', {})
+                        
+                        total_endpoints = sum(len(endpoints) for endpoints in api_endpoints.values())
+                        connected_integrations = sum(1 for status in integration_status.values() if status == "Connected")
+                        
+                        self.log_test("Dashboard Summary", True, 
+                                    f"Status: {service_status}, Endpoints: {total_endpoints}, Integrations: {connected_integrations}/{len(integration_status)}")
+                    else:
+                        self.log_test("Dashboard Summary", False, f"Invalid response structure: {data}")
+                else:
+                    self.log_test("Dashboard Summary", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("Dashboard Summary", False, f"Exception: {str(e)}")
+
+    # ========================================
     # ADVANCED TRADING & EXECUTION ENGINE TESTS (STEP 11)
     # ========================================
     
