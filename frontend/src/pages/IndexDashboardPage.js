@@ -330,7 +330,7 @@ const IndexDashboardPage = () => {
               <CardHeader>
                 <CardTitle className="flex items-center">
                   <DollarSign className="w-5 h-5 mr-2 text-[#4CC1E9]" />
-                  Major Stablecoins (>$1B Market Cap)
+                  Major Stablecoins (&gt;$1B Market Cap)
                 </CardTitle>
               </CardHeader>
               <CardContent>
