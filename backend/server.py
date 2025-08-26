@@ -210,6 +210,17 @@ async def startup_event():
     logger.info("  - WS /api/stream/syi/live (Live SYI WebSocket stream)")
     logger.info("  - WS /api/stream/peg-metrics (Peg metrics WebSocket stream)")
     logger.info("  - WS /api/stream/liquidity-metrics (Liquidity WebSocket stream)")
+    logger.info("NEW STEP 7 (BATCH ANALYTICS) ENDPOINTS:")
+    logger.info("  - GET /api/analytics/status (Batch analytics service status)")
+    logger.info("  - POST /api/analytics/start (Start batch analytics service)")
+    logger.info("  - POST /api/analytics/jobs/{job_name}/run (Run job manually)")
+    logger.info("  - GET /api/analytics/peg-stability (Peg stability analytics)")
+    logger.info("  - GET /api/analytics/liquidity (Liquidity analytics)")
+    logger.info("  - GET /api/analytics/risk (Advanced risk analytics)")
+    logger.info("  - GET /api/analytics/performance (Index performance analytics)")
+    logger.info("  - GET /api/analytics/compliance-report (Compliance reporting)")
+    logger.info("  - GET /api/analytics/historical-data (Historical data export)")
+    logger.info("  - GET /api/analytics/summary (Comprehensive analytics summary)")
 
 @app.on_event("shutdown")
 async def shutdown_db_client():
