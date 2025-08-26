@@ -2489,6 +2489,21 @@ class StableYieldTester:
         await self.test_websocket_test_data()
         await self.test_websocket_broadcast_test()
         
+        # Batch Analytics & Performance Reporting System tests (STEP 7)
+        print("\n📈 Testing Batch Analytics & Performance Reporting System (STEP 7)...")
+        await self.test_analytics_status()
+        await self.test_analytics_start()
+        await self.test_analytics_manual_job_peg_metrics()
+        await self.test_analytics_manual_job_risk_analytics()
+        await self.test_analytics_peg_stability()
+        await self.test_analytics_liquidity()
+        await self.test_analytics_risk()
+        await self.test_analytics_performance()
+        await self.test_analytics_compliance_report()
+        await self.test_analytics_historical_data()
+        await self.test_analytics_summary()
+        await self.test_analytics_stop()
+        
         # Summary
         print("\n" + "=" * 60)
         self.print_summary()
