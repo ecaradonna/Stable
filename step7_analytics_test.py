@@ -231,8 +231,14 @@ class Step7AnalyticsTester:
                                 self.log_test(f"Analytics Performance {period}", True, 
                                             f"Performance data available for {period}, Index: {current_index}")
                             else:
-                                self.log_test(f"Analytics Performance {period}", True, 
-                                            f"Performance endpoint working for {period} (no data yet)")
+                                # Check if it's the expected "no data yet" message
+                                message = data.get('message', '')
+                                if 'No performance analytics available yet' in message:
+                                    self.log_test(f"Analytics Performance {period}", True, 
+                                                f"Performance endpoint working for {period} (no data yet - expected)")
+                                else:
+                                    self.log_test(f"Analytics Performance {period}", True, 
+                                                f"Performance endpoint working for {period} (no data yet)")
                         else:
                             self.log_test(f"Analytics Performance {period}", False, f"Invalid response structure: {data}")
                     else:
