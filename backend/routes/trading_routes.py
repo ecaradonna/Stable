@@ -552,7 +552,7 @@ async def execute_rebalance(strategy_id: str) -> Dict[str, Any]:
         raise HTTPException(status_code=500, detail=f"Failed to execute rebalance: {str(e)}")
 
 # Market Data
-@router.get("/trading/market-data")
+@router.get("/market-data")
 async def get_market_data() -> Dict[str, Any]:
     """Get current market data for all trading pairs"""
     try:
