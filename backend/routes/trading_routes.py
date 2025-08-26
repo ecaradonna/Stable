@@ -171,7 +171,7 @@ async def create_order(request: CreateOrderRequest) -> Dict[str, Any]:
         logger.error(f"Error creating order: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to create order: {str(e)}")
 
-@router.get("/trading/orders")
+@router.get("/orders")
 async def get_orders(
     client_id: Optional[str] = Query(default=None, description="Filter by client ID"),
     status: Optional[str] = Query(default=None, description="Filter by order status"),
