@@ -10,7 +10,7 @@ from datetime import datetime
 import logging
 from pydantic import BaseModel
 
-from ..services.trading_engine_service import get_trading_engine_service
+from services.trading_engine_service import get_trading_engine_service
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
