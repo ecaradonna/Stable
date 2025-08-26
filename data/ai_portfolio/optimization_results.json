@@ -1,1 +1,26 @@
-{}
+{
+  "ai_portfolio_1118db8c": {
+    "portfolio_id": "ai_portfolio_1118db8c",
+    "optimization_strategy": "OptimizationStrategy.AI_ENHANCED",
+    "optimal_allocation": {
+      "USDC": 0.2,
+      "USDT": 0.2,
+      "TUSD": 0.2,
+      "PYUSD": 0.2,
+      "DAI": 0.2
+    },
+    "expected_return": 0.0,
+    "expected_volatility": 0.02,
+    "sharpe_ratio": -1.0,
+    "max_drawdown": -0.05,
+    "optimization_score": 0.14,
+    "constraints_satisfied": true,
+    "optimization_time": 0.00048804283142089844,
+    "metadata": {
+      "market_regime": "low_volatility",
+      "sentiment_score": 0.31276502161162256,
+      "features_used": 10,
+      "optimization_iterations": 100
+    }
+  }
+}

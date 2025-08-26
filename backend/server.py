@@ -166,6 +166,17 @@ async def startup_event():
     # - WebSocket services (connection loops)
     # - Other background services
     
+    # Start Trading Engine FIRST (needed for AI Portfolio integration)
+    try:
+        from services.trading_engine_service import start_trading_engine
+        
+        # Start Trading Engine service
+        await start_trading_engine()
+        logger.info("✅ Advanced Trading Engine service started")
+    except Exception as e:
+        logger.error(f"❌ Failed to start Trading Engine service: {e}")
+        logger.info("⚠️ Continuing without trading features")
+    
     # Start AI-Powered Portfolio Management services (STEP 13) - PRIORITY FOR TESTING
     try:
         from services.ai_portfolio_service import start_ai_portfolio
@@ -187,17 +198,6 @@ async def startup_event():
     except Exception as e:
         logger.error(f"❌ Failed to start Risk Management service: {e}")
         logger.info("⚠️ Continuing without enhanced risk management features")
-    
-    # Start Trading Engine (needed for AI Portfolio integration)
-    try:
-        from services.trading_engine_service import start_trading_engine
-        
-        # Start Trading Engine service
-        await start_trading_engine()
-        logger.info("✅ Advanced Trading Engine service started")
-    except Exception as e:
-        logger.error(f"❌ Failed to start Trading Engine service: {e}")
-        logger.info("⚠️ Continuing without trading features")
     
     logger.info("✅ Emergency Startup Complete - Essential services running")
     logger.info("🎯 STEP 13 AI Portfolio Management endpoints available:")
