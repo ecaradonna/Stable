@@ -212,11 +212,18 @@ const YieldIndicesPage = () => {
               </p>
               
               <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-6">
-                <Button className="bg-white text-[#0E1A2B] hover:bg-gray-100 font-semibold px-8 py-3">
+                <Button 
+                  className="bg-white text-[#0E1A2B] hover:bg-gray-100 font-semibold px-8 py-3"
+                  onClick={() => navigate('/index-dashboard')}
+                >
                   View Live Indices
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
-                <Button variant="outline" className="border-white text-white hover:bg-white hover:text-[#0E1A2B] px-8 py-3">
+                <Button 
+                  variant="outline" 
+                  className="border-white text-white hover:bg-white hover:text-[#0E1A2B] px-8 py-3"
+                  onClick={() => navigate('/api-documentation')}
+                >
                   API Documentation
                 </Button>
               </div>
