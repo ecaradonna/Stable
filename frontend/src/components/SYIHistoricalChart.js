@@ -321,14 +321,49 @@ const SYIHistoricalChart = () => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (
-        <div className="bg-white p-3 rounded-lg shadow-lg border">
-          <p className="font-semibold text-[#0E1A2B] mb-1">{data.full_date}</p>
-          <p className="text-[#4CC1E9]">
-            SYI Yield: <span className="font-bold">{data.yield_percentage.toFixed(3)}%</span>
-          </p>
-          <p className="text-gray-600 text-sm">
-            Index Value: {data.index_value.toFixed(4)}
-          </p>
+        <div className="bg-white p-4 rounded-lg shadow-xl border border-gray-200">
+          <p className="font-semibold text-[#0E1A2B] mb-2">{data.full_date}</p>
+          
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-[#4CC1E9] flex items-center">
+                <div className="w-3 h-3 bg-[#4CC1E9] rounded-full mr-2"></div>
+                SYI Yield:
+              </span>
+              <span className="font-bold ml-3">{data.yield_percentage?.toFixed(3)}%</span>
+            </div>
+            
+            {showCrypto && data.btc_change_pct !== null && (
+              <div className="flex items-center justify-between">
+                <span className="text-orange-500 flex items-center">
+                  <Bitcoin className="w-3 h-3 mr-2" />
+                  Bitcoin:
+                </span>
+                <span className={`font-bold ml-3 ${data.btc_change_pct >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                  {data.btc_change_pct >= 0 ? '+' : ''}{data.btc_change_pct?.toFixed(1)}%
+                </span>
+              </div>
+            )}
+            
+            {showCrypto && data.eth_change_pct !== null && (
+              <div className="flex items-center justify-between">
+                <span className="text-blue-500 flex items-center">
+                  <Coins className="w-3 h-3 mr-2" />
+                  Ethereum:
+                </span>
+                <span className={`font-bold ml-3 ${data.eth_change_pct >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                  {data.eth_change_pct >= 0 ? '+' : ''}{data.eth_change_pct?.toFixed(1)}%
+                </span>
+              </div>
+            )}
+            
+            {showCrypto && (
+              <div className="border-t pt-2 mt-2 text-xs text-gray-500">
+                <div>BTC: ${data.btc_price?.toLocaleString()} | ETH: ${data.eth_price?.toLocaleString()}</div>
+                <div>Index Value: {data.index_value?.toFixed(4)}</div>
+              </div>
+            )}
+          </div>
         </div>
       );
     }
