@@ -14,6 +14,7 @@ from dataclasses import dataclass, asdict
 from enum import Enum
 import statistics
 from pathlib import Path
+from scipy.stats import norm
 
 from .yield_aggregator import YieldAggregator
 from .ray_calculator import RAYCalculator
