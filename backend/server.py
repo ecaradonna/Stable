@@ -381,5 +381,14 @@ async def shutdown_db_client():
     except Exception as e:
         logger.error(f"❌ Error stopping DevOps service: {e}")
     
+    # Stop Trading Engine service
+    try:
+        from services.trading_engine_service import stop_trading_engine
+        
+        await stop_trading_engine()
+        logger.info("✅ Advanced Trading Engine service stopped")
+    except Exception as e:
+        logger.error(f"❌ Error stopping Trading Engine service: {e}")
+    
     client.close()
     logger.info("StableYield Market Intelligence API shutting down...")
