@@ -969,7 +969,294 @@ class AIPortfolioService:
         except Exception as e:
             logger.error(f"❌ Error loading AI portfolios: {e}")
     
-    # Additional helper methods would be implemented here...
+    async def _calculate_optimization_metrics(self, optimal_allocation: Dict[str, float], 
+                                           market_features: Dict[str, Any]) -> Tuple[float, float, float, float]:
+        """Calculate optimization metrics"""
+        try:
+            # Get yield data for expected return calculation
+            yields = await self.yield_aggregator.get_all_yields()
+            
+            # Calculate expected return
+            expected_return = 0.0
+            for yield_data in yields:
+                asset = yield_data.get('stablecoin', 'Unknown')
+                if asset in optimal_allocation:
+                    weight = optimal_allocation[asset]
+                    apy = yield_data.get('apy', 0) / 100  # Convert to decimal
+                    expected_return += weight * apy
+            
+            # Estimate volatility (simplified for stablecoins)
+            expected_volatility = 0.02  # 2% annual volatility estimate for stablecoin portfolio
+            
+            # Calculate Sharpe ratio (assuming 2% risk-free rate)
+            risk_free_rate = 0.02
+            sharpe_ratio = (expected_return - risk_free_rate) / expected_volatility if expected_volatility > 0 else 0
+            
+            # Estimate max drawdown (simplified)
+            max_drawdown = -0.05  # 5% max drawdown estimate
+            
+            return expected_return, expected_volatility, sharpe_ratio, max_drawdown
+            
+        except Exception as e:
+            logger.error(f"❌ Error calculating optimization metrics: {e}")
+            return 0.08, 0.02, 1.0, -0.05  # Default values
+    
+    def _calculate_optimization_score(self, expected_return: float, expected_volatility: float, sharpe_ratio: float) -> float:
+        """Calculate optimization score"""
+        try:
+            # Composite score based on return, risk, and Sharpe ratio
+            return_score = min(expected_return * 10, 1.0)  # Scale expected return
+            risk_score = max(0, 1.0 - expected_volatility * 10)  # Penalize high volatility
+            sharpe_score = min(sharpe_ratio / 3.0, 1.0)  # Scale Sharpe ratio
+            
+            # Weighted average
+            composite_score = (return_score * 0.4 + risk_score * 0.3 + sharpe_score * 0.3)
+            return max(0.0, min(1.0, composite_score))
+            
+        except Exception as e:
+            logger.error(f"❌ Error calculating optimization score: {e}")
+            return 0.5
+    
+    def _check_constraints(self, allocation: Dict[str, float], ai_config: AIPortfolioConfig) -> bool:
+        """Check if allocation satisfies constraints"""
+        try:
+            # Check position size constraints
+            for asset, weight in allocation.items():
+                if weight < ai_config.min_position_size or weight > ai_config.max_position_size:
+                    return False
+            
+            # Check if weights sum to approximately 1
+            total_weight = sum(allocation.values())
+            if abs(total_weight - 1.0) > 0.01:  # 1% tolerance
+                return False
+            
+            return True
+            
+        except Exception as e:
+            logger.error(f"❌ Error checking constraints: {e}")
+            return False
+    
+    async def _check_rebalancing_trigger(self, portfolio_id: str, trigger: RebalancingTrigger, 
+                                       current_allocation: Dict[str, float]) -> bool:
+        """Check if rebalancing trigger condition is met"""
+        try:
+            ai_config = self.ai_portfolios.get(portfolio_id)
+            if not ai_config:
+                return False
+            
+            if trigger == RebalancingTrigger.TIME_BASED:
+                # Check if enough time has passed since last rebalancing
+                # Simplified - in production would check actual timestamps
+                return True
+            
+            elif trigger == RebalancingTrigger.THRESHOLD_BASED:
+                # Check allocation drift
+                optimization_result = self.optimization_results.get(portfolio_id)
+                if optimization_result:
+                    max_drift = 0
+                    for asset, target_weight in optimization_result.optimal_allocation.items():
+                        current_weight = current_allocation.get(asset, 0)
+                        drift = abs(current_weight - target_weight)
+                        max_drift = max(max_drift, drift)
+                    
+                    return max_drift > 0.05  # 5% drift threshold
+                return False
+            
+            elif trigger == RebalancingTrigger.VOLATILITY_BASED:
+                # Check market volatility
+                market_features = await self._extract_market_features()
+                volatility = market_features.get("yield_volatility", 0)
+                return volatility > 0.3  # High volatility threshold
+            
+            elif trigger == RebalancingTrigger.AI_SIGNAL:
+                # AI-generated signal (simplified)
+                market_features = await self._extract_market_features()
+                ai_score = market_features.get("syi_trend", 0)
+                return abs(ai_score) > 0.02  # Significant trend change
+            
+            elif trigger == RebalancingTrigger.MARKET_REGIME_CHANGE:
+                # Check for regime change
+                current_regime = await self._detect_market_regime()
+                # In production, would compare with previous regime
+                return current_regime in [MarketRegime.HIGH_VOLATILITY, MarketRegime.BEAR_MARKET]
+            
+            return False
+            
+        except Exception as e:
+            logger.error(f"❌ Error checking rebalancing trigger: {e}")
+            return False
+    
+    async def _calculate_signal_confidence(self, portfolio_id: str, optimization_result: PortfolioOptimizationResult, 
+                                         trigger_type: RebalancingTrigger) -> float:
+        """Calculate confidence score for rebalancing signal"""
+        try:
+            base_confidence = 0.6
+            
+            # Adjust based on optimization quality
+            if optimization_result.constraints_satisfied:
+                base_confidence += 0.1
+            
+            if optimization_result.sharpe_ratio > 1.5:
+                base_confidence += 0.1
+            
+            # Adjust based on trigger type
+            confidence_adjustments = {
+                RebalancingTrigger.AI_SIGNAL: 0.2,
+                RebalancingTrigger.VOLATILITY_BASED: 0.1,
+                RebalancingTrigger.THRESHOLD_BASED: 0.15,
+                RebalancingTrigger.MARKET_REGIME_CHANGE: 0.1,
+                RebalancingTrigger.TIME_BASED: 0.05
+            }
+            
+            base_confidence += confidence_adjustments.get(trigger_type, 0)
+            
+            # Clamp to [0, 1]
+            return max(0.0, min(1.0, base_confidence))
+            
+        except Exception as e:
+            logger.error(f"❌ Error calculating signal confidence: {e}")
+            return 0.5
+    
+    async def _generate_rebalancing_reasoning(self, current_allocation: Dict[str, float], 
+                                            recommended_allocation: Dict[str, float], 
+                                            trigger_type: RebalancingTrigger, 
+                                            market_regime: MarketRegime, 
+                                            confidence_score: float) -> str:
+        """Generate human-readable reasoning for rebalancing"""
+        try:
+            # Calculate biggest changes
+            changes = []
+            for asset in recommended_allocation:
+                current = current_allocation.get(asset, 0)
+                recommended = recommended_allocation[asset]
+                change = recommended - current
+                if abs(change) > 0.01:  # 1% minimum change
+                    direction = "increase" if change > 0 else "decrease"
+                    changes.append(f"{direction} {asset} by {abs(change):.1%}")
+            
+            # Build reasoning
+            reasoning_parts = []
+            reasoning_parts.append(f"Rebalancing triggered by {trigger_type.value.replace('_', ' ')}")
+            reasoning_parts.append(f"Current market regime: {market_regime.value.replace('_', ' ')}")
+            
+            if changes:
+                reasoning_parts.append(f"Recommended changes: {', '.join(changes[:3])}")
+            
+            reasoning_parts.append(f"AI confidence: {confidence_score:.1%}")
+            
+            return ". ".join(reasoning_parts) + "."
+            
+        except Exception as e:
+            logger.error(f"❌ Error generating rebalancing reasoning: {e}")
+            return "AI-generated rebalancing recommendation based on market analysis."
+    
+    async def _get_portfolio_sentiment(self, portfolio_id: str) -> Dict[str, Any]:
+        """Get sentiment data for portfolio assets"""
+        try:
+            ai_config = self.ai_portfolios.get(portfolio_id)
+            if not ai_config or not ai_config.use_sentiment_analysis:
+                return {}
+            
+            # Get current portfolio allocation (simplified)
+            yields = await self.yield_aggregator.get_all_yields()
+            assets = [y.get('stablecoin', 'Unknown') for y in yields if y.get('stablecoin')]
+            
+            # Get sentiment for portfolio assets
+            sentiment_data = {}
+            total_sentiment = 0
+            count = 0
+            
+            for asset in assets:
+                if asset in self.market_sentiments:
+                    sentiment = self.market_sentiments[asset]
+                    sentiment_data[asset] = sentiment.sentiment_score
+                    total_sentiment += sentiment.sentiment_score
+                    count += 1
+            
+            if count > 0:
+                sentiment_data["avg_sentiment"] = total_sentiment / count
+            
+            return sentiment_data
+            
+        except Exception as e:
+            logger.error(f"❌ Error getting portfolio sentiment: {e}")
+            return {}
+    
+    async def _prepare_optimization_features(self, portfolio_id: str, market_features: Dict[str, Any], 
+                                           sentiment_data: Dict[str, Any], regime_data: MarketRegime) -> List[float]:
+        """Prepare features for ML optimization model"""
+        try:
+            features = []
+            
+            # Market features
+            features.append(market_features.get("avg_yield", 0))
+            features.append(market_features.get("yield_volatility", 0))
+            features.append(market_features.get("yield_spread", 0))
+            features.append(market_features.get("syi_value", 1.0))
+            features.append(market_features.get("syi_trend", 0))
+            
+            # Sentiment features
+            features.append(sentiment_data.get("avg_sentiment", 0))
+            
+            # Regime features (one-hot encoding)
+            regime_encoding = [0, 0, 0, 0, 0]  # 5 regime types
+            regime_index = {
+                MarketRegime.BULL_MARKET: 0,
+                MarketRegime.BEAR_MARKET: 1,
+                MarketRegime.SIDEWAYS_MARKET: 2,
+                MarketRegime.HIGH_VOLATILITY: 3,
+                MarketRegime.LOW_VOLATILITY: 4
+            }
+            if regime_data in regime_index:
+                regime_encoding[regime_index[regime_data]] = 1
+            features.extend(regime_encoding)
+            
+            # Portfolio-specific features
+            ai_config = self.ai_portfolios.get(portfolio_id)
+            if ai_config:
+                features.append(ai_config.risk_tolerance)
+                features.append(ai_config.performance_target)
+                features.append(ai_config.max_drawdown_limit)
+            else:
+                features.extend([0.5, 0.08, 0.15])  # Default values
+            
+            return features
+            
+        except Exception as e:
+            logger.error(f"❌ Error preparing optimization features: {e}")
+            return [0.0] * 14  # Return default feature vector
+    
+    async def _apply_ai_enhancements(self, base_weights: np.ndarray, assets: List[str], 
+                                   sentiment_data: Dict[str, Any], regime_data: MarketRegime) -> np.ndarray:
+        """Apply AI enhancements to base portfolio weights"""
+        try:
+            enhanced_weights = base_weights.copy()
+            
+            # Apply sentiment adjustments
+            if sentiment_data:
+                for i, asset in enumerate(assets):
+                    if asset in sentiment_data:
+                        sentiment_score = sentiment_data[asset]
+                        # Adjust weight based on sentiment (small adjustment)
+                        adjustment = sentiment_score * 0.05  # Max 5% adjustment
+                        enhanced_weights[i] *= (1 + adjustment)
+            
+            # Apply regime-based adjustments
+            if regime_data == MarketRegime.HIGH_VOLATILITY:
+                # Reduce concentration in high volatility
+                enhanced_weights = enhanced_weights * 0.9 + np.ones(len(assets)) / len(assets) * 0.1
+            elif regime_data == MarketRegime.BULL_MARKET:
+                # Slight tilt towards higher yielding assets (simplified)
+                pass  # Keep base weights
+            
+            # Renormalize
+            enhanced_weights = enhanced_weights / enhanced_weights.sum()
+            
+            return enhanced_weights
+            
+        except Exception as e:
+            logger.error(f"❌ Error applying AI enhancements: {e}")
+            return base_weights
     
     def get_ai_portfolio_status(self) -> Dict[str, Any]:
         """Get AI portfolio service status"""
