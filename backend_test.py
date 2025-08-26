@@ -2170,6 +2170,16 @@ class StableYieldTester:
         await self.test_ray_integration_with_yields()
         await self.test_syi_integration_with_ray()
         
+        # WebSocket Real-Time Streaming System tests (STEP 6)
+        print("\n🔌 Testing WebSocket Real-Time Streaming System (STEP 6)...")
+        await self.test_websocket_status()
+        await self.test_realtime_peg_metrics()
+        await self.test_realtime_liquidity_metrics()
+        await self.test_websocket_start()
+        await self.test_websocket_stop()
+        await self.test_websocket_test_data()
+        await self.test_websocket_broadcast_test()
+        
         # Summary
         print("\n" + "=" * 60)
         self.print_summary()
