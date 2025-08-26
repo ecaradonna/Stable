@@ -5,6 +5,7 @@ import logging
 from .defi_llama_service import DefiLlamaService
 from .binance_service import BinanceService
 from .protocol_policy_service import ProtocolPolicyService
+from .yield_sanitizer import YieldSanitizer, SanitizationAction
 
 logger = logging.getLogger(__name__)
 
