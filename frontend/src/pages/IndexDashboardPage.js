@@ -29,7 +29,22 @@ const IndexDashboardPage = () => {
 
   const fetchAllData = async () => {
     try {
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || import.meta.env.REACT_APP_BACKEND_URL;
+      // Dynamic backend URL detection
+      const getBackendURL = () => {
+        if (window.location.hostname === 'localhost') {
+          return 'http://localhost:8001';
+        }
+        // Always use HTTPS in production/preview environments
+        const envBackendUrl = process.env.REACT_APP_BACKEND_URL || import.meta.env.REACT_APP_BACKEND_URL;
+        if (envBackendUrl) {
+          return envBackendUrl;
+        }
+        const protocol = window.location.protocol === 'https:' ? 'https:' : window.location.protocol;
+        const hostname = window.location.hostname;
+        return `${protocol}//${hostname}`;
+      };
+      
+      const backendUrl = getBackendURL();
       
       // Fetch current index data
       const indexResponse = await fetch(`${backendUrl}/api/index/current`);
