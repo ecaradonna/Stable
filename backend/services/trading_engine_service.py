@@ -604,6 +604,10 @@ class TradingEngineService:
             position_value = position.quantity * position.current_price
             current_allocation[symbol] = (position_value / total_value) * 100
         
+        # If no positions, show 100% cash allocation
+        if not current_allocation and total_value > 0:
+            current_allocation = {"CASH": 100.0}
+        
         for asset, target_pct in portfolio.target_allocation.items():
             current_pct = current_allocation.get(asset, Decimal('0'))
             allocation_drift[asset] = current_pct - target_pct
