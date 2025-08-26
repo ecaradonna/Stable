@@ -232,5 +232,14 @@ async def shutdown_db_client():
     except Exception as e:
         logger.error(f"❌ Error stopping WebSocket services: {e}")
     
+    # Stop batch analytics services
+    try:
+        from services.batch_analytics_service import stop_batch_analytics
+        
+        await stop_batch_analytics()
+        logger.info("✅ Batch analytics service stopped")
+    except Exception as e:
+        logger.error(f"❌ Error stopping batch analytics service: {e}")
+    
     client.close()
     logger.info("StableYield Market Intelligence API shutting down...")
