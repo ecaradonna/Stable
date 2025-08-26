@@ -235,6 +235,17 @@ async def startup_event():
         logger.error(f"❌ Failed to start Trading Engine service: {e}")
         logger.info("⚠️ Continuing without trading features")
     
+    # Start Advanced Analytics Dashboard services (STEP 12)
+    try:
+        from services.dashboard_service import start_dashboard
+        
+        # Start Dashboard service
+        await start_dashboard()
+        logger.info("✅ Advanced Analytics Dashboard service started")
+    except Exception as e:
+        logger.error(f"❌ Failed to start Dashboard service: {e}")
+        logger.info("⚠️ Continuing without dashboard features")
+    
     logger.info("New capabilities enabled:")
     logger.info("  - Real-time StableYield Index calculation")
     logger.info("  - Real-time peg stability monitoring")
