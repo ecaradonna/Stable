@@ -448,5 +448,14 @@ async def shutdown_db_client():
     except Exception as e:
         logger.error(f"❌ Error stopping Dashboard service: {e}")
     
+    # Stop AI Portfolio service
+    try:
+        from services.ai_portfolio_service import stop_ai_portfolio
+        
+        await stop_ai_portfolio()
+        logger.info("✅ AI-Powered Portfolio Management service stopped")
+    except Exception as e:
+        logger.error(f"❌ Error stopping AI Portfolio service: {e}")
+    
     client.close()
     logger.info("StableYield Market Intelligence API shutting down...")
