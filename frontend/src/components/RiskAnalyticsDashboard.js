@@ -6,7 +6,21 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { TrendingUp, TrendingDown, Shield, Zap, AlertTriangle, CheckCircle } from "lucide-react";
 import axios from "axios";
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const getBackendURL = () => {
+  if (window.location.hostname === 'localhost') {
+    return 'http://localhost:8001';
+  }
+  // Always use HTTPS in production/preview environments
+  const envBackendUrl = process.env.REACT_APP_BACKEND_URL || import.meta.env.REACT_APP_BACKEND_URL;
+  if (envBackendUrl) {
+    return envBackendUrl;
+  }
+  const protocol = window.location.protocol === 'https:' ? 'https:' : window.location.protocol;
+  const hostname = window.location.hostname;
+  return `${protocol}//${hostname}`;
+};
+
+const BACKEND_URL = getBackendURL();
 const API = `${BACKEND_URL}/api`;
 
 const RiskAnalyticsDashboard = () => {
