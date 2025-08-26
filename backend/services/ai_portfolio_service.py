@@ -466,10 +466,19 @@ class AIPortfolioService:
     
     # AI Portfolio Management
     async def create_ai_portfolio(self, portfolio_data: Dict[str, Any]) -> AIPortfolioConfig:
-        """Create a new AI-managed portfolio"""
+        """Create a new AI-managed portfolio with production-ready execution constraints"""
         try:
             portfolio_id = portfolio_data["portfolio_id"]
             client_id = portfolio_data["client_id"]
+            
+            # Default execution constraints
+            execution_constraints = Constraints(
+                min_trade_value=portfolio_data.get("min_trade_value", 10.0),
+                lot_size=portfolio_data.get("lot_size", 0.0001),
+                max_turnover_pct=portfolio_data.get("max_turnover_pct", 0.35),
+                fee_bps=portfolio_data.get("fee_bps", 8.0),
+                slippage_bps=portfolio_data.get("slippage_bps", 10.0)
+            )
             
             # Create AI portfolio configuration
             ai_config = AIPortfolioConfig(
@@ -486,7 +495,8 @@ class AIPortfolioService:
                 use_market_regime_detection=portfolio_data.get("use_market_regime_detection", True),
                 use_predictive_rebalancing=portfolio_data.get("use_predictive_rebalancing", True),
                 performance_target=portfolio_data.get("performance_target", 0.08),  # 8% annual target
-                max_drawdown_limit=portfolio_data.get("max_drawdown_limit", 0.15)   # 15% max drawdown
+                max_drawdown_limit=portfolio_data.get("max_drawdown_limit", 0.15),  # 15% max drawdown
+                execution_constraints=execution_constraints
             )
             
             # Store configuration
