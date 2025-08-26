@@ -1,0 +1,15 @@
+[
+  {
+    "webhook_id": "10dc59fd-9f16-4555-9dba-62e6aeff91c4",
+    "client_id": "test_client_954d9b7d",
+    "url": "https://webhook.site/test-stableyield",
+    "events": [
+      "yield_update",
+      "anomaly_alert"
+    ],
+    "secret": "test_webhook_secret",
+    "is_active": true,
+    "created_at": "2025-08-26T09:38:19.074584",
+    "last_triggered": null
+  }
+]
