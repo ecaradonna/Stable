@@ -8,6 +8,8 @@ from models.index_models import IndexValue, StablecoinConstituent
 from services.crypto_compare_service import CryptoCompareService
 from services.defi_llama_service import DefiLlamaService
 from services.binance_service import BinanceService
+from services.ray_calculator import RAYCalculator
+from services.syi_compositor import SYICompositor
 
 logger = logging.getLogger(__name__)
 
