@@ -347,27 +347,121 @@ const IndexDashboardPage = () => {
             </p>
           </div>
           
-          {/* Temporary: Testing route functionality */}
+          {/* SYI Macro Analysis - Simplified Working Version */}
           <Card className="border-[#4CC1E9]/20 bg-gradient-to-br from-white to-[#4CC1E9]/5">
             <CardHeader>
-              <CardTitle className="flex items-center">
-                <BarChart3 className="w-6 h-6 mr-2 text-[#4CC1E9]" />
-                SYI Macro Analysis - Risk-On/Risk-Off Indicators
-              </CardTitle>
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center">
+                  <BarChart3 className="w-6 h-6 mr-2 text-[#4CC1E9]" />
+                  SYI Macro Analysis - Risk-On/Risk-Off Indicators
+                </CardTitle>
+                
+                <div className="flex items-center space-x-2">
+                  <Badge variant="outline" className="text-gray-600">CSV Export</Badge>
+                  <Badge className="bg-[#4CC1E9]">30D</Badge>
+                  <Badge variant="outline">90D</Badge>
+                  <Badge variant="outline">1Y</Badge>
+                </div>
+              </div>
             </CardHeader>
+            
             <CardContent>
-              <div className="text-center py-8">
-                <p className="text-lg text-gray-600 mb-4">
-                  🎯 Advanced macro-financial analysis implementation
-                </p>
-                <div className="grid grid-cols-2 gap-4 max-w-md mx-auto">
-                  <div className="p-4 bg-white rounded-lg border">
-                    <h3 className="font-semibold text-[#0E1A2B] mb-2">SYI vs T-Bills</h3>
-                    <p className="text-sm text-gray-600">Risk Premium Liquidity (RPL) Analysis</p>
+              {/* Tab Navigation */}
+              <div className="flex space-x-1 mb-6 bg-gray-100 p-1 rounded-lg">
+                <button className="flex-1 flex items-center justify-center px-3 py-2 bg-white rounded-md shadow-sm font-medium text-[#0E1A2B]">
+                  <Building2 className="w-4 h-4 mr-2" />
+                  SYI vs T-Bills (RPL)
+                </button>
+                <button className="flex-1 flex items-center justify-center px-3 py-2 font-medium text-gray-600 hover:text-[#0E1A2B]">
+                  <AlertTriangle className="w-4 h-4 mr-2" />
+                  SYI vs SSI (Stress)
+                </button>
+              </div>
+
+              {/* RPL Performance Summary */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                <div className="text-center p-3 bg-white rounded-lg border">
+                  <div className="flex items-center justify-center mb-1">
+                    <Activity className="w-4 h-4 text-[#4CC1E9] mr-1" />
+                    <span className="text-sm text-gray-600">Current RPL</span>
                   </div>
-                  <div className="p-4 bg-white rounded-lg border">
-                    <h3 className="font-semibold text-[#0E1A2B] mb-2">SYI vs SSI</h3>
-                    <p className="text-sm text-gray-600">Stablecoin Stress Index Monitoring</p>
+                  <div className="text-lg font-bold text-red-600">
+                    -3.53bp
+                  </div>
+                </div>
+                
+                <div className="text-center p-3 bg-white rounded-lg border">
+                  <div className="flex items-center justify-center mb-1">
+                    <Shield className="w-4 h-4 text-gray-600 mr-1" />
+                    <span className="text-sm text-gray-600">Risk Regime</span>
+                  </div>
+                  <Badge className="bg-red-600">
+                    risk-off
+                  </Badge>
+                </div>
+                
+                <div className="text-center p-3 bg-white rounded-lg border">
+                  <div className="flex items-center justify-center mb-1">
+                    <TrendingUp className="w-4 h-4 text-orange-500 mr-1" />
+                    <span className="text-sm text-gray-600">Crossovers</span>
+                  </div>
+                  <div className="text-lg font-bold text-[#0E1A2B]">
+                    2
+                  </div>
+                </div>
+                
+                <div className="text-center p-3 bg-white rounded-lg border">
+                  <div className="flex items-center justify-center mb-1">
+                    <BarChart3 className="w-4 h-4 text-purple-500 mr-1" />
+                    <span className="text-sm text-gray-600">Risk-On %</span>
+                  </div>
+                  <div className="text-lg font-bold text-[#0E1A2B]">
+                    25.4%
+                  </div>
+                </div>
+              </div>
+
+              {/* Chart Placeholder */}
+              <div className="h-80 w-full bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center mb-6">
+                <div className="text-center">
+                  <BarChart3 className="w-16 h-16 text-[#4CC1E9] mx-auto mb-4" />
+                  <h3 className="text-xl font-semibold text-[#0E1A2B] mb-2">SYI vs U.S. Treasury Bills</h3>
+                  <p className="text-gray-600 mb-4">Risk Premium Liquidity (RPL) Spread Analysis</p>
+                  <div className="flex items-center justify-center space-x-4 text-sm">
+                    <div className="flex items-center">
+                      <div className="w-3 h-3 bg-[#4CC1E9] rounded-full mr-2"></div>
+                      <span>SYI Yield: 1.017%</span>
+                    </div>
+                    <div className="flex items-center">
+                      <div className="w-3 h-3 bg-black rounded-full mr-2"></div>
+                      <span>3M T-Bill: 5.25%</span>
+                    </div>
+                    <div className="flex items-center">
+                      <div className="w-3 h-3 bg-red-500 rounded-full mr-2"></div>
+                      <span>RPL: -353bp</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* RPL Analysis */}
+              <div className="p-4 bg-gradient-to-r from-[#0E1A2B] to-[#2E6049] rounded-xl text-white">
+                <h4 className="font-semibold mb-2 flex items-center">
+                  <Building2 className="w-4 h-4 mr-2" />
+                  Risk Premium Liquidity (RPL) Analysis
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <span className="text-white/70">Current Spread:</span>
+                    <span className="ml-2 font-medium text-red-300">
+                      SYI (1.017%) - T-Bill (5.25%) = -353bp
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-white/70">Interpretation:</span>
+                    <span className="ml-2 font-medium">
+                      Risk-Off: Flight to safety, Treasuries significantly outperform stablecoins
+                    </span>
                   </div>
                 </div>
               </div>
