@@ -222,6 +222,17 @@ async def startup_event():
         logger.error(f"❌ Failed to start DevOps service: {e}")
         logger.info("⚠️ Continuing without DevOps features")
     
+    # Start Advanced Trading Engine services (STEP 11)
+    try:
+        from services.trading_engine_service import start_trading_engine
+        
+        # Start Trading Engine service
+        await start_trading_engine()
+        logger.info("✅ Advanced Trading Engine service started")
+    except Exception as e:
+        logger.error(f"❌ Failed to start Trading Engine service: {e}")
+        logger.info("⚠️ Continuing without trading features")
+    
     logger.info("New capabilities enabled:")
     logger.info("  - Real-time StableYield Index calculation")
     logger.info("  - Real-time peg stability monitoring")
