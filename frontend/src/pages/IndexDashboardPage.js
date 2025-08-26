@@ -16,7 +16,9 @@ import {
   DollarSign,
   Users,
   AlertCircle,
-  CheckCircle
+  CheckCircle,
+  Building2,
+  AlertTriangle
 } from "lucide-react";
 
 // Helper functions for stablecoin data
