@@ -198,7 +198,7 @@ const IndexDashboardPage = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold text-[#0E1A2B]">
-                    {statistics.volatility?.toFixed(4)}%
+                    {statistics.volatility ? (statistics.volatility * 100).toFixed(2) : '0.00'}%
                   </div>
                 </CardContent>
               </Card>
