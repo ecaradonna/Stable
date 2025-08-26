@@ -129,6 +129,7 @@ app.include_router(ray_router, prefix="/api")  # Risk-Adjusted Yield (RAY) and S
 app.include_router(websocket_router, prefix="/api")  # WebSocket streaming routes (STEP 6)
 app.include_router(analytics_router, prefix="/api")  # Batch analytics routes (STEP 7)
 app.include_router(ml_router, prefix="/api")  # Machine Learning routes (STEP 8)
+app.include_router(enterprise_router, prefix="/api")  # Enterprise Integration routes (STEP 9)
 
 app.add_middleware(
     CORSMiddleware,
