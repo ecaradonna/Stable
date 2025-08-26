@@ -1540,8 +1540,7 @@ class AIPortfolioService:
             
             # Add execution plan details if available
             if rebalance_plan:
-                reasoning_parts.append(f"Execution plan: {len(rebalance_plan.trades)} trades, "
-                                     f"est. cost ${rebalance_plan.est_fees + rebalance_plan.est_slippage_impact:.2f}")
+                reasoning_parts.append(f"Execution plan: {len(rebalance_plan.trades)} trades, estimated cost ${rebalance_plan.est_fees + rebalance_plan.est_slippage_impact:.2f}")
             
             reasoning_parts.append(f"AI confidence: {confidence_score:.1%}")
             
