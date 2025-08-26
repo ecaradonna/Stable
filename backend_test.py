@@ -27,6 +27,13 @@ class StableYieldTester:
         self.test_email = f"test.user.{uuid.uuid4().hex[:8]}@stableyield.com"
         self.test_name = "John Doe"
         
+        # Store test data for enterprise tests
+        self.test_api_key = None
+        self.test_key_id = None
+        self.test_webhook_id = None
+        self.test_integration_id = None
+        self.test_jwt_token = None
+        
     async def __aenter__(self):
         self.session = aiohttp.ClientSession()
         return self
