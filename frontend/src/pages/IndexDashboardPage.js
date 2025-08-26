@@ -347,7 +347,32 @@ const IndexDashboardPage = () => {
             </p>
           </div>
           
-          <SYIMacroAnalysisChart />
+          {/* Temporary: Testing route functionality */}
+          <Card className="border-[#4CC1E9]/20 bg-gradient-to-br from-white to-[#4CC1E9]/5">
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <BarChart3 className="w-6 h-6 mr-2 text-[#4CC1E9]" />
+                SYI Macro Analysis - Risk-On/Risk-Off Indicators
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center py-8">
+                <p className="text-lg text-gray-600 mb-4">
+                  🎯 Advanced macro-financial analysis implementation
+                </p>
+                <div className="grid grid-cols-2 gap-4 max-w-md mx-auto">
+                  <div className="p-4 bg-white rounded-lg border">
+                    <h3 className="font-semibold text-[#0E1A2B] mb-2">SYI vs T-Bills</h3>
+                    <p className="text-sm text-gray-600">Risk Premium Liquidity (RPL) Analysis</p>
+                  </div>
+                  <div className="p-4 bg-white rounded-lg border">
+                    <h3 className="font-semibold text-[#0E1A2B] mb-2">SYI vs SSI</h3>
+                    <p className="text-sm text-gray-600">Stablecoin Stress Index Monitoring</p>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </section>
 
