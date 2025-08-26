@@ -358,6 +358,7 @@ metadata:
 
 test_plan:
   current_focus:
+    - "Risk-Adjusted Yield (RAY) & Aggregation System (STEP 5)"
     - "Yield Sanitization System (STEP 4)"
     - "StableYield Index Hero Integration"
     - "Live Yields Integration"
