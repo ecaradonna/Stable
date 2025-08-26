@@ -18,6 +18,7 @@ from routes.production_status_routes import router as production_router
 from routes.policy_routes import router as policy_router
 from routes.liquidity_routes import router as liquidity_router
 from routes.sanitization_routes import router as sanitization_router
+from routes.ray_routes import router as ray_router
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
