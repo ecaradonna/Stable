@@ -13,5 +13,20 @@
     "created_at": "2025-08-26T09:38:18.555999",
     "last_used": null,
     "is_active": true
+  },
+  {
+    "key_id": "3602ee5c-18c8-49e6-b4a4-a4bdc4e1535a",
+    "api_key": "sy_ab0899b393d8467aa7b3bf32d1715f63",
+    "client_name": "test_client_5649b3af",
+    "tier": "basic",
+    "rate_limit_per_minute": 100,
+    "allowed_endpoints": [
+      "/api/yields",
+      "/api/index/live",
+      "/api/health"
+    ],
+    "created_at": "2025-08-26T12:54:06.185529",
+    "last_used": null,
+    "is_active": true
   }
 ]

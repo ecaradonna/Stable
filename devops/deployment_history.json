@@ -1,1 +1,16 @@
-[]
+[
+  {
+    "environment": "production",
+    "version": "1.0.0",
+    "build_number": 1,
+    "deployment_time": "2025-08-26T12:54:10.405297",
+    "services": [
+      "backend",
+      "frontend",
+      "database"
+    ],
+    "database_migration": true,
+    "rollback_enabled": true,
+    "health_check_timeout": 300
+  }
+]
