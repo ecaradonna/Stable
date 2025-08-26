@@ -385,7 +385,7 @@ class YieldSanitizer:
         # For now, implement basic flash spike detection
         
         source = yield_data.get('source', 'unknown')
-        current_time = datetime.utcnov()
+        current_time = datetime.utcnow()
         
         # Simulate historical check (in production, query actual historical data)
         if apy > config['flash_duration_minutes']:  # Simple heuristic
