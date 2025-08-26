@@ -391,7 +391,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "COMPREHENSIVE END-TO-END TESTING COMPLETE"
+    - "Batch Analytics & Performance Reporting System (STEP 7)"
   stuck_tasks: []
   test_all: true
   test_priority: "complete"
