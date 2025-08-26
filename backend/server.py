@@ -121,6 +121,7 @@ app.include_router(production_router)  # Production status routes
 app.include_router(policy_router, prefix="/api")  # Protocol policy routes
 app.include_router(liquidity_router, prefix="/api")  # Liquidity filtering routes
 app.include_router(sanitization_router, prefix="/api")  # Yield sanitization routes
+app.include_router(ray_router, prefix="/api")  # Risk-Adjusted Yield (RAY) and SYI routes
 
 app.add_middleware(
     CORSMiddleware,
