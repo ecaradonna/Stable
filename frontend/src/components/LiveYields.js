@@ -299,7 +299,7 @@ const LiveYields = () => {
                 <div className="text-center mb-6">
                   <div className="flex items-center justify-center space-x-2 mb-2">
                     <div className="text-4xl font-bold bg-gradient-to-r from-[#4CC1E9] to-[#007A99] bg-clip-text text-transparent">
-                      {displayYield.toFixed(2)}%
+                      {showRiskAdjusted && risk.ry_apy ? (risk.ry_apy / 100).toFixed(2) : displayYield.toFixed(2)}%
                     </div>
                     {showRiskAdjusted && (
                       <Shield className="w-5 h-5 text-[#4CC1E9]" />
@@ -308,7 +308,7 @@ const LiveYields = () => {
                   
                   {showRiskAdjusted && risk.ry_apy && (
                     <div className="text-sm text-gray-500 mb-2">
-                      Raw: {yieldItem.currentYield.toFixed(2)}% → Adjusted: {risk.ry_apy.toFixed(2)}%
+                      Raw: {(yieldItem.currentYield || (risk.apy / 100)).toFixed(2)}% → Adjusted: {(risk.ry_apy / 100).toFixed(2)}%
                     </div>
                   )}
                   
