@@ -484,6 +484,21 @@ frontend:
           agent: "main"
           comment: "✅ NEW PAGE COMPLETE - Created comprehensive Risk-Adjusted Analytics page with quantitative frameworks content. Includes detailed risk dimensions (Peg Stability, Liquidity Depth, Counterparty Risk), RAY formula explanation, and institutional applications. Hero section Risk-Adjusted Analytics card now clickable and navigates to dedicated page. Both new pages integrated with consistent branding and navigation."
 
+  - task: "SYI Macro Analysis Implementation"
+    implemented: true
+    working: false
+    file: "/app/frontend/src/components/SYIMacroAnalysisChart.js"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "🎯 COMPREHENSIVE SYI MACRO ANALYSIS IMPLEMENTATION COMPLETE - Successfully replaced 'SYI vs Bitcoin & Ethereum Performance' with sophisticated 'SYI Macro Analysis - Risk-On/Risk-Off Indicators' featuring two advanced macro-financial charts: 1) SYI vs U.S. Treasury Bills (RPL Spread) with dual line chart, area visualization for positive/negative RPL, and comprehensive metrics (Current RPL, Risk Regime, Crossovers, Risk-On %). 2) SYI vs Stablecoin Stress Index (SSI) with dual Y-axis chart, stress threshold lines, and early warning metrics (Current SSI, Stress Level, Max SSI, Stress Events). Implementation includes Radix UI tabs system with Building2 and AlertTriangle icons, timeframe controls (7D/30D/90D/1Y), interactive Recharts with custom tooltips, performance metrics cards, CSV export functionality, and institutional-grade styling with #4CC1E9 blue theme. Component integrated into IndexDashboardPage.js in Historical Performance section. All mock data generation, analytics calculations, and responsive design implemented for Bloomberg-level institutional presentation."
+        - working: false
+          agent: "testing"
+          comment: "❌ CRITICAL ROUTING ISSUE DETECTED - Comprehensive testing reveals that the /index-dashboard route is not functioning properly. Despite correct React Router configuration in App.js (Route path='/index-dashboard' element={IndexDashboardPage}), browser consistently redirects to homepage (/) when attempting to access /index-dashboard URL. TESTING RESULTS: ✅ Old Bitcoin/Ethereum chart successfully removed, ✅ SYIMacroAnalysisChart component properly coded with all required features (tabs, timeframe controls, charts, metrics, export), ✅ Component correctly imported in IndexDashboardPage.js, ❌ Route not accessible - browser redirects to homepage, ❌ SYI Macro Analysis section not visible, ❌ No tabs, timeframe controls, or macro charts rendered, ❌ Performance metrics not displayed. ROOT CAUSE: React Router /index-dashboard route not working despite correct configuration. The implementation is complete but not accessible due to routing issue. RECOMMENDATION: Fix React Router configuration or build process to enable /index-dashboard route access."
+
 metadata:
   created_by: "main_agent"
   version: "2.1"
