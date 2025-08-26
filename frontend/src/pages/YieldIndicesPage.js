@@ -23,6 +23,7 @@ import {
 const YieldIndicesPage = () => {
   const [isContactOpen, setIsContactOpen] = useState(false);
   const [isWhitepaperOpen, setIsWhitepaperOpen] = useState(false);
+  const navigate = useNavigate();
 
   const methodologyPoints = [
     {
