@@ -1909,6 +1909,17 @@ class StableYieldTester:
         await self.test_sanitization_integration_with_previous_steps()
         await self.test_winsorization_functionality()
         
+        # Risk-Adjusted Yield (RAY) & SYI System tests (STEP 5)
+        print("\n⚖️ Testing Risk-Adjusted Yield (RAY) & SYI System (STEP 5)...")
+        await self.test_ray_methodology()
+        await self.test_ray_calculate_single()
+        await self.test_ray_market_analysis()
+        await self.test_syi_composition()
+        await self.test_syi_methodology()
+        await self.test_ray_parameter_validation()
+        await self.test_ray_integration_with_yields()
+        await self.test_syi_integration_with_ray()
+        
         # Summary
         print("\n" + "=" * 60)
         self.print_summary()
