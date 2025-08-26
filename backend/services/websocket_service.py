@@ -80,6 +80,10 @@ class WebSocketConnectionManager:
         
         logger.debug(f"📡 Broadcasted to {len(connections) - len(disconnected)} {stream_type} connections")
     
+    async def broadcast(self, stream_type: str, data: Dict):
+        """Alias for broadcast_to_stream for compatibility"""
+        await self.broadcast_to_stream(stream_type, data)
+    
     async def _send_welcome_message(self, websocket: WebSocketServerProtocol, stream_type: str):
         """Send welcome message with stream info"""
         welcome = {
