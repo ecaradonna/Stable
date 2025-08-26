@@ -397,7 +397,7 @@ async def get_portfolios(
         logger.error(f"Error getting portfolios: {e}")
         raise HTTPException(status_code=500, detail="Failed to get portfolios")
 
-@router.get("/trading/portfolios/{portfolio_id}/performance")
+@router.get("/portfolios/{portfolio_id}/performance")
 async def get_portfolio_performance(portfolio_id: str) -> Dict[str, Any]:
     """Get detailed portfolio performance metrics"""
     try:
