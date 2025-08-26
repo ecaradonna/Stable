@@ -210,7 +210,17 @@ backend:
           agent: "testing"
           comment: "✅ LIQUIDITY FILTER SYSTEM (STEP 3) FULLY OPERATIONAL - Comprehensive testing completed with 90.7% success rate (49/54 tests passed). LIQUIDITY CONFIGURATION API: All endpoints working - GET /api/liquidity/summary (Config v1.0.0 with thresholds: Min $1M, Institutional $50M, Blue Chip $500M), GET /api/liquidity/thresholds (chain/asset/protocol specific thresholds), GET /api/liquidity/stats (5 pools analyzed, grade distribution), POST /api/liquidity/refresh (config refresh working). TVL FILTERING IN YIELDS: All filtering parameters working - min_tvl filters (tested $10M, $50M), institutional_only flag, grade_filter (blue_chip, institutional, professional, retail), chain and asset filters. POOL FILTERING API: GET /api/pools/filter working with all parameters - min_tvl, grade_filter, chain/asset combinations. LIQUIDITY METRICS: Pool metrics calculation working (TVL parsing, grade classification, threshold validation). PARAMETER VALIDATION: All validation working - negative TVL rejected (422), volatility > 1.0 rejected (422), invalid grade filters rejected (422), valid parameters accepted. TVL PARSING: Successfully parsing liquidity strings and applying filters (100% reduction when appropriate). INSTITUTIONAL FILTERING: System correctly identifies that current pools don't meet institutional thresholds, demonstrating proper filtering logic. All critical liquidity filtering functionality operational and ready for production use."
 
-  - task: "Yield Sanitization System (STEP 4)"
+  - task: "Risk-Adjusted Yield (RAY) & Aggregation System (STEP 5)"
+    implemented: true
+    working: false
+    file: "/app/backend/routes/ray_routes.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "STEP 5 IMPLEMENTATION: Created RAY calculator service (ray_calculator.py) for institutional-grade risk-adjusted yield calculations with multi-factor risk assessment (peg stability, liquidity, counterparty, protocol, temporal). Created SYI compositor service (syi_compositor.py) for composing StableYield Index using TVL-capped weighting methodology. Created ray_routes.py with API endpoints for RAY calculations, market analysis, and SYI composition. Registered routes in server.py. System implements Risk-Adjusted Yield = Base APY * (1 - Total Risk Penalty) with compound penalty methodology and confidence scoring."
     implemented: true
     working: true
     file: "/app/backend/routes/sanitization_routes.py"
