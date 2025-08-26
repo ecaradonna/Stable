@@ -1,7 +1,7 @@
 """
 AI-Powered Portfolio Management & Automated Rebalancing Service (STEP 13)
 Advanced AI algorithms for autonomous portfolio optimization, machine learning-driven 
-rebalancing strategies, and predictive risk management
+rebalancing strategies, and production-ready execution with fee/slippage awareness
 """
 
 import asyncio
@@ -9,7 +9,7 @@ import logging
 import json
 import time
 import numpy as np
-from typing import Dict, Any, List, Optional, Tuple
+from typing import Dict, Any, List, Optional, Tuple, NamedTuple
 from datetime import datetime, timedelta
 from dataclasses import dataclass, asdict
 from decimal import Decimal
@@ -31,6 +31,49 @@ from .ml_insights_service import get_ml_insights_service
 from .dashboard_service import get_dashboard_service
 
 logger = logging.getLogger(__name__)
+
+# === PRODUCTION-READY REBALANCING TYPES ===
+
+@dataclass
+class Holding:
+    """Current asset holding"""
+    asset: str          # e.g., 'USDC', 'USDT', 'DAI'
+    quantity: float     # current units
+    price: float        # quote currency per unit (e.g., USD)
+
+@dataclass
+class TargetWeight:
+    """Target portfolio weight"""
+    asset: str
+    weight: float       # desired portfolio weight in [0,1]
+
+@dataclass
+class Constraints:
+    """Trading constraints"""
+    min_trade_value: float = 5.0        # ignore trades below this notional (e.g., $5)
+    lot_size: float = 0.000001          # round quantities to this step (e.g., 0.0001)
+    max_turnover_pct: float = 0.50      # cap per-asset turnover relative to current notional
+    fee_bps: float = 8.0                # trading fee in basis points (e.g., 8 = 0.08%)
+    slippage_bps: float = 10.0          # expected slippage in bps to pad buys/sells
+
+@dataclass
+class Trade:
+    """Individual trade instruction"""
+    side: str           # 'BUY' or 'SELL'
+    asset: str
+    quantity: float     # rounded to lot size
+    est_price: float    # price used to estimate notional
+    est_notional: float # est_price * quantity
+    reason: str         # 'rebalance', 'raise_cash', 'deploy_cash'
+
+@dataclass
+class RebalancePlan:
+    """Complete rebalancing execution plan"""
+    trades: List[Trade]
+    est_fees: float
+    est_slippage_impact: float
+    est_cash_delta: float               # >0 means ending with extra cash, <0 needs cash
+    after_weights: Dict[str, float]     # estimated resulting weights
 
 class OptimizationStrategy(Enum):
     """Portfolio optimization strategies"""
@@ -73,10 +116,11 @@ class AIPortfolioConfig:
     use_predictive_rebalancing: bool
     performance_target: float  # Target annual return
     max_drawdown_limit: float  # Maximum allowed drawdown
+    execution_constraints: Constraints  # Trading execution constraints
 
 @dataclass
 class AIRebalancingSignal:
-    """AI-generated rebalancing signal"""
+    """AI-generated rebalancing signal with execution plan"""
     signal_id: str
     portfolio_id: str
     trigger_type: RebalancingTrigger
@@ -87,6 +131,7 @@ class AIRebalancingSignal:
     expected_risk: float
     market_regime: MarketRegime
     reasoning: str
+    rebalance_plan: RebalancePlan  # Production-ready execution plan
     generated_at: datetime
     expires_at: datetime
 
@@ -118,8 +163,209 @@ class PortfolioOptimizationResult:
     optimization_time: float
     metadata: Dict[str, Any]
 
+# === PRODUCTION-READY REBALANCING ENGINE ===
+
+def generate_rebalance_plan(
+    holdings: List[Holding],
+    targets: List[TargetWeight],
+    quote_cash: float,
+    constraints: Constraints = None
+) -> RebalancePlan:
+    """
+    Generate a fee/slippage-aware rebalance plan from current holdings to target weights.
+    This is deterministic and conservative: sells first to fund buys, enforces min trade notional and turnover caps.
+    """
+    if constraints is None:
+        constraints = Constraints()
+    
+    # Create indexes
+    price_by = {h.asset: h.price for h in holdings}
+    qty_by = {h.asset: h.quantity for h in holdings}
+    target_by = {t.asset: t.weight for t in targets}
+    
+    # Normalize target weights (defensive)
+    target_sum = sum(max(t.weight, 0) for t in targets)
+    if target_sum <= 0:
+        raise ValueError('Target weights sum must be > 0')
+    
+    for t in targets:
+        target_by[t.asset] = max(t.weight, 0) / target_sum
+    
+    # Compute current portfolio value (positions + cash)
+    pos_value = sum(h.quantity * h.price for h in holdings)
+    total_value = pos_value + quote_cash
+    
+    # Compute desired notionals
+    desired_notional = {}
+    for t in targets:
+        desired_notional[t.asset] = target_by[t.asset] * total_value
+    
+    # Compute deltas per asset (desired - current)
+    deltas = {}
+    for t in targets:
+        cur_notional = qty_by.get(t.asset, 0) * price_by.get(t.asset, 0)
+        deltas[t.asset] = desired_notional[t.asset] - cur_notional
+    
+    # Partition into sells and buys
+    sells = []
+    buys = []
+    
+    for asset, delta in deltas.items():
+        price = price_by.get(asset, 0)
+        current_notional = qty_by.get(asset, 0) * price
+        
+        # Skip tiny adjustments
+        if abs(delta) < constraints.min_trade_value:
+            continue
+        
+        # Enforce per-asset turnover cap
+        cap = max(current_notional * constraints.max_turnover_pct, constraints.min_trade_value)
+        adj = np.sign(delta) * min(abs(delta), cap)
+        
+        if adj < 0:
+            sells.append({
+                'asset': asset,
+                'notional': -adj,
+                'price': price,
+                'current_notional': current_notional
+            })
+        elif adj > 0:
+            buys.append({
+                'asset': asset,
+                'notional': adj,
+                'price': price,
+                'current_notional': current_notional
+            })
+    
+    # Deterministic ordering: largest sells first (raise cash), then largest buys
+    sells.sort(key=lambda x: x['notional'], reverse=True)
+    buys.sort(key=lambda x: x['notional'], reverse=True)
+    
+    trades = []
+    cash = quote_cash
+    
+    fee_rate = constraints.fee_bps / 10000
+    slip_rate = constraints.slippage_bps / 10000
+    
+    est_fees = 0
+    est_slip = 0
+    
+    # SELL pass (raise cash first)
+    for s in sells:
+        if s['notional'] < constraints.min_trade_value or s['price'] <= 0:
+            continue
+        
+        est_fill_price = s['price'] * (1 - slip_rate)  # conservative: sells hit lower
+        raw_qty = s['notional'] / est_fill_price
+        qty = np.floor(raw_qty / constraints.lot_size) * constraints.lot_size
+        
+        if qty <= 0:
+            continue
+        
+        est_notional = qty * est_fill_price
+        fees = est_notional * fee_rate
+        est_fees += fees
+        est_slip += qty * (s['price'] - est_fill_price)  # positive cost
+        
+        trades.append(Trade(
+            side='SELL',
+            asset=s['asset'],
+            quantity=qty,
+            est_price=est_fill_price,
+            est_notional=est_notional,
+            reason='raise_cash'
+        ))
+        
+        cash += est_notional - fees  # proceeds net of fees
+        qty_by[s['asset']] = qty_by.get(s['asset'], 0) - qty
+    
+    # BUY pass (deploy available cash)
+    for b in buys:
+        if b['notional'] < constraints.min_trade_value or b['price'] <= 0:
+            continue
+        
+        est_fill_price = b['price'] * (1 + slip_rate)  # conservative: buys pay higher
+        budget = min(b['notional'], max(0, cash))  # don't overspend
+        
+        if budget < constraints.min_trade_value:
+            continue
+        
+        raw_qty = budget / est_fill_price
+        qty = np.floor(raw_qty / constraints.lot_size) * constraints.lot_size
+        
+        if qty <= 0:
+            continue
+        
+        est_notional = qty * est_fill_price
+        fees = est_notional * fee_rate
+        total_cost = est_notional + fees
+        
+        if total_cost > cash:
+            # tighten to available cash
+            tight_qty = np.floor((cash / (est_fill_price * (1 + fee_rate))) / constraints.lot_size) * constraints.lot_size
+            if tight_qty <= 0:
+                continue
+            
+            tight_notional = tight_qty * est_fill_price
+            tight_fees = tight_notional * fee_rate
+            
+            trades.append(Trade(
+                side='BUY',
+                asset=b['asset'],
+                quantity=tight_qty,
+                est_price=est_fill_price,
+                est_notional=tight_notional,
+                reason='deploy_cash'
+            ))
+            
+            est_fees += tight_fees
+            est_slip += tight_qty * (est_fill_price - b['price'])
+            cash -= tight_notional + tight_fees
+            qty_by[b['asset']] = qty_by.get(b['asset'], 0) + tight_qty
+        else:
+            trades.append(Trade(
+                side='BUY',
+                asset=b['asset'],
+                quantity=qty,
+                est_price=est_fill_price,
+                est_notional=est_notional,
+                reason='deploy_cash'
+            ))
+            
+            est_fees += fees
+            est_slip += qty * (est_fill_price - b['price'])
+            cash -= total_cost
+            qty_by[b['asset']] = qty_by.get(b['asset'], 0) + qty
+    
+    # Estimate resulting weights
+    end_pos_value = sum(qty_by.get(asset, 0) * price_by.get(asset, 0) 
+                       for asset in set(list(qty_by.keys()) + list(price_by.keys())))
+    end_total = end_pos_value + cash
+    
+    after_weights = {}
+    for asset in set(list(qty_by.keys()) + list(price_by.keys())):
+        qty = qty_by.get(asset, 0)
+        price = price_by.get(asset, 0)
+        after_weights[asset] = (qty * price) / end_total if end_total > 0 else 0
+    
+    return RebalancePlan(
+        trades=trades,
+        est_fees=round(est_fees, 2),
+        est_slippage_impact=round(est_slip, 2),
+        est_cash_delta=round(cash - quote_cash, 2),
+        after_weights=after_weights
+    )
+
+def assert_weights_valid(targets: List[TargetWeight], tol: float = 1e-6):
+    """Validate target weights"""
+    weight_sum = sum(t.weight for t in targets)
+    if weight_sum <= 0:
+        raise ValueError('Target weights must sum to > 0')
+    if abs(weight_sum - 1) > 0.05:
+        logger.warning(f'Target weights sum ({weight_sum:.4f}) != 1; will renormalize.')
+
 class AIPortfolioService:
-    """AI-powered portfolio management and automated rebalancing service"""
+    """AI-powered portfolio management with production-ready execution"""
     
     def __init__(self):
         # Core service integrations
@@ -168,7 +414,9 @@ class AIPortfolioService:
             "avg_optimization_time": 0,
             "total_rebalancing_signals": 0,
             "executed_rebalances": 0,
-            "avg_signal_confidence": 0
+            "avg_signal_confidence": 0,
+            "total_trades_generated": 0,
+            "avg_execution_cost": 0
         }
     
     async def start(self):
