@@ -139,6 +139,7 @@ app.include_router(devops_router, prefix="/api")  # DevOps & Production routes (
 app.include_router(trading_router, prefix="/api/trading")  # Advanced Trading Engine routes (STEP 11)
 app.include_router(dashboard_router, prefix="/api/dashboard")  # Advanced Analytics Dashboard routes (STEP 12)
 app.include_router(ai_portfolio_router, prefix="/api/ai-portfolio")  # AI Portfolio Management routes (STEP 13)
+app.include_router(risk_management_router, prefix="/api/risk-management")  # Enhanced Risk Management routes
 
 app.add_middleware(
     CORSMiddleware,
