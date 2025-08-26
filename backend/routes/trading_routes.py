@@ -39,7 +39,7 @@ class CreateRebalanceStrategyRequest(BaseModel):
     use_ray_signals: bool = True
     use_ml_predictions: bool = True
 
-@router.get("/trading/status")
+@router.get("/status")
 async def get_trading_status() -> Dict[str, Any]:
     """Get trading engine status and overview"""
     try:
