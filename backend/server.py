@@ -183,6 +183,17 @@ async def startup_event():
         logger.error(f"❌ Failed to start batch analytics service: {e}")
         logger.info("⚠️ Continuing without batch analytics features")
     
+    # Start Machine Learning services (STEP 8)
+    try:
+        from services.ml_insights_service import start_ml_insights
+        
+        # Start ML insights service
+        await start_ml_insights()
+        logger.info("✅ ML Insights service started")
+    except Exception as e:
+        logger.error(f"❌ Failed to start ML insights service: {e}")
+        logger.info("⚠️ Continuing without ML features")
+    
     logger.info("New capabilities enabled:")
     logger.info("  - Real-time StableYield Index calculation")
     logger.info("  - Real-time peg stability monitoring")
