@@ -479,7 +479,7 @@ async def create_rebalance_strategy(request: CreateRebalanceStrategyRequest) -> 
         logger.error(f"Error creating rebalance strategy: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to create rebalance strategy: {str(e)}")
 
-@router.get("/trading/rebalance-strategies")
+@router.get("/rebalance-strategies")
 async def get_rebalance_strategies(
     portfolio_id: Optional[str] = Query(default=None, description="Filter by portfolio ID")
 ) -> Dict[str, Any]:
