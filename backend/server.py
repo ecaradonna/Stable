@@ -265,5 +265,14 @@ async def shutdown_db_client():
     except Exception as e:
         logger.error(f"❌ Error stopping batch analytics service: {e}")
     
+    # Stop ML insights service
+    try:
+        from services.ml_insights_service import stop_ml_insights
+        
+        await stop_ml_insights()
+        logger.info("✅ ML Insights service stopped")
+    except Exception as e:
+        logger.error(f"❌ Error stopping ML insights service: {e}")
+    
     client.close()
     logger.info("StableYield Market Intelligence API shutting down...")
