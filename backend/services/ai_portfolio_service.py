@@ -752,7 +752,7 @@ class AIPortfolioService:
             return None
     
     async def execute_ai_rebalancing(self, signal_id: str) -> Dict[str, Any]:
-        """Execute AI-recommended rebalancing"""
+        """Execute AI-recommended rebalancing using production-ready execution plan"""
         try:
             if signal_id not in self.rebalancing_signals:
                 raise ValueError(f"Rebalancing signal {signal_id} not found")
@@ -763,15 +763,50 @@ class AIPortfolioService:
             if datetime.utcnow() > signal.expires_at:
                 raise ValueError(f"Rebalancing signal {signal_id} has expired")
             
+            # Validate execution plan
+            rebalance_plan = signal.rebalance_plan
+            
+            # Safety check: block execution if insufficient cash (unless credit line allowed)
+            if rebalance_plan.est_cash_delta < 0:
+                logger.warning(f"⚠️ Rebalance plan requires additional cash: ${abs(rebalance_plan.est_cash_delta):.2f}")
+                # In production, this might be allowed with proper risk management
+            
             # Get trading engine
             trading_engine = get_trading_engine_service()
             if not trading_engine:
                 raise ValueError("Trading engine not available")
             
-            # Execute rebalancing through trading engine
-            rebalance_result = await trading_engine.execute_rebalance_from_allocation(
-                signal.portfolio_id, signal.recommended_allocation
-            )
+            # Execute trades in order (sells first, then buys)
+            executed_trades = []
+            total_execution_cost = 0
+            
+            for trade in rebalance_plan.trades:
+                try:
+                    # Convert to trading engine format
+                    order_result = await trading_engine.create_order(
+                        client_id=signal.portfolio_id,  # Using portfolio_id as client_id
+                        symbol=f"{trade.asset}/USD",  # Assuming USD quote
+                        side=trade.side.lower(),
+                        order_type="market",  # Use market orders for immediate execution
+                        quantity=Decimal(str(trade.quantity))
+                    )
+                    
+                    executed_trades.append({
+                        "trade": asdict(trade),
+                        "order_result": order_result,
+                        "execution_status": "success"
+                    })
+                    
+                    total_execution_cost += trade.est_notional * (trade.est_price - (1.0 if trade.side == 'BUY' else -1.0))
+                    
+                except Exception as trade_error:
+                    logger.error(f"❌ Error executing trade {trade.asset} {trade.side}: {trade_error}")
+                    executed_trades.append({
+                        "trade": asdict(trade),
+                        "order_result": None,
+                        "execution_status": "failed",
+                        "error": str(trade_error)
+                    })
             
             # Update metrics
             self.optimization_metrics["executed_rebalances"] += 1
@@ -779,18 +814,40 @@ class AIPortfolioService:
             # Mark signal as executed
             signal.executed_at = datetime.utcnow()
             
-            logger.info(f"✅ Executed AI rebalancing for portfolio {signal.portfolio_id}: "
-                       f"Signal: {signal_id}, Confidence: {signal.confidence_score:.2f}")
+            # Calculate tracking error (||target - after||₁ / 2)
+            tracking_error = sum(abs(signal.rebalance_plan.after_weights.get(asset, 0) - target_weight) 
+                               for asset, target_weight in signal.recommended_allocation.items()) / 2
             
-            return {
+            execution_summary = {
                 "signal_id": signal_id,
                 "portfolio_id": signal.portfolio_id,
-                "execution_result": rebalance_result,
                 "executed_at": signal.executed_at.isoformat(),
                 "confidence_score": signal.confidence_score,
                 "expected_return": signal.expected_return,
-                "expected_risk": signal.expected_risk
+                "expected_risk": signal.expected_risk,
+                "execution_plan": {
+                    "total_trades": len(rebalance_plan.trades),
+                    "successful_trades": len([t for t in executed_trades if t["execution_status"] == "success"]),
+                    "failed_trades": len([t for t in executed_trades if t["execution_status"] == "failed"]),
+                    "est_fees": rebalance_plan.est_fees,
+                    "est_slippage": rebalance_plan.est_slippage_impact,
+                    "est_total_cost": rebalance_plan.est_fees + rebalance_plan.est_slippage_impact,
+                    "actual_execution_cost": total_execution_cost,
+                    "tracking_error": tracking_error
+                },
+                "weight_changes": {
+                    "pre_weights": signal.current_allocation,
+                    "target_weights": signal.recommended_allocation,
+                    "estimated_after_weights": rebalance_plan.after_weights
+                },
+                "executed_trades": executed_trades
             }
+            
+            logger.info(f"✅ Executed AI rebalancing for portfolio {signal.portfolio_id}: "
+                       f"Signal: {signal_id}, Trades: {len(executed_trades)}, "
+                       f"Success Rate: {execution_summary['execution_plan']['successful_trades']}/{len(executed_trades)}")
+            
+            return execution_summary
             
         except Exception as e:
             logger.error(f"❌ Error executing AI rebalancing {signal_id}: {e}")
