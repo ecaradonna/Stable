@@ -9,7 +9,23 @@ const Header = ({ onJoinWaitlist, onDownloadWhitepaper }) => {
   const handleLiveIndexClick = (e) => {
     e.preventDefault();
     console.log('Live Index clicked - navigating to /index-dashboard');
-    navigate('/index-dashboard');
+    
+    try {
+      // Try React Router navigation first
+      navigate('/index-dashboard');
+    } catch (error) {
+      console.error('React Router navigation failed:', error);
+      // Fallback to window.location
+      window.location.href = '/index-dashboard';
+    }
+    
+    // Additional fallback with timeout
+    setTimeout(() => {
+      if (window.location.pathname !== '/index-dashboard') {
+        console.log('Navigation timeout - forcing window.location change');
+        window.location.href = '/index-dashboard';
+      }
+    }, 1000);
   };
 
   return (
