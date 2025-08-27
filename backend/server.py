@@ -27,7 +27,7 @@ from routes.devops_routes import router as devops_router
 from routes.trading_routes import router as trading_router
 from routes.dashboard_routes import router as dashboard_router
 from routes.ai_portfolio_routes import router as ai_portfolio_router
-from routes.risk_management_routes import router as risk_management_router
+from routes.index_family_routes import router as index_family_router
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -139,7 +139,7 @@ app.include_router(devops_router, prefix="/api")  # DevOps & Production routes (
 app.include_router(trading_router, prefix="/api/trading")  # Advanced Trading Engine routes (STEP 11)
 app.include_router(dashboard_router, prefix="/api/dashboard")  # Advanced Analytics Dashboard routes (STEP 12)
 app.include_router(ai_portfolio_router, prefix="/api/ai-portfolio")  # AI Portfolio Management routes (STEP 13)
-app.include_router(risk_management_router, prefix="/api/risk-management")  # Enhanced Risk Management routes
+app.include_router(index_family_router, prefix="/api/index-family")  # Index Family Management routes
 
 app.add_middleware(
     CORSMiddleware,
