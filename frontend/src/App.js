@@ -16,7 +16,7 @@ function App() {
   return (
     <HelmetProvider>
       <div className="App">
-        <HashRouter>
+        <BrowserRouter>
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/blog" element={<BlogPage />} />
@@ -28,7 +28,7 @@ function App() {
             <Route path="/api-documentation" element={<ApiDocumentationPage />} />
           </Routes>
           <Toaster />
-        </HashRouter>
+        </BrowserRouter>
       </div>
     </HelmetProvider>
   );
