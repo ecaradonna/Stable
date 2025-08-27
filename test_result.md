@@ -122,9 +122,9 @@ backend:
 
   - task: "External API Integration"
     implemented: true
-    working: true  
+    working: false  
     file: "/app/backend/services/yield_aggregator.py"
-    stuck_count: 1
+    stuck_count: 2
     priority: "high"
     needs_retesting: false
     status_history:
@@ -140,6 +140,9 @@ backend:
         - working: true
           agent: "testing"
           comment: "✅ DEFI INTEGRATION FIXED & WORKING - Fixed critical bug in DefiLlama service (line 87: 'apy' vs 'currentYield' key mismatch). DeFi integration now fully operational with 91.3% test success rate. Successfully retrieving real DeFi yields from major protocols: USDT 77.99% (Interest-Curve/Move), USDC 80.32% (Interest-Curve/Move), DAI 9.31% (Convex-Finance/Ethereum), PYUSD 22.68%, TUSD 18.16%. System now provides real DeFi data with complete metadata (pool_id, chain, TVL). Binance CeFi remains blocked (HTTP 451) but DeFi data compensates with live yields from DefiLlama API. Yield aggregator successfully combining DeFi sources (5 DeFi, 0 CeFi)."
+        - working: false
+          agent: "testing"
+          comment: "❌ CRITICAL YIELD DATA ISSUE CONFIRMED - DefiLlama integration returning UNREALISTIC YIELDS: USDC 81.39% and USDT 78.78% from Interest-Curve protocol. These yields exceed reasonable stablecoin ranges (should be 1-15% APY). ROOT CAUSE IDENTIFIED: Yield sanitization system is properly configured (reasonable_maximum: 50%, suspicious_threshold: 25%) but NOT BEING APPLIED in yield aggregation pipeline. All 5 yields show NO sanitization metadata, meaning _apply_yield_sanitization() function is being bypassed or failing silently. This is causing users to see '80%' values as reported in issue. IMMEDIATE FIX NEEDED: Ensure yield sanitization is actually executed in yield_aggregator.py line 58."
 
   - task: "User Management APIs"
     implemented: true
