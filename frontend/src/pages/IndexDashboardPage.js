@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import SEOHead from "../components/SEOHead";
+import IndexFamilyOverview from "../components/IndexFamilyOverview";
 import ContactModal from "../components/ContactModal";
 import WhitepaperDownloadModal from "../components/WhitepaperDownloadModal";
 import LiveIndexTicker from "../components/LiveIndexTicker";
