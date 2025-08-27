@@ -37,6 +37,9 @@ const Header = ({ onJoinWaitlist, onDownloadWhitepaper }) => {
             <Link to="/methodology" className="text-[#0E1A2B] hover:text-[#2E6049] transition-colors font-medium">
               Index Methodology
             </Link>
+            <Link to="/api-documentation" className="text-[#0E1A2B] hover:text-[#2E6049] transition-colors font-medium">
+              API Access
+            </Link>
           </nav>
 
           {/* Actions */}
