@@ -55,6 +55,15 @@ const Header = ({ onJoinWaitlist, onDownloadWhitepaper }) => {
             >
               Live Index
             </button>
+            {/* Backup Link for fallback */}
+            <Link 
+              to="/index-dashboard" 
+              className="text-[#0E1A2B] hover:text-[#2E6049] transition-colors font-medium ml-4 text-sm"
+              style={{display: 'none'}}
+              id="backup-live-index-link"
+            >
+              [Dashboard]
+            </Link>
             <Link to="/yield-indices" className="text-[#0E1A2B] hover:text-[#2E6049] transition-colors font-medium">
               Yield Indices & Benchmarks
             </Link>
