@@ -510,9 +510,9 @@ frontend:
 
   - task: "Live Stablecoin Market Charts Implementation"
     implemented: true
-    working: true
+    working: false
     file: "/app/frontend/src/components/StablecoinMarketCharts.js"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
     needs_retesting: false
     status_history:
@@ -522,6 +522,9 @@ frontend:
         - working: true
           agent: "testing"
           comment: "✅ BACKEND SUPPORT FOR STABLECOIN MARKET CHARTS VERIFIED - Comprehensive backend testing shows excellent support for live stablecoin market data. YIELD DATA INTEGRATION: ✅ GET /api/yields/ returns 5 stablecoins with live DeFi yields (USDT 78.71%, USDC 81.51%, DAI 7.75% from real protocols), ✅ Individual coin endpoints working with detailed metadata, ✅ Yield comparison and history endpoints functional, ✅ Policy-enhanced yields with reputation scores (avg 0.77). MARKET INTELLIGENCE DATA: ✅ Peg stability rankings available for 7 stablecoins with peg scores and methodology, ✅ Protocol policy system providing institutional-grade filtering, ✅ Liquidity metrics and TVL data available. PERFORMANCE METRICS: Yield endpoints responding in acceptable timeframes (some optimization needed for bulk data). INTEGRATION STATUS: Backend provides comprehensive real-time data to support all 4 chart tabs (Distribution, Rankings, Yield Trends, Adoption) with live yield data, peg stability metrics, and market intelligence. Frontend can successfully render interactive charts with real backend data."
+        - working: false
+          agent: "testing"
+          comment: "❌ CRITICAL ROUTING ISSUE PREVENTS TESTING - Live Stablecoin Market Charts component cannot be tested due to fundamental routing issue with /index-dashboard page. COMPONENT STATUS: ✅ StablecoinMarketCharts.js component properly implemented with all 4 tabs (Distribution, Rankings, Yield Trends, Adoption), ✅ Interactive Recharts integration complete, ✅ Export functionality implemented, ✅ Component correctly imported in IndexDashboardPage.js. TESTING FAILURE: ❌ Cannot access /index-dashboard route - browser redirects to homepage, ❌ Component not visible for interaction testing, ❌ Tab switching functionality cannot be verified, ❌ Chart rendering and interactivity cannot be tested, ❌ Export functionality cannot be validated. ROOT CAUSE: Same routing issue affecting SYI Macro Analysis - React Router /index-dashboard route not functioning. The Live Stablecoin Market Charts implementation appears complete but is inaccessible due to the routing problem. IMPACT: User's primary concern about 'Live Index graphs are not shown' and 'switching is not possible' remains unresolved because the entire dashboard page is unreachable."
 
 metadata:
   created_by: "main_agent"
