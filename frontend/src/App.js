@@ -28,7 +28,7 @@ function App() {
             <Route path="/api-documentation" element={<ApiDocumentationPage />} />
           </Routes>
           <Toaster />
-        </BrowserRouter>
+        </HashRouter>
       </div>
     </HelmetProvider>
   );
