@@ -378,6 +378,13 @@ const IndexDashboardPage = () => {
         </div>
       </section>
 
+      {/* StableYield Index Family */}
+      <section className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <IndexFamilyOverview />
+        </div>
+      </section>
+
       {/* Comprehensive Stablecoin Market Overview */}
       <section className="py-16 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
