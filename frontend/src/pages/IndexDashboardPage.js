@@ -29,7 +29,7 @@ const IndexDashboardPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const fetchAllData = async () => {
+  const fetchAllData = useCallback(async () => {
     try {
       // Dynamic backend URL detection
       const getBackendURL = () => {
@@ -70,7 +70,7 @@ const IndexDashboardPage = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []); // Empty dependency array since this function doesn't depend on any props or state
 
   useEffect(() => {
     fetchAllData();
