@@ -150,8 +150,11 @@ class YieldAggregator:
             # Prepare yields for sanitization
             sanitization_input = []
             for yield_data in yields:
+                apy_value = yield_data['currentYield']
+                logger.info(f"Preparing sanitization for {yield_data['stablecoin']}: {apy_value}% from {yield_data['source']}")
+                
                 sanitization_data = {
-                    'apy': yield_data['currentYield'],
+                    'apy': apy_value,
                     'source': yield_data['source'],
                     'canonical_protocol_id': yield_data.get('metadata', {}).get('protocol_info', {}).get('protocol_id'),
                     'stablecoin': yield_data['stablecoin']
@@ -159,11 +162,15 @@ class YieldAggregator:
                 sanitization_input.append(sanitization_data)
             
             # Run batch sanitization
+            logger.info("Running batch sanitization...")
             sanitization_results = self.yield_sanitizer.sanitize_yield_batch(sanitization_input)
+            logger.info(f"Sanitization complete. Got {len(sanitization_results)} results")
             
             # Apply sanitization results
             sanitized_yields = []
             for i, (yield_data, result) in enumerate(zip(yields, sanitization_results)):
+                logger.info(f"Processing result for {yield_data['stablecoin']}: Original={result.original_apy}%, Sanitized={result.sanitized_apy}%, Action={result.action_taken.value}")
+                
                 # Skip rejected yields
                 if result.action_taken == SanitizationAction.REJECT:
                     logger.warning(f"Rejecting yield for {yield_data['stablecoin']} from {yield_data['source']}: {result.warnings}")
@@ -173,6 +180,8 @@ class YieldAggregator:
                 original_yield = yield_data['currentYield']
                 sanitized_yield_data = yield_data.copy()
                 sanitized_yield_data['currentYield'] = result.sanitized_apy
+                
+                logger.info(f"Yield updated for {yield_data['stablecoin']}: {original_yield}% -> {result.sanitized_apy}%")
                 
                 # Add sanitization metadata
                 if 'metadata' not in sanitized_yield_data:
@@ -220,8 +229,9 @@ class YieldAggregator:
             return sanitized_yields
             
         except Exception as e:
-            logger.error(f"Yield sanitization error: {e}")
-            # Return original yields if sanitization fails
+            logger.error(f"Error in yield sanitization: {str(e)}", exc_info=True)
+            # If sanitization fails, return original yields with warning
+            logger.warning("Returning original yields due to sanitization failure")
             return yields
     
     def _map_source_to_protocol_id(self, source: str) -> str:
