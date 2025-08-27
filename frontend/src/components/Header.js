@@ -1,9 +1,17 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "./ui/button";
 import { FileText } from "lucide-react";
 
 const Header = ({ onJoinWaitlist, onDownloadWhitepaper }) => {
+  const navigate = useNavigate();
+
+  const handleLiveIndexClick = (e) => {
+    e.preventDefault();
+    console.log('Live Index clicked - navigating to /index-dashboard');
+    navigate('/index-dashboard');
+  };
+
   return (
     <header className="sticky top-0 bg-white/95 backdrop-blur-sm border-b border-gray-100 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -25,9 +33,12 @@ const Header = ({ onJoinWaitlist, onDownloadWhitepaper }) => {
 
           {/* Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            <Link to="/index-dashboard" className="text-[#0E1A2B] hover:text-[#2E6049] transition-colors font-medium">
+            <button 
+              onClick={handleLiveIndexClick}
+              className="text-[#0E1A2B] hover:text-[#2E6049] transition-colors font-medium cursor-pointer"
+            >
               Live Index
-            </Link>
+            </button>
             <Link to="/yield-indices" className="text-[#0E1A2B] hover:text-[#2E6049] transition-colors font-medium">
               Yield Indices & Benchmarks
             </Link>
