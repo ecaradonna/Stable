@@ -27,6 +27,7 @@ from routes.devops_routes import router as devops_router
 from routes.trading_routes import router as trading_router
 from routes.dashboard_routes import router as dashboard_router
 from routes.ai_portfolio_routes import router as ai_portfolio_router
+from routes.risk_management_routes import router as risk_management_router
 from routes.index_family_routes import router as index_family_router
 
 ROOT_DIR = Path(__file__).parent
