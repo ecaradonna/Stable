@@ -247,14 +247,14 @@ const RiskAnalyticsDashboard = () => {
                       <div>
                         <span className="text-gray-600">Raw APY</span>
                         <div className="font-bold text-lg text-[#0E1A2B]">
-                          {strategy.apy.toFixed(2)}%
+                          {(strategy.apy / 100).toFixed(3)}%
                         </div>
                       </div>
                       
                       <div>
                         <span className="text-gray-600">Risk-Adjusted</span>
                         <div className="font-bold text-lg bg-gradient-to-r from-[#4CC1E9] to-[#007A99] bg-clip-text text-transparent">
-                          {strategy.ry_apy.toFixed(2)}%
+                          {(strategy.ry_apy / 100).toFixed(3)}%
                         </div>
                       </div>
                       
