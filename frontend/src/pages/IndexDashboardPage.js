@@ -445,133 +445,20 @@ const IndexDashboardPage = () => {
         </div>
       </section>
 
-      {/* Comprehensive Stablecoin Market Overview */}
+      {/* Interactive Stablecoin Market Charts */}
       <section className="py-16 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-[#0E1A2B] mb-4">
-              Comprehensive Stablecoin Market Overview
+              Live Stablecoin Market Analytics
             </h2>
             <p className="text-gray-600 max-w-2xl mx-auto">
-              Complete list of major USD stablecoins across all protocols and platforms, 
-              providing broad market context beyond the StableYield Index constituents.
+              Interactive market analysis with real-time distribution data, yield trends, 
+              and adoption metrics across all major stablecoin protocols.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Major Stablecoins */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <DollarSign className="w-5 h-5 mr-2 text-[#4CC1E9]" />
-                  Major Stablecoins (&gt;$1B Market Cap)
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {getMajorStablecoins().map((coin) => (
-                    <div key={coin.symbol} className="flex items-center justify-between p-3 bg-white rounded-lg border hover:shadow-md transition-shadow">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-10 h-10 bg-gradient-to-r from-[#4CC1E9] to-[#007A99] rounded-full flex items-center justify-center">
-                          <span className="text-white font-bold text-sm">{coin.symbol.slice(0,2)}</span>
-                        </div>
-                        <div>
-                          <h4 className="font-semibold text-[#0E1A2B]">{coin.name}</h4>
-                          <p className="text-sm text-gray-600">{coin.symbol} • {coin.type}</p>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-lg font-bold text-[#0E1A2B]">
-                          ${coin.marketCap}
-                        </div>
-                        <div className="text-sm text-gray-600">
-                          {coin.backing}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Emerging & DeFi Stablecoins */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <TrendingUp className="w-5 h-5 mr-2 text-[#007A99]" />
-                  Emerging & DeFi Stablecoins
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {getEmergingStablecoins().map((coin) => (
-                    <div key={coin.symbol} className="flex items-center justify-between p-3 bg-white rounded-lg border hover:shadow-md transition-shadow">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-10 h-10 bg-gradient-to-r from-[#2E6049] to-[#4CC1E9] rounded-full flex items-center justify-center">
-                          <span className="text-white font-bold text-sm">{coin.symbol.slice(0,2)}</span>
-                        </div>
-                        <div>
-                          <h4 className="font-semibold text-[#0E1A2B]">{coin.name}</h4>
-                          <p className="text-sm text-gray-600">{coin.symbol} • {coin.type}</p>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-lg font-bold text-[#0E1A2B]">
-                          ${coin.marketCap}
-                        </div>
-                        <div className="text-sm text-gray-600">
-                          {coin.backing}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Stablecoin Categories Summary */}
-          <div className="mt-12">
-            <Card className="bg-gradient-to-r from-[#0E1A2B] to-[#2E6049] text-white">
-              <CardHeader>
-                <CardTitle className="text-center text-xl">
-                  Stablecoin Market Segmentation
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                  <div className="text-center">
-                    <div className="text-3xl font-bold text-[#4CC1E9] mb-2">
-                      ${getTotalMarketCap().fiatBacked}B
-                    </div>
-                    <div className="text-sm text-white/80">Fiat-Backed</div>
-                    <div className="text-xs text-white/60">USDT, USDC, BUSD</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-3xl font-bold text-[#4CC1E9] mb-2">
-                      ${getTotalMarketCap().cryptoBacked}B
-                    </div>
-                    <div className="text-sm text-white/80">Crypto-Backed</div>
-                    <div className="text-xs text-white/60">DAI, sUSD, LUSD</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-3xl font-bold text-[#4CC1E9] mb-2">
-                      ${getTotalMarketCap().algorithmic}B
-                    </div>
-                    <div className="text-sm text-white/80">Algorithmic</div>
-                    <div className="text-xs text-white/60">FRAX, FEI, AMPL</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-3xl font-bold text-[#4CC1E9] mb-2">
-                      {getTotalMarketCap().totalCoins}
-                    </div>
-                    <div className="text-sm text-white/80">Total Stablecoins</div>
-                    <div className="text-xs text-white/60">Active Projects</div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+          <StablecoinMarketCharts />
         </div>
       </section>
 
