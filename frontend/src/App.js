@@ -16,7 +16,7 @@ function App() {
   return (
     <HelmetProvider>
       <div className="App">
-        <BrowserRouter>
+        <HashRouter>
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/blog" element={<BlogPage />} />
