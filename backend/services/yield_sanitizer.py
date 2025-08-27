@@ -444,7 +444,8 @@ class YieldSanitizer:
         
         # Bonus for reliable sources
         reliable_sources = ['aave_v3', 'compound_v3', 'curve']
-        source = yield_data.get('canonical_protocol_id', yield_data.get('source', '')).lower()
+        source = yield_data.get('canonical_protocol_id') or yield_data.get('source', '') or ''
+        source = source.lower() if source else ''
         if any(reliable in source for reliable in reliable_sources):
             confidence += config['source_reliability_bonus']
         
