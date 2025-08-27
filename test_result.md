@@ -536,7 +536,9 @@ test_plan:
   current_focus:
     - "SYI Macro Analysis Implementation"
     - "Live Stablecoin Market Charts Implementation"
-  stuck_tasks: []
+  stuck_tasks:
+    - "SYI Macro Analysis Implementation"
+    - "Live Stablecoin Market Charts Implementation"
   test_all: false
   test_priority: "high_first"
 
