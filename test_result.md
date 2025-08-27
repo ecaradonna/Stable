@@ -486,9 +486,9 @@ frontend:
 
   - task: "SYI Macro Analysis Implementation"
     implemented: true
-    working: true
+    working: false
     file: "/app/frontend/src/components/SYIMacroAnalysisChart.js"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
     needs_retesting: false
     status_history:
@@ -504,6 +504,9 @@ frontend:
         - working: true
           agent: "testing"
           comment: "✅ BACKEND SUPPORT FOR SYI MACRO ANALYSIS VERIFIED - Comprehensive backend testing completed with 76.2% success rate (16/21 tests passed). CORE INDEX DASHBOARD ENDPOINTS WORKING: ✅ GET /api/index/current (Index value: 1.0172, 6 constituents), ✅ GET /api/index/constituents (complete constituent data with weights, RAY, peg scores), ✅ GET /api/index/statistics?days=7 (statistics available with 9 metrics), ✅ GET /api/index/history (678-1000 historical data points for different timeframes), ✅ GET /api/index/live (live ticker with status and update timing). PERFORMANCE EXCELLENT: Index endpoints responding in 9-52ms (well under 1 second threshold). MACRO ANALYSIS DATA PARTIALLY AVAILABLE: ❌ SYI RAY endpoints (404 - not implemented), ✅ Peg stability data available (7 stablecoins with peg scores, methodology), ❌ Treasury bills data (404 - not implemented). BACKEND INFRASTRUCTURE SOLID: All core index data endpoints functional, real-time data available, proper error handling for most cases. Frontend can successfully integrate with available backend data for SYI Macro Analysis charts."
+        - working: false
+          agent: "testing"
+          comment: "❌ CRITICAL ROUTING ISSUE CONFIRMED - COMPREHENSIVE FRONTEND TESTING FAILED. Despite multiple attempts to access /index-dashboard route, React Router consistently redirects to homepage (/). DETAILED TESTING RESULTS: ❌ Direct URL navigation to /index-dashboard fails - redirects to homepage, ❌ 'Live Index' navigation link exists but clicking leads to homepage, ❌ Browser URL shows '/' instead of '/index-dashboard' after navigation attempts, ❌ SYI Macro Analysis component not accessible for testing, ❌ Live Stablecoin Market Charts not accessible for testing, ❌ Interactive features cannot be tested due to routing failure. TECHNICAL ANALYSIS: React Router configuration appears correct in App.js with proper route definition, but runtime routing is failing. This suggests either: 1) Build/deployment issue with React Router, 2) Server-side routing configuration problem, 3) React Router version compatibility issue, or 4) Missing route handling in production environment. IMPACT: Complete failure of primary testing objectives - live index graphs and switching functionality cannot be tested because the dashboard page is inaccessible. USER REPORTED ISSUE CONFIRMED: 'Live Index graphs are not shown' and 'switching is not possible' - this is due to the fundamental routing issue preventing access to the dashboard page entirely."
 
   - task: "Live Stablecoin Market Charts Implementation"
     implemented: true
