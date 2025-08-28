@@ -8,20 +8,21 @@ const LiveIndexTicker = () => {
 
   const fetchIndexData = async () => {
     setLoading(true);
-    try {
-      const getBackendURL = () => {
-        const envBackendUrl = process.env.REACT_APP_BACKEND_URL || import.meta?.env?.REACT_APP_BACKEND_URL;
-        if (envBackendUrl) {
-          return envBackendUrl;
-        }
-        if (window.location.hostname === 'localhost') {
-          return 'http://localhost:8001';
-        }
-        const protocol = window.location.protocol;
-        const hostname = window.location.hostname;
-        return `${protocol}//${hostname}`;
-      };
+    
+    const getBackendURL = () => {
+      const envBackendUrl = process.env.REACT_APP_BACKEND_URL || import.meta?.env?.REACT_APP_BACKEND_URL;
+      if (envBackendUrl) {
+        return envBackendUrl;
+      }
+      if (window.location.hostname === 'localhost') {
+        return 'http://localhost:8001';
+      }
+      const protocol = window.location.protocol;
+      const hostname = window.location.hostname;
+      return `${protocol}//${hostname}`;
+    };
 
+    try {
       const backendUrl = getBackendURL();
       
       // Use new SYI calculation system for accurate weighted average
