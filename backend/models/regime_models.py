@@ -45,7 +45,7 @@ class PegStatus(BaseModel):
 
 class RegimeEvaluationRequest(BaseModel):
     """Request payload for regime evaluation"""
-    date: str = Field(..., regex=r'^\d{4}-\d{2}-\d{2}$', description="Evaluation date (YYYY-MM-DD)")
+    date: str = Field(..., pattern=r'^\d{4}-\d{2}-\d{2}$', description="Evaluation date (YYYY-MM-DD)")
     syi: float = Field(..., ge=0, le=1, description="SYI value in decimal format")
     tbill_3m: float = Field(..., ge=0, le=1, description="3M T-Bill rate in decimal format")
     components: List[RegimeComponent] = Field(default_factory=list, description="RAY components for breadth")
