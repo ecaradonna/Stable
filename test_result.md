@@ -57,8 +57,8 @@
 ##   test_priority: "high_first"  # or "sequential" or "stuck_first"
 ##
 ## agent_communication:
-##     -agent: "main"  # or "testing" or "user"
-##     -message: "Communication message between agents"
+##     -agent: "main"
+##     -message: "Registered syi_routes in server.py for new SYI calculation system. Ready to test the new SYI API endpoints: POST /api/syi/calc, GET /api/syi/current, GET /api/syi/history, POST /api/syi/upsert, GET /api/syi/test, GET /api/syi/health. This implements the refined weighted average calculation of Risk-Adjusted Yields (RAY) as per user specification. Please test all endpoints to verify SYI calculation accuracy and API functionality."
 
 # Protocol Guidelines for Main agent
 #
