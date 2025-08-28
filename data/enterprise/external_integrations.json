@@ -25,5 +25,14 @@
     "rate_limit": 100,
     "is_active": true,
     "last_sync": null
+  },
+  {
+    "integration_id": "51237d6a-6e16-4b8f-ba25-fb5987e1f103",
+    "provider": "custom",
+    "api_key": "test_integration_key",
+    "endpoint_url": "https://api.example.com/v1",
+    "rate_limit": 100,
+    "is_active": true,
+    "last_sync": null
   }
 ]

@@ -57,5 +57,17 @@
       "slack"
     ],
     "is_active": true
+  },
+  {
+    "rule_id": "test_cpu_alert_2ee191c8",
+    "metric": "cpu_usage",
+    "threshold": 80.0,
+    "operator": "gt",
+    "severity": "warning",
+    "notification_channels": [
+      "email",
+      "slack"
+    ],
+    "is_active": true
   }
 ]

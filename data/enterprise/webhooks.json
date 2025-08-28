@@ -37,5 +37,18 @@
     "is_active": true,
     "created_at": "2025-08-28T05:02:00.809035",
     "last_triggered": null
+  },
+  {
+    "webhook_id": "cb332e59-292b-4314-8ae7-f9935e8b8ad4",
+    "client_id": "test_client_518b1271",
+    "url": "https://webhook.site/test-stableyield",
+    "events": [
+      "yield_update",
+      "anomaly_alert"
+    ],
+    "secret": "test_webhook_secret",
+    "is_active": true,
+    "created_at": "2025-08-28T05:27:57.519637",
+    "last_triggered": null
   }
 ]
