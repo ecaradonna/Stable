@@ -60,7 +60,49 @@ const IndexDashboardPage = () => {
       // Fetch constituents (Legacy - working)
       const constituentsResponse = await fetch(`${backendUrl}/api/index/constituents`);
       const constituentsData = await constituentsResponse.json();
-      setConstituents(constituentsData.constituents || []);
+      
+      // Fetch fresh yield data to enhance constituents
+      try {
+        const yieldsResponse = await fetch(`${backendUrl}/api/yields/`);
+        const yieldsData = await yieldsResponse.json();
+        
+        // Create a map of yield data by symbol
+        const yieldMap = {};
+        if (Array.isArray(yieldsData)) {
+          yieldsData.forEach(yield => {
+            yieldMap[yield.stablecoin] = {
+              currentYield: yield.currentYield,
+              riskScore: yield.riskScore,
+              source: yield.source,
+              liquidity: yield.liquidity
+            };
+          });
+        }
+        
+        // Enhance constituents with fresh yield data
+        const enhancedConstituents = (constituentsData.constituents || []).map(constituent => {
+          const yieldInfo = yieldMap[constituent.symbol];
+          return {
+            ...constituent,
+            // Use fresh yield data if available, otherwise use existing raw_apy
+            raw_apy: yieldInfo ? yieldInfo.currentYield : constituent.raw_apy,
+            risk_tier: yieldInfo ? yieldInfo.riskScore : constituent.risk_tier || 'Medium',
+            source: yieldInfo ? yieldInfo.source : 'Legacy Data',
+            liquidity: yieldInfo ? yieldInfo.liquidity : null,
+            // Calculate RAY (Risk-Adjusted Yield) - simple example
+            ray: yieldInfo ? 
+              (yieldInfo.currentYield * (yieldInfo.riskScore === 'High' ? 0.8 : yieldInfo.riskScore === 'Medium' ? 0.9 : 1.0)) :
+              (constituent.raw_apy * 0.85)
+          };
+        });
+        
+        setConstituents(enhancedConstituents);
+        
+      } catch (yieldError) {
+        console.error('Error fetching yield data for constituents:', yieldError);
+        // Use original constituent data as fallback
+        setConstituents(constituentsData.constituents || []);
+      }
       
       // Fetch statistics from Index Family Overview (NEW - working with real data)
       try {
