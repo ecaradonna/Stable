@@ -17,7 +17,8 @@ const LiveIndexTicker = () => {
       if (window.location.hostname === 'localhost') {
         return 'http://localhost:8001';
       }
-      const protocol = window.location.protocol;
+      // Always use HTTPS in production
+      const protocol = window.location.protocol === 'https:' ? 'https:' : window.location.protocol;
       const hostname = window.location.hostname;
       return `${protocol}//${hostname}`;
     };
