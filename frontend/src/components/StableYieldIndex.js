@@ -162,11 +162,18 @@ const StableYieldIndex = () => {
             </div>
             
             <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-6">
-              <Button className="bg-white text-[#0E1A2B] hover:bg-gray-100 font-semibold px-8 py-3">
+              <Button 
+                className="bg-white text-[#0E1A2B] hover:bg-gray-100 font-semibold px-8 py-3"
+                onClick={() => window.location.href = '/index-dashboard'}
+              >
                 View Live Index
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
-              <Button variant="outline" className="border-white text-white hover:bg-white hover:text-[#0E1A2B] px-8 py-3">
+              <Button 
+                variant="outline" 
+                className="border-white text-white hover:bg-white hover:text-[#0E1A2B] px-8 py-3"
+                onClick={() => window.location.href = '/methodology'}
+              >
                 Read Methodology
               </Button>
             </div>
