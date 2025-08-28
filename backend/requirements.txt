@@ -35,4 +35,9 @@ aiohttp>=3.12.0
 aiofiles>=24.1.0
 psutil>=7.0.0
 scipy>=1.11.0
-coinbase-advanced-py>=1.2.0
+# PegCheck system dependencies (added for stablecoin peg monitoring)
+# These are already covered by existing requirements but listed for clarity
+fastapi>=0.110.1
+requests>=2.31.0
+python-dotenv>=1.0.1
+pydantic>=2.6.4
