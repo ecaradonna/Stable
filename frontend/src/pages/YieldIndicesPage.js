@@ -136,9 +136,12 @@ const YieldIndicesPage = () => {
           </div>
 
           <div className="text-center">
-            <Badge className="bg-gradient-to-r from-[#4CC1E9] to-[#007A99] text-white px-6 py-3 text-base">
-              = Risk-Adjusted Yield Indices
-            </Badge>
+            <Button 
+              className="bg-gradient-to-r from-[#4CC1E9] to-[#007A99] text-white px-6 py-3 text-base"
+              onClick={() => navigate('/risk-analytics')}
+            >
+              View Risk-Adjusted Yield Indices
+            </Button>
           </div>
         </div>
       </section>
