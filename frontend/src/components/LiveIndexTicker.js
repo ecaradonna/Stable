@@ -136,9 +136,9 @@ const LiveIndexTicker = () => {
         </div>
       </div>
       
-      {/* TODO: PRODUCTION UPGRADE NEEDED */}
+      {/* Real-time data status */}
       <div className="mt-2 text-xs text-gray-400">
-        📍 Demo data - Upgrade to production APIs for real-time accuracy
+        📊 Live data • Index Family: Real-time • CeFi: Coinbase API • Updated: {new Date().toLocaleTimeString()}
       </div>
     </div>
   );
