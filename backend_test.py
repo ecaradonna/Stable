@@ -6964,6 +6964,23 @@ class StableYieldTester:
         await self.test_syi_input_validation()
         await self.test_syi_date_range_validation()
         
+        # Risk Regime Inversion Alert System Tests - NEW PRIORITY
+        print("\n⚠️ Testing Risk Regime Inversion Alert System...")
+        await self.test_regime_health_check()
+        await self.test_regime_start_service()
+        await self.test_regime_parameters()
+        await self.test_regime_test_calculation()
+        await self.test_regime_evaluate_with_payload()
+        await self.test_regime_current_state()
+        await self.test_regime_upsert_data()
+        await self.test_regime_history()
+        await self.test_regime_statistics()
+        await self.test_regime_recent_alerts()
+        await self.test_regime_summary()
+        await self.test_regime_mathematical_calculations()
+        await self.test_regime_peg_stress_override()
+        await self.test_regime_validation_errors()
+        
         # Yield data API tests
         print("\n📊 Testing Yield Data APIs...")
         await self.test_yields_all()
