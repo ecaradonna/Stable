@@ -39,7 +39,7 @@ const LiveIndexTicker = () => {
           const totalConstituents = indices.reduce((sum, idx) => sum + (idx.constituent_count || 0), 0);
           
           setIndexData({
-            value: primaryIndex.value, // Real value from Coinbase integration
+            value: primaryIndex.value * 100, // Convert decimal to percentage (0.0337 -> 3.37%)
             timestamp: data.data.date,
             status: "live",
             constituents_count: totalConstituents,
