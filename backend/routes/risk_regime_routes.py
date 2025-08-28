@@ -127,8 +127,8 @@ async def get_current_regime(
 
 @router.get("/history", response_model=RegimeHistoryResponse)
 async def get_regime_history(
-    from_date: str = Query(..., regex=r'^\d{4}-\d{2}-\d{2}$', description="Start date (YYYY-MM-DD)"),
-    to_date: str = Query(..., regex=r'^\d{4}-\d{2}-\d{2}$', description="End date (YYYY-MM-DD)"),
+    from_date: str = Query(..., pattern=r'^\d{4}-\d{2}-\d{2}$', description="Start date (YYYY-MM-DD)"),
+    to_date: str = Query(..., pattern=r'^\d{4}-\d{2}-\d{2}$', description="End date (YYYY-MM-DD)"),
     limit: int = Query(100, ge=1, le=1000, description="Maximum number of entries"),
     regime_service: RiskRegimeService = Depends(lambda: get_risk_regime_service(db))
 ):
