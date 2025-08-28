@@ -49,18 +49,18 @@ class PegCheckPayload:
     """Complete peg check result payload"""
     as_of: int  # Unix timestamp
     symbols: List[str]
+    reports: List[PegReport]
     
     # Raw price data by source
     coingecko: Dict[str, float] 
     cryptocompare: Dict[str, float]
-    chainlink: Optional[Dict[str, float]] = None
-    uniswap: Optional[Dict[str, float]] = None
-    
-    # Analysis results
-    reports: List[PegReport]
     
     # Cross-reference analysis
     cefi_consistency: Dict[str, float]  # Consistency between CeFi sources
+    
+    # Optional data sources
+    chainlink: Optional[Dict[str, float]] = None
+    uniswap: Optional[Dict[str, float]] = None
     
     # Metadata
     config: Optional[Dict] = None
