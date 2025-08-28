@@ -32,6 +32,7 @@ from routes.index_family_routes import router as index_family_router
 from routes.coinbase_routes import router as coinbase_router
 from routes.pegcheck_routes import router as pegcheck_router
 from routes.syi_routes import router as syi_router
+from routes.risk_regime_routes import router as risk_regime_router
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
