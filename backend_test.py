@@ -1076,6 +1076,505 @@ class StableYieldTester:
             self.log_test("Parameter Validation Valid Params", False, f"Exception: {str(e)}")
     
     # ========================================
+    # COINBASE API INTEGRATION TESTS
+    # ========================================
+    
+    async def test_coinbase_status(self):
+        """Test GET /api/coinbase/status endpoint"""
+        try:
+            async with self.session.get(f"{API_BASE}/coinbase/status") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    required_fields = ['status', 'connected', 'api_configured', 'last_check', 'message']
+                    missing_fields = [field for field in required_fields if field not in data]
+                    
+                    if not missing_fields:
+                        status = data.get('status')
+                        connected = data.get('connected')
+                        api_configured = data.get('api_configured')
+                        message = data.get('message', '')
+                        
+                        # Check if API is properly configured
+                        if api_configured:
+                            if connected:
+                                self.log_test("Coinbase Status", True, 
+                                            f"Status: {status}, Connected: {connected}, Message: {message}")
+                            else:
+                                self.log_test("Coinbase Status", False, 
+                                            f"API configured but not connected - {message}")
+                        else:
+                            self.log_test("Coinbase Status", False, 
+                                        f"API not configured - {message}")
+                    else:
+                        self.log_test("Coinbase Status", False, f"Missing fields: {missing_fields}")
+                else:
+                    self.log_test("Coinbase Status", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("Coinbase Status", False, f"Exception: {str(e)}")
+    
+    async def test_coinbase_yield_data(self):
+        """Test GET /api/coinbase/yield-data endpoint"""
+        try:
+            async with self.session.get(f"{API_BASE}/coinbase/yield-data") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    required_fields = ['success', 'data', 'message', 'timestamp']
+                    missing_fields = [field for field in required_fields if field not in data]
+                    
+                    if not missing_fields:
+                        success = data.get('success')
+                        yield_data = data.get('data', {})
+                        message = data.get('message', '')
+                        
+                        if success and 'yield_accounts' in yield_data:
+                            accounts = yield_data['yield_accounts']
+                            total_accounts = yield_data.get('total_accounts', 0)
+                            data_source = yield_data.get('data_source', 'unknown')
+                            
+                            # Validate account data structure
+                            if accounts and len(accounts) > 0:
+                                first_account = accounts[0]
+                                account_fields = ['currency', 'balance', 'annual_yield_rate', 'yield_source']
+                                missing_account_fields = [field for field in account_fields if field not in first_account]
+                                
+                                if not missing_account_fields:
+                                    # Check for realistic yield data
+                                    realistic_yields = []
+                                    for account in accounts:
+                                        yield_rate = account.get('annual_yield_rate', 0)
+                                        if 0 <= yield_rate <= 25:  # Reasonable range for CeFi yields
+                                            realistic_yields.append(account)
+                                    
+                                    if len(realistic_yields) > 0:
+                                        avg_yield = sum(acc['annual_yield_rate'] for acc in realistic_yields) / len(realistic_yields)
+                                        self.log_test("Coinbase Yield Data", True, 
+                                                    f"Found {total_accounts} accounts, avg yield: {avg_yield:.2f}%, source: {data_source}")
+                                    else:
+                                        self.log_test("Coinbase Yield Data", False, 
+                                                    f"No realistic yield rates found in {total_accounts} accounts")
+                                else:
+                                    self.log_test("Coinbase Yield Data", False, 
+                                                f"Missing account fields: {missing_account_fields}")
+                            else:
+                                self.log_test("Coinbase Yield Data", False, 
+                                            f"No yield accounts returned - {message}")
+                        else:
+                            self.log_test("Coinbase Yield Data", False, 
+                                        f"Request failed or invalid data structure - {message}")
+                    else:
+                        self.log_test("Coinbase Yield Data", False, f"Missing fields: {missing_fields}")
+                else:
+                    self.log_test("Coinbase Yield Data", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("Coinbase Yield Data", False, f"Exception: {str(e)}")
+    
+    async def test_coinbase_cefi_index(self):
+        """Test GET /api/coinbase/cefi-index endpoint"""
+        try:
+            async with self.session.get(f"{API_BASE}/coinbase/cefi-index") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    required_fields = ['success', 'data', 'message', 'timestamp']
+                    missing_fields = [field for field in required_fields if field not in data]
+                    
+                    if not missing_fields:
+                        success = data.get('success')
+                        index_data = data.get('data', {})
+                        message = data.get('message', '')
+                        
+                        if success and index_data:
+                            required_index_fields = ['total_value_usd', 'weighted_yield', 'constituent_count', 'constituents']
+                            missing_index_fields = [field for field in required_index_fields if field not in index_data]
+                            
+                            if not missing_index_fields:
+                                total_value = index_data.get('total_value_usd', 0)
+                                weighted_yield = index_data.get('weighted_yield', 0)
+                                constituent_count = index_data.get('constituent_count', 0)
+                                constituents = index_data.get('constituents', [])
+                                data_source = index_data.get('data_source', 'unknown')
+                                
+                                # Validate realistic values
+                                if total_value >= 0 and 0 <= weighted_yield <= 25 and constituent_count >= 0:
+                                    # Check constituents structure
+                                    valid_constituents = 0
+                                    for constituent in constituents:
+                                        if all(field in constituent for field in ['currency', 'balance', 'value_usd', 'annual_yield_rate']):
+                                            valid_constituents += 1
+                                    
+                                    if valid_constituents == len(constituents):
+                                        self.log_test("Coinbase CeFi Index", True, 
+                                                    f"Index calculated: ${total_value:.2f} total value, {weighted_yield:.2f}% weighted yield, {constituent_count} constituents, source: {data_source}")
+                                    else:
+                                        self.log_test("Coinbase CeFi Index", False, 
+                                                    f"Invalid constituent data: {valid_constituents}/{len(constituents)} valid")
+                                else:
+                                    self.log_test("Coinbase CeFi Index", False, 
+                                                f"Unrealistic values - Value: ${total_value}, Yield: {weighted_yield}%, Count: {constituent_count}")
+                            else:
+                                self.log_test("Coinbase CeFi Index", False, 
+                                            f"Missing index fields: {missing_index_fields}")
+                        else:
+                            self.log_test("Coinbase CeFi Index", False, 
+                                        f"Request failed or no data - {message}")
+                    else:
+                        self.log_test("Coinbase CeFi Index", False, f"Missing fields: {missing_fields}")
+                else:
+                    self.log_test("Coinbase CeFi Index", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("Coinbase CeFi Index", False, f"Exception: {str(e)}")
+    
+    async def test_coinbase_refresh(self):
+        """Test POST /api/coinbase/refresh endpoint"""
+        try:
+            async with self.session.post(f"{API_BASE}/coinbase/refresh") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    required_fields = ['success', 'message', 'summary', 'timestamp']
+                    missing_fields = [field for field in required_fields if field not in data]
+                    
+                    if not missing_fields:
+                        success = data.get('success')
+                        summary = data.get('summary', {})
+                        message = data.get('message', '')
+                        
+                        if success and summary:
+                            yield_accounts = summary.get('yield_accounts', 0)
+                            total_value_usd = summary.get('total_value_usd', 0)
+                            weighted_yield = summary.get('weighted_yield', 0)
+                            
+                            if yield_accounts >= 0 and total_value_usd >= 0 and 0 <= weighted_yield <= 25:
+                                self.log_test("Coinbase Refresh", True, 
+                                            f"Refresh successful: {yield_accounts} accounts, ${total_value_usd:.2f} value, {weighted_yield:.2f}% yield")
+                            else:
+                                self.log_test("Coinbase Refresh", False, 
+                                            f"Invalid refresh summary values - Accounts: {yield_accounts}, Value: ${total_value_usd}, Yield: {weighted_yield}%")
+                        else:
+                            self.log_test("Coinbase Refresh", False, 
+                                        f"Refresh failed or no summary - {message}")
+                    else:
+                        self.log_test("Coinbase Refresh", False, f"Missing fields: {missing_fields}")
+                else:
+                    self.log_test("Coinbase Refresh", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("Coinbase Refresh", False, f"Exception: {str(e)}")
+    
+    async def test_coinbase_health(self):
+        """Test GET /api/coinbase/health endpoint"""
+        try:
+            async with self.session.get(f"{API_BASE}/coinbase/health") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    required_fields = ['service', 'status', 'timestamp', 'api_configured', 'credentials_present']
+                    missing_fields = [field for field in required_fields if field not in data]
+                    
+                    if not missing_fields:
+                        service = data.get('service')
+                        status = data.get('status')
+                        api_configured = data.get('api_configured')
+                        credentials_present = data.get('credentials_present')
+                        connectivity = data.get('connectivity', 'unknown')
+                        data_available = data.get('data_available', False)
+                        
+                        if service == 'coinbase_integration':
+                            if status == 'healthy' and api_configured and credentials_present:
+                                self.log_test("Coinbase Health", True, 
+                                            f"Service healthy: API configured, credentials present, connectivity: {connectivity}, data: {data_available}")
+                            elif api_configured and credentials_present:
+                                self.log_test("Coinbase Health", True, 
+                                            f"Service configured but status: {status}, connectivity: {connectivity}")
+                            else:
+                                self.log_test("Coinbase Health", False, 
+                                            f"Service not properly configured - API: {api_configured}, Credentials: {credentials_present}")
+                        else:
+                            self.log_test("Coinbase Health", False, 
+                                        f"Wrong service identifier: {service}")
+                    else:
+                        self.log_test("Coinbase Health", False, f"Missing fields: {missing_fields}")
+                else:
+                    self.log_test("Coinbase Health", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("Coinbase Health", False, f"Exception: {str(e)}")
+    
+    async def test_index_family_calculate_with_coinbase(self):
+        """Test POST /api/v1/index-family/calculate endpoint with Coinbase integration"""
+        try:
+            async with self.session.post(f"{API_BASE}/v1/index-family/calculate?force=true") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    required_fields = ['success', 'data', 'message']
+                    missing_fields = [field for field in required_fields if field not in data]
+                    
+                    if not missing_fields:
+                        success = data.get('success')
+                        calc_data = data.get('data', {})
+                        message = data.get('message', '')
+                        
+                        if success and calc_data:
+                            calculated_indices = calc_data.get('calculated_indices', [])
+                            values = calc_data.get('values', {})
+                            
+                            # Check if SY-CeFi index was calculated
+                            if 'SYCEFI' in calculated_indices and 'SYCEFI' in values:
+                                sycefi_value = values['SYCEFI']
+                                
+                                # Validate that SY-CeFi has a reasonable value (should be > 0 if Coinbase data is integrated)
+                                if sycefi_value > 0:
+                                    self.log_test("Index Family Calculate (Coinbase)", True, 
+                                                f"SY-CeFi calculated with Coinbase data: {sycefi_value:.4f}, total indices: {len(calculated_indices)}")
+                                else:
+                                    self.log_test("Index Family Calculate (Coinbase)", False, 
+                                                f"SY-CeFi value is zero - may not be using Coinbase data: {sycefi_value}")
+                            else:
+                                self.log_test("Index Family Calculate (Coinbase)", False, 
+                                            f"SY-CeFi not found in calculated indices: {calculated_indices}")
+                        else:
+                            self.log_test("Index Family Calculate (Coinbase)", False, 
+                                        f"Calculation failed - {message}")
+                    else:
+                        self.log_test("Index Family Calculate (Coinbase)", False, f"Missing fields: {missing_fields}")
+                else:
+                    self.log_test("Index Family Calculate (Coinbase)", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("Index Family Calculate (Coinbase)", False, f"Exception: {str(e)}")
+    
+    async def test_index_family_sycefi_value(self):
+        """Test GET /api/v1/index-family/SYCEFI endpoint"""
+        try:
+            async with self.session.get(f"{API_BASE}/v1/index-family/SYCEFI") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    required_fields = ['success', 'data', 'message']
+                    missing_fields = [field for field in required_fields if field not in data]
+                    
+                    if not missing_fields:
+                        success = data.get('success')
+                        index_data = data.get('data', {})
+                        message = data.get('message', '')
+                        
+                        if success and index_data:
+                            # Check for index value fields
+                            value = index_data.get('value')
+                            date = index_data.get('date')
+                            confidence = index_data.get('confidence')
+                            
+                            if value is not None and date and confidence is not None:
+                                # Check if value indicates real Coinbase integration
+                                if value > 0 and confidence > 0:
+                                    self.log_test("Index Family SY-CeFi Value", True, 
+                                                f"SY-CeFi Index: {value:.4f}, confidence: {confidence:.2f}, date: {date}")
+                                else:
+                                    self.log_test("Index Family SY-CeFi Value", False, 
+                                                f"SY-CeFi has zero value or confidence - Value: {value}, Confidence: {confidence}")
+                            else:
+                                self.log_test("Index Family SY-CeFi Value", False, 
+                                            f"Missing index data fields - Value: {value}, Date: {date}, Confidence: {confidence}")
+                        else:
+                            self.log_test("Index Family SY-CeFi Value", False, 
+                                        f"Request failed - {message}")
+                    else:
+                        self.log_test("Index Family SY-CeFi Value", False, f"Missing fields: {missing_fields}")
+                elif response.status == 404:
+                    self.log_test("Index Family SY-CeFi Value", False, 
+                                "SY-CeFi index not found - may need to calculate first")
+                else:
+                    self.log_test("Index Family SY-CeFi Value", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("Index Family SY-CeFi Value", False, f"Exception: {str(e)}")
+    
+    async def test_index_family_overview_coinbase(self):
+        """Test GET /api/v1/index-family/overview endpoint for Coinbase integration"""
+        try:
+            async with self.session.get(f"{API_BASE}/v1/index-family/overview") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    required_fields = ['success', 'data', 'message']
+                    missing_fields = [field for field in required_fields if field not in data]
+                    
+                    if not missing_fields:
+                        success = data.get('success')
+                        overview_data = data.get('data', {})
+                        message = data.get('message', '')
+                        
+                        if success and overview_data:
+                            indices = overview_data.get('indices', [])
+                            
+                            # Find SY-CeFi in the overview
+                            sycefi_index = None
+                            for index in indices:
+                                if index.get('code') == 'SYCEFI':
+                                    sycefi_index = index
+                                    break
+                            
+                            if sycefi_index:
+                                value = sycefi_index.get('value')
+                                confidence = sycefi_index.get('confidence')
+                                description = sycefi_index.get('description', '')
+                                
+                                # Check if SY-CeFi shows integration with Coinbase
+                                if value and value > 0 and confidence and confidence > 0:
+                                    # Look for Coinbase-related keywords in description
+                                    coinbase_keywords = ['coinbase', 'cefi', 'centralized']
+                                    has_coinbase_ref = any(keyword in description.lower() for keyword in coinbase_keywords)
+                                    
+                                    if has_coinbase_ref:
+                                        self.log_test("Index Family Overview (Coinbase)", True, 
+                                                    f"SY-CeFi in overview with Coinbase integration: {value:.4f}, confidence: {confidence:.2f}")
+                                    else:
+                                        self.log_test("Index Family Overview (Coinbase)", True, 
+                                                    f"SY-CeFi in overview: {value:.4f}, confidence: {confidence:.2f} (description may not mention Coinbase)")
+                                else:
+                                    self.log_test("Index Family Overview (Coinbase)", False, 
+                                                f"SY-CeFi has invalid values - Value: {value}, Confidence: {confidence}")
+                            else:
+                                self.log_test("Index Family Overview (Coinbase)", False, 
+                                            f"SY-CeFi not found in overview indices: {[idx.get('code') for idx in indices]}")
+                        else:
+                            self.log_test("Index Family Overview (Coinbase)", False, 
+                                        f"Request failed - {message}")
+                    else:
+                        self.log_test("Index Family Overview (Coinbase)", False, f"Missing fields: {missing_fields}")
+                else:
+                    self.log_test("Index Family Overview (Coinbase)", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("Index Family Overview (Coinbase)", False, f"Exception: {str(e)}")
+    
+    async def test_coinbase_data_quality_validation(self):
+        """Test data quality and validation of Coinbase integration"""
+        print("\n🔍 Testing Coinbase Data Quality & Validation...")
+        
+        # Test 1: Check if yield data has realistic values
+        try:
+            async with self.session.get(f"{API_BASE}/coinbase/yield-data") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    yield_data = data.get('data', {})
+                    accounts = yield_data.get('yield_accounts', [])
+                    
+                    realistic_count = 0
+                    unrealistic_count = 0
+                    
+                    for account in accounts:
+                        yield_rate = account.get('annual_yield_rate', 0)
+                        currency = account.get('currency', '')
+                        
+                        # Define realistic ranges for different currencies
+                        realistic_ranges = {
+                            'USDC': (0, 8),    # Stablecoin yields
+                            'USDT': (0, 8),    # Stablecoin yields  
+                            'DAI': (0, 8),     # Stablecoin yields
+                            'USD': (0, 8),     # USD yields
+                            'BTC': (0, 2),     # BTC typically low yield
+                            'ETH': (0, 8),     # ETH staking yields
+                            'SOL': (0, 12),    # SOL staking yields
+                            'ADA': (0, 8),     # ADA staking yields
+                            'DOT': (0, 15),    # DOT staking yields
+                            'ATOM': (0, 25),   # ATOM staking yields
+                        }
+                        
+                        min_yield, max_yield = realistic_ranges.get(currency.upper(), (0, 25))
+                        
+                        if min_yield <= yield_rate <= max_yield:
+                            realistic_count += 1
+                        else:
+                            unrealistic_count += 1
+                    
+                    total_accounts = len(accounts)
+                    if total_accounts > 0:
+                        realistic_pct = (realistic_count / total_accounts) * 100
+                        if realistic_pct >= 80:  # At least 80% should be realistic
+                            self.log_test("Coinbase Data Quality", True, 
+                                        f"{realistic_pct:.1f}% realistic yields ({realistic_count}/{total_accounts})")
+                        else:
+                            self.log_test("Coinbase Data Quality", False, 
+                                        f"Only {realistic_pct:.1f}% realistic yields ({realistic_count}/{total_accounts})")
+                    else:
+                        self.log_test("Coinbase Data Quality", False, "No yield accounts to validate")
+                else:
+                    self.log_test("Coinbase Data Quality", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("Coinbase Data Quality", False, f"Exception: {str(e)}")
+        
+        # Test 2: Check fallback mechanism
+        try:
+            # This test assumes that if API credentials are invalid, it should fall back gracefully
+            async with self.session.get(f"{API_BASE}/coinbase/status") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    status = data.get('status')
+                    message = data.get('message', '')
+                    
+                    # Check for proper fallback handling
+                    fallback_indicators = ['mock', 'demo', 'fallback', 'not_configured', 'configured_error']
+                    has_fallback = any(indicator in status.lower() or indicator in message.lower() 
+                                     for indicator in fallback_indicators)
+                    
+                    if has_fallback or status == 'healthy':
+                        self.log_test("Coinbase Fallback Mechanism", True, 
+                                    f"Proper fallback handling - Status: {status}")
+                    else:
+                        self.log_test("Coinbase Fallback Mechanism", False, 
+                                    f"Unclear fallback status - Status: {status}, Message: {message}")
+                else:
+                    self.log_test("Coinbase Fallback Mechanism", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("Coinbase Fallback Mechanism", False, f"Exception: {str(e)}")
+    
+    async def test_coinbase_error_handling(self):
+        """Test error handling and resilience of Coinbase integration"""
+        print("\n🛡️ Testing Coinbase Error Handling & Resilience...")
+        
+        # Test 1: All endpoints should handle errors gracefully
+        coinbase_endpoints = [
+            "/coinbase/status",
+            "/coinbase/yield-data", 
+            "/coinbase/cefi-index",
+            "/coinbase/health"
+        ]
+        
+        for endpoint in coinbase_endpoints:
+            try:
+                async with self.session.get(f"{API_BASE}{endpoint}") as response:
+                    # All endpoints should return valid JSON even on errors
+                    if response.status in [200, 500]:  # Accept both success and server errors
+                        try:
+                            data = await response.json()
+                            if isinstance(data, dict):
+                                self.log_test(f"Error Handling {endpoint}", True, 
+                                            f"Returns valid JSON (HTTP {response.status})")
+                            else:
+                                self.log_test(f"Error Handling {endpoint}", False, 
+                                            f"Invalid JSON structure (HTTP {response.status})")
+                        except json.JSONDecodeError:
+                            self.log_test(f"Error Handling {endpoint}", False, 
+                                        f"Invalid JSON response (HTTP {response.status})")
+                    else:
+                        self.log_test(f"Error Handling {endpoint}", False, 
+                                    f"Unexpected HTTP status: {response.status}")
+            except Exception as e:
+                self.log_test(f"Error Handling {endpoint}", False, f"Exception: {str(e)}")
+        
+        # Test 2: POST endpoints should handle errors gracefully
+        try:
+            async with self.session.post(f"{API_BASE}/coinbase/refresh") as response:
+                if response.status in [200, 500]:
+                    try:
+                        data = await response.json()
+                        if isinstance(data, dict):
+                            self.log_test("Error Handling POST /coinbase/refresh", True, 
+                                        f"Returns valid JSON (HTTP {response.status})")
+                        else:
+                            self.log_test("Error Handling POST /coinbase/refresh", False, 
+                                        f"Invalid JSON structure (HTTP {response.status})")
+                    except json.JSONDecodeError:
+                        self.log_test("Error Handling POST /coinbase/refresh", False, 
+                                    f"Invalid JSON response (HTTP {response.status})")
+                else:
+                    self.log_test("Error Handling POST /coinbase/refresh", False, 
+                                f"Unexpected HTTP status: {response.status}")
+        except Exception as e:
+            self.log_test("Error Handling POST /coinbase/refresh", False, f"Exception: {str(e)}")
+
+    # ========================================
     # AI-POWERED PORTFOLIO MANAGEMENT TESTS (STEP 13)
     # ========================================
     
