@@ -19,6 +19,7 @@ function App() {
     <HelmetProvider>
       <div className="App">
         <BrowserRouter>
+          <ScrollToTop />
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/blog" element={<BlogPage />} />
