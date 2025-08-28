@@ -11,6 +11,7 @@ import RiskAnalyticsPage from "./pages/RiskAnalyticsPage";
 import IndexDashboardPage from "./pages/IndexDashboardPage";
 import PegMonitorPage from "./pages/PegMonitorPage";
 import ApiDocumentationPage from "./pages/ApiDocumentationPage";
+import ScrollToTop from "./components/ScrollToTop";
 import { Toaster } from "./components/ui/toaster";
 
 function App() {
