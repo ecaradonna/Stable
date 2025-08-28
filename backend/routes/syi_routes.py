@@ -115,8 +115,8 @@ async def get_current_syi(
 
 @router.get("/history")
 async def get_syi_history(
-    from_date: str = Query(..., pattern=r'^\d{4}-\d{2}-\d{2}$'),
-    to_date: str = Query(..., pattern=r'^\d{4}-\d{2}-\d{2}$')
+    from_date: str = Query(..., alias="from", pattern=r'^\d{4}-\d{2}-\d{2}$'),
+    to_date: str = Query(..., alias="to", pattern=r'^\d{4}-\d{2}-\d{2}$')
 ):
     """
     Get SYI historical data
