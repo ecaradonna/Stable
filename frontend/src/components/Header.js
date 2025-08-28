@@ -4,30 +4,6 @@ import { Button } from "./ui/button";
 import { FileText } from "lucide-react";
 
 const Header = ({ onJoinWaitlist, onDownloadWhitepaper }) => {
-  const navigate = useNavigate();
-
-  const handleLiveIndexClick = (e) => {
-    e.preventDefault();
-    console.log('Live Index clicked - navigating to /index-dashboard');
-    
-    try {
-      // Try React Router navigation first
-      navigate('/index-dashboard');
-    } catch (error) {
-      console.error('React Router navigation failed:', error);
-      // Fallback to window.location
-      window.location.href = '/index-dashboard';
-    }
-    
-    // Additional fallback with timeout
-    setTimeout(() => {
-      if (window.location.pathname !== '/index-dashboard') {
-        console.log('Navigation timeout - forcing window.location change');
-        window.location.href = '/index-dashboard';
-      }
-    }, 1000);
-  };
-
   return (
     <header className="sticky top-0 bg-white/95 backdrop-blur-sm border-b border-gray-100 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
