@@ -369,7 +369,7 @@ async def get_recent_alerts(
     try:
         # Calculate date range
         end_date = datetime.now().date()
-        start_date = end_date - datetime.timedelta(days=days)
+        start_date = end_date - timedelta(days=days)
         
         # Get history with alerts
         history = await regime_service.get_regime_history(
