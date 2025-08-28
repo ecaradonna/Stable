@@ -36,12 +36,12 @@ const LiveIndexTicker = () => {
     } catch (err) {
       console.error('Error fetching index data:', err);
       
-      // Set fallback data instead of showing error
+      // Set realistic fallback data instead of showing error
       setIndexData({
-        value: indexResponse.index_value || 1.0172,
+        value: 1.0172, // Use realistic SYI value
         timestamp: new Date().toISOString(),
-        status: "live", // Changed from "demo" to "live" 
-        constituents_count: indexResponse.constituents_count || 6,
+        status: "estimated", // Changed from "demo" to "estimated" for fallback
+        constituents_count: 6,
         last_update_seconds: 30 // Real update frequency
       });
       
