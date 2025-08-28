@@ -74,7 +74,12 @@ const IndexDashboardPage = () => {
           
           if (allIndices.length > 0) {
             const totalTvl = allIndices.reduce((sum, idx) => sum + (idx.total_tvl || 0), 0);
-            const avgYield = allIndices.reduce((sum, idx) => sum + (idx.value || 0), 0) / allIndices.length;
+            const weightedYieldSum = allIndices.reduce((sum, idx) => {
+              const yield_val = idx.value || 0;
+              const tvl = idx.total_tvl || 0;
+              return sum + (yield_val * tvl);
+            }, 0);
+            const avgYield = totalTvl > 0 ? (weightedYieldSum / totalTvl) : 0;
             const totalConstituents = allIndices.reduce((sum, idx) => sum + (idx.constituent_count || 0), 0);
             
             // Create statistics object in expected format
