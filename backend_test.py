@@ -1525,6 +1525,304 @@ class StableYieldTester:
                 self.log_test(f"PegCheck Error Handling ({description})", False, f"Exception: {str(e)}")
 
     # ========================================
+    # SYI (STABLEYIELD INDEX) CALCULATION TESTS
+    # ========================================
+    
+    async def test_syi_health(self):
+        """Test GET /api/syi/health endpoint"""
+        try:
+            async with self.session.get(f"{API_BASE}/syi/health") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    required_fields = ['service', 'status', 'methodology_version', 'timestamp']
+                    missing_fields = [field for field in required_fields if field not in data]
+                    
+                    if not missing_fields:
+                        service = data.get('service')
+                        status = data.get('status')
+                        version = data.get('methodology_version')
+                        
+                        if service == 'syi' and status == 'healthy':
+                            self.log_test("SYI Health Check", True, f"Service healthy, version: {version}")
+                        else:
+                            self.log_test("SYI Health Check", False, f"Service not healthy: {data}")
+                    else:
+                        self.log_test("SYI Health Check", False, f"Missing fields: {missing_fields}")
+                else:
+                    self.log_test("SYI Health Check", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("SYI Health Check", False, f"Exception: {str(e)}")
+    
+    async def test_syi_test_calculation(self):
+        """Test GET /api/syi/test endpoint - reference dataset calculation"""
+        try:
+            async with self.session.get(f"{API_BASE}/syi/test") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    required_fields = ['success', 'test_result', 'expected_percent', 'actual_percent', 'error']
+                    missing_fields = [field for field in required_fields if field not in data]
+                    
+                    if not missing_fields:
+                        success = data.get('success')
+                        test_result = data.get('test_result')
+                        expected = data.get('expected_percent')
+                        actual = data.get('actual_percent')
+                        error = data.get('error')
+                        
+                        if success and test_result == 'PASS':
+                            self.log_test("SYI Test Calculation", True, 
+                                        f"Expected: {expected}%, Actual: {actual}%, Error: {error:.6f}")
+                        else:
+                            self.log_test("SYI Test Calculation", False, 
+                                        f"Test failed - Expected: {expected}%, Actual: {actual}%, Error: {error}")
+                    else:
+                        self.log_test("SYI Test Calculation", False, f"Missing fields: {missing_fields}")
+                else:
+                    self.log_test("SYI Test Calculation", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("SYI Test Calculation", False, f"Exception: {str(e)}")
+    
+    async def test_syi_calc_endpoint(self):
+        """Test POST /api/syi/calc endpoint with sample payload"""
+        try:
+            # Use the exact sample payload from the specification
+            payload = {
+                "as_of_date": "2025-08-28",
+                "components": [
+                    {"symbol": "USDT", "weight": 72.5, "ray": 4.20},
+                    {"symbol": "USDC", "weight": 21.8, "ray": 4.50},
+                    {"symbol": "DAI", "weight": 4.4, "ray": 7.59},
+                    {"symbol": "TUSD", "weight": 0.4, "ray": 15.02},
+                    {"symbol": "FRAX", "weight": 0.7, "ray": 6.80},
+                    {"symbol": "USDP", "weight": 0.2, "ray": 3.42}
+                ],
+                "meta": {
+                    "units": "percent",
+                    "ray_units": "percent"
+                }
+            }
+            
+            async with self.session.post(f"{API_BASE}/syi/calc", json=payload) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    
+                    if data.get('success') and 'data' in data:
+                        result_data = data['data']
+                        syi_percent = result_data.get('syi_percent')
+                        components_count = result_data.get('components_count')
+                        methodology_version = result_data.get('methodology_version')
+                        
+                        # Check if result is close to expected 4.47448%
+                        expected = 4.47448
+                        if syi_percent and abs(syi_percent - expected) < 0.001:
+                            self.log_test("SYI Calc Endpoint", True, 
+                                        f"SYI: {syi_percent:.5f}%, Components: {components_count}, Version: {methodology_version}")
+                        else:
+                            self.log_test("SYI Calc Endpoint", False, 
+                                        f"Unexpected SYI value: {syi_percent}% (expected ~{expected}%)")
+                    else:
+                        self.log_test("SYI Calc Endpoint", False, f"Invalid response structure: {data}")
+                else:
+                    self.log_test("SYI Calc Endpoint", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("SYI Calc Endpoint", False, f"Exception: {str(e)}")
+    
+    async def test_syi_current(self):
+        """Test GET /api/syi/current endpoint"""
+        try:
+            async with self.session.get(f"{API_BASE}/syi/current") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    required_fields = ['success', 'syi_decimal', 'syi_percent', 'timestamp', 'methodology_version', 'components_count']
+                    missing_fields = [field for field in required_fields if field not in data]
+                    
+                    if not missing_fields:
+                        success = data.get('success')
+                        syi_percent = data.get('syi_percent')
+                        syi_decimal = data.get('syi_decimal')
+                        components_count = data.get('components_count')
+                        
+                        if success and syi_percent > 0:
+                            self.log_test("SYI Current", True, 
+                                        f"Current SYI: {syi_percent:.5f}% ({syi_decimal:.6f}), Components: {components_count}")
+                        else:
+                            self.log_test("SYI Current", False, f"Invalid SYI value: {syi_percent}")
+                    else:
+                        self.log_test("SYI Current", False, f"Missing fields: {missing_fields}")
+                else:
+                    self.log_test("SYI Current", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("SYI Current", False, f"Exception: {str(e)}")
+    
+    async def test_syi_history(self):
+        """Test GET /api/syi/history endpoint with date range"""
+        try:
+            # Test with a valid date range
+            from_date = "2025-08-26"
+            to_date = "2025-08-28"
+            
+            async with self.session.get(f"{API_BASE}/syi/history?from={from_date}&to={to_date}") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    required_fields = ['series', 'methodology_version']
+                    missing_fields = [field for field in required_fields if field not in data]
+                    
+                    if not missing_fields:
+                        series = data.get('series', [])
+                        methodology_version = data.get('methodology_version')
+                        
+                        if isinstance(series, list) and len(series) > 0:
+                            # Validate series structure
+                            valid_entries = 0
+                            for entry in series:
+                                if all(field in entry for field in ['date', 'syi_decimal', 'syi_percent']):
+                                    valid_entries += 1
+                            
+                            if valid_entries == len(series):
+                                latest_entry = series[-1]
+                                self.log_test("SYI History", True, 
+                                            f"Found {len(series)} entries, latest: {latest_entry['date']} = {latest_entry['syi_percent']:.5f}%")
+                            else:
+                                self.log_test("SYI History", False, f"Invalid series entries: {valid_entries}/{len(series)}")
+                        else:
+                            self.log_test("SYI History", False, f"Empty or invalid series: {series}")
+                    else:
+                        self.log_test("SYI History", False, f"Missing fields: {missing_fields}")
+                else:
+                    self.log_test("SYI History", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("SYI History", False, f"Exception: {str(e)}")
+    
+    async def test_syi_upsert(self):
+        """Test POST /api/syi/upsert endpoint"""
+        try:
+            # Use a different date to test upsert functionality
+            payload = {
+                "as_of_date": "2025-08-29",
+                "components": [
+                    {"symbol": "USDT", "weight": 70.0, "ray": 4.25},
+                    {"symbol": "USDC", "weight": 25.0, "ray": 4.55},
+                    {"symbol": "DAI", "weight": 5.0, "ray": 7.80}
+                ],
+                "meta": {
+                    "units": "percent",
+                    "ray_units": "percent"
+                }
+            }
+            
+            async with self.session.post(f"{API_BASE}/syi/upsert", json=payload) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    
+                    if data.get('success'):
+                        message = data.get('message', '')
+                        syi_percent = data.get('syi_percent')
+                        components_count = data.get('components_count')
+                        
+                        if 'stored' in message.lower() and syi_percent and components_count:
+                            self.log_test("SYI Upsert", True, 
+                                        f"Stored SYI: {syi_percent:.5f}% with {components_count} components")
+                        else:
+                            self.log_test("SYI Upsert", False, f"Invalid upsert response: {data}")
+                    else:
+                        self.log_test("SYI Upsert", False, f"Upsert failed: {data}")
+                else:
+                    self.log_test("SYI Upsert", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("SYI Upsert", False, f"Exception: {str(e)}")
+    
+    async def test_syi_input_validation(self):
+        """Test SYI input validation and error handling"""
+        # Test 1: Invalid date format
+        try:
+            invalid_payload = {
+                "as_of_date": "2025/08/28",  # Wrong format
+                "components": [
+                    {"symbol": "USDT", "weight": 100.0, "ray": 4.20}
+                ]
+            }
+            
+            async with self.session.post(f"{API_BASE}/syi/calc", json=invalid_payload) as response:
+                if response.status == 422:  # Validation error
+                    self.log_test("SYI Validation Invalid Date", True, "Correctly rejected invalid date format")
+                else:
+                    self.log_test("SYI Validation Invalid Date", False, f"Should reject invalid date but got HTTP {response.status}")
+        except Exception as e:
+            self.log_test("SYI Validation Invalid Date", False, f"Exception: {str(e)}")
+        
+        # Test 2: Negative weights
+        try:
+            invalid_payload = {
+                "as_of_date": "2025-08-28",
+                "components": [
+                    {"symbol": "USDT", "weight": -10.0, "ray": 4.20}  # Negative weight
+                ]
+            }
+            
+            async with self.session.post(f"{API_BASE}/syi/calc", json=invalid_payload) as response:
+                if response.status == 422:  # Validation error
+                    self.log_test("SYI Validation Negative Weight", True, "Correctly rejected negative weight")
+                else:
+                    self.log_test("SYI Validation Negative Weight", False, f"Should reject negative weight but got HTTP {response.status}")
+        except Exception as e:
+            self.log_test("SYI Validation Negative Weight", False, f"Exception: {str(e)}")
+        
+        # Test 3: Duplicate symbols
+        try:
+            invalid_payload = {
+                "as_of_date": "2025-08-28",
+                "components": [
+                    {"symbol": "USDT", "weight": 50.0, "ray": 4.20},
+                    {"symbol": "USDT", "weight": 50.0, "ray": 4.30}  # Duplicate symbol
+                ]
+            }
+            
+            async with self.session.post(f"{API_BASE}/syi/calc", json=invalid_payload) as response:
+                if response.status == 422:  # Validation error
+                    self.log_test("SYI Validation Duplicate Symbols", True, "Correctly rejected duplicate symbols")
+                else:
+                    self.log_test("SYI Validation Duplicate Symbols", False, f"Should reject duplicates but got HTTP {response.status}")
+        except Exception as e:
+            self.log_test("SYI Validation Duplicate Symbols", False, f"Exception: {str(e)}")
+        
+        # Test 4: Empty components
+        try:
+            invalid_payload = {
+                "as_of_date": "2025-08-28",
+                "components": []  # Empty components
+            }
+            
+            async with self.session.post(f"{API_BASE}/syi/calc", json=invalid_payload) as response:
+                if response.status == 422:  # Validation error
+                    self.log_test("SYI Validation Empty Components", True, "Correctly rejected empty components")
+                else:
+                    self.log_test("SYI Validation Empty Components", False, f"Should reject empty components but got HTTP {response.status}")
+        except Exception as e:
+            self.log_test("SYI Validation Empty Components", False, f"Exception: {str(e)}")
+    
+    async def test_syi_date_range_validation(self):
+        """Test SYI history date range validation"""
+        # Test 1: Invalid date range (from > to)
+        try:
+            async with self.session.get(f"{API_BASE}/syi/history?from=2025-08-28&to=2025-08-26") as response:
+                if response.status == 422:  # Validation error
+                    self.log_test("SYI Date Range Validation", True, "Correctly rejected invalid date range")
+                else:
+                    self.log_test("SYI Date Range Validation", False, f"Should reject invalid range but got HTTP {response.status}")
+        except Exception as e:
+            self.log_test("SYI Date Range Validation", False, f"Exception: {str(e)}")
+        
+        # Test 2: Invalid date format in query params
+        try:
+            async with self.session.get(f"{API_BASE}/syi/history?from=2025/08/26&to=2025/08/28") as response:
+                if response.status == 422:  # Validation error
+                    self.log_test("SYI History Date Format", True, "Correctly rejected invalid date format in query")
+                else:
+                    self.log_test("SYI History Date Format", False, f"Should reject invalid format but got HTTP {response.status}")
+        except Exception as e:
+            self.log_test("SYI History Date Format", False, f"Exception: {str(e)}")
+
+    # ========================================
     # COINBASE API INTEGRATION TESTS
     # ========================================
     
