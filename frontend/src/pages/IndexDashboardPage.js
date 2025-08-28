@@ -164,10 +164,10 @@ const IndexDashboardPage = () => {
             
             // Create statistics object in expected format
             const calculatedStats = {
-              average_yield: avgYield * 100, // Convert to percentage
+              avg_yield: avgYield * 100, // Convert to percentage - using correct property name
               total_tvl: totalTvl,
               total_constituents: totalConstituents,
-              volatility: 2.3, // Placeholder - could calculate from historical data
+              avg_volatility: 0.023, // 2.3% in decimal format
               updated_at: indexFamilyData.data.date
             };
             
