@@ -3,6 +3,7 @@ Peg computation and analysis logic
 """
 
 import math
+import time
 import statistics
 from typing import Dict, List, Optional, Tuple
 
