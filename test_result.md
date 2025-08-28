@@ -427,11 +427,11 @@ backend:
 
   - task: "SYI Frontend Integration - IndexFamilyOverview Component"
     implemented: true
-    working: "NA"
+    working: false
     file: "/app/frontend/src/components/IndexFamilyOverview.js"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: false
           agent: "testing"
@@ -439,6 +439,9 @@ backend:
         - working: "NA"
           agent: "main"
           comment: "Updated IndexFamilyOverview component to integrate SY100 index with new SYI calculation system. Modified fetchIndexFamily function to: 1) First call /api/syi/current for SY100 index using new calculation, 2) Fallback to Index Family API for other indices (SY-CeFi, SY-DeFi, SY-RPI), 3) Added SYI methodology version badge for SY100 when using new calculation. Component now displays accurate SYI-calculated SY100 values (4.47448%) while maintaining compatibility with other indices."
+        - working: false
+          agent: "testing"
+          comment: "❌ INDEXFAMILYOVERVIEW COMPONENT NOT ACCESSIBLE - Testing revealed that IndexFamilyOverview component is not displaying on Index Dashboard page (/index-dashboard). Component code has been updated with new SYI integration but is not rendering properly. ISSUES IDENTIFIED: Component not found on Index Dashboard page, 'StableYield Index Family' text not present, SY100 index card not accessible for testing. INTEGRATION STATUS: Code changes appear correct (calls /api/syi/current for SY100, adds SYI v2.0.0 badge, maintains fallback compatibility) but component is not rendering. CONCLUSION: IndexFamilyOverview integration cannot be verified due to component not displaying on intended page. Requires investigation of component rendering or page routing issues."
 
   - task: "SYI Frontend Integration - IndexDashboardPage Component"
     implemented: false
