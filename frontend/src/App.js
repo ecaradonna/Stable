@@ -26,6 +26,7 @@ function App() {
             <Route path="/yield-indices" element={<YieldIndicesPage />} />
             <Route path="/risk-analytics" element={<RiskAnalyticsPage />} />
             <Route path="/index-dashboard" element={<IndexDashboardPage />} />
+            <Route path="/peg-monitor" element={<PegMonitorPage />} />
             <Route path="/api-documentation" element={<ApiDocumentationPage />} />
           </Routes>
           <Toaster />
