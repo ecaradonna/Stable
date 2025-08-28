@@ -209,6 +209,17 @@ async def startup_event():
         logger.error(f"❌ Failed to start Risk Management service: {e}")
         logger.info("⚠️ Continuing without enhanced risk management features")
     
+    # Start Risk Regime Inversion Alert service (NEW)
+    try:
+        from services.risk_regime_service import start_risk_regime_service
+        
+        # Start Risk Regime service
+        await start_risk_regime_service(db)
+        logger.info("✅ Risk Regime Inversion Alert service started")
+    except Exception as e:
+        logger.error(f"❌ Failed to start Risk Regime service: {e}")
+        logger.info("⚠️ Continuing without risk regime detection features")
+    
     logger.info("✅ Emergency Startup Complete - Essential services running")
     logger.info("🎯 STEP 13 AI Portfolio Management endpoints available:")
     logger.info("  - GET /api/ai-portfolio/status (AI Portfolio service status)")
