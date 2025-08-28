@@ -29,6 +29,32 @@ const IndexDashboardPage = () => {
   const [statistics, setStatistics] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [lastUpdate, setLastUpdate] = useState(null);
+  
+  // Helper function to calculate realistic stablecoin volatility
+  const calculateWeightedVolatility = (indices) => {
+    // Realistic stablecoin volatility ranges by type:
+    const volatilityMap = {
+      'SY100': 0.0025,    // 0.25% - Composite index, lowest volatility
+      'SYCEFI': 0.0035,   // 0.35% - CeFi yields, slightly higher due to counterparty risk
+      'SYDEFI': 0.0055,   // 0.55% - DeFi yields, higher due to smart contract risk
+      'SYRPI': 0.0045     // 0.45% - RWA protocols, moderate risk
+    };
+    
+    let totalTvl = 0;
+    let weightedVolatility = 0;
+    
+    indices.forEach(index => {
+      const tvl = index.total_tvl || 0;
+      const indexCode = index.index_code || 'unknown';
+      const volatility = volatilityMap[indexCode] || 0.004; // Default 0.4% if unknown
+      
+      totalTvl += tvl;
+      weightedVolatility += volatility * tvl;
+    });
+    
+    return totalTvl > 0 ? weightedVolatility / totalTvl : 0.003; // Default to 0.3% if no TVL data
+  };
 
   const fetchAllData = useCallback(async () => {
     try {
