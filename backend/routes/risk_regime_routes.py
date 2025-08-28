@@ -4,7 +4,7 @@ Exposes endpoints for regime evaluation, history, and management
 """
 
 from fastapi import APIRouter, HTTPException, Query, Depends
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 from typing import List, Dict, Any, Optional
 import logging
 import os
