@@ -591,11 +591,8 @@ metadata:
 
 test_plan:
   current_focus:
-    - "SYI Macro Analysis Implementation"
-    - "Live Stablecoin Market Charts Implementation"
-  stuck_tasks:
-    - "SYI Macro Analysis Implementation"
-    - "Live Stablecoin Market Charts Implementation"
+    - "StableYield Index (SYI) New Calculation System"
+  stuck_tasks: []
   test_all: false
   test_priority: "high_first"
 
