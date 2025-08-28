@@ -438,7 +438,7 @@ const IndexDashboardPage = () => {
                 <CardContent className="pt-6">
                   <Users className="w-12 h-12 text-[#F59E0B] mx-auto mb-4" />
                   <h3 className="text-2xl font-bold text-[#0E1A2B] mb-2">
-                    {statistics.avg_volatility ? (statistics.avg_volatility * 100).toFixed(1) : 'N/A'}%
+                    {statistics.avg_volatility ? statistics.avg_volatility.toFixed(0) : 'N/A'}%
                   </h3>
                   <p className="text-gray-600">Avg Volatility</p>
                 </CardContent>
