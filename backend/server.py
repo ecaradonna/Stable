@@ -29,6 +29,7 @@ from routes.dashboard_routes import router as dashboard_router
 from routes.ai_portfolio_routes import router as ai_portfolio_router
 from routes.risk_management_routes import router as risk_management_router
 from routes.index_family_routes import router as index_family_router
+from routes.coinbase_routes import router as coinbase_router
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
