@@ -536,6 +536,24 @@ const IndexDashboardPage = () => {
         </div>
       </section>
 
+      {/* Risk Regime Detection */}
+      <section className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-[#0E1A2B] mb-4">
+              Risk Regime Inversion Alert
+            </h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              Advanced risk regime detection using SYI indicators, momentum analysis, and market breadth calculations.
+            </p>
+          </div>
+          
+          <div className="max-w-md mx-auto">
+            <RiskRegimeWidget />
+          </div>
+        </div>
+      </section>
+
       {/* Comprehensive Stablecoin Market Overview */}
       <section className="py-16 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
