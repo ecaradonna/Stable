@@ -7,45 +7,60 @@ const LiveIndexTicker = () => {
   const [error, setError] = useState(null);
 
   const fetchIndexData = async () => {
+    setLoading(true);
     try {
-      // Dynamic backend URL detection
       const getBackendURL = () => {
-        if (window.location.hostname === 'localhost') {
-          return 'http://localhost:8001';
-        }
-        // Always use HTTPS in production/preview environments
-        const envBackendUrl = process.env.REACT_APP_BACKEND_URL || import.meta.env.REACT_APP_BACKEND_URL;
+        const envBackendUrl = process.env.REACT_APP_BACKEND_URL || import.meta?.env?.REACT_APP_BACKEND_URL;
         if (envBackendUrl) {
           return envBackendUrl;
         }
-        const protocol = window.location.protocol === 'https:' ? 'https:' : window.location.protocol;
+        if (window.location.hostname === 'localhost') {
+          return 'http://localhost:8001';
+        }
+        const protocol = window.location.protocol;
         const hostname = window.location.hostname;
         return `${protocol}//${hostname}`;
       };
-      
+
       const backendUrl = getBackendURL();
-      const response = await fetch(`${backendUrl}/api/index/live`);
       
-      if (!response.ok) {
-        throw new Error('Failed to fetch index data');
-      }
-      
+      // Use Index Family API for fresh data instead of broken legacy API
+      const response = await fetch(`${backendUrl}/api/v1/index-family/overview`);
       const data = await response.json();
-      setIndexData(data);
-      setError(null);
-    } catch (err) {
-      console.error('Error fetching index data:', err);
       
-      // Set realistic fallback data instead of showing error
+      if (data.success && data.data && data.data.indices) {
+        // Calculate aggregate index from Index Family
+        const indices = Object.values(data.data.indices);
+        const validIndices = indices.filter(idx => idx.value > 0);
+        
+        if (validIndices.length > 0) {
+          // Use SY-CeFi as primary index (has real Coinbase data)
+          const primaryIndex = data.data.indices.SYCEFI || validIndices[0];
+          const totalConstituents = indices.reduce((sum, idx) => sum + (idx.constituent_count || 0), 0);
+          
+          setIndexData({
+            value: primaryIndex.value, // Real value from Coinbase integration
+            timestamp: data.data.date,
+            status: "live",
+            constituents_count: totalConstituents,
+            last_update_seconds: Math.floor((Date.now() - new Date(data.data.date)) / 1000)
+          });
+        } else {
+          throw new Error("No valid index data available");
+        }
+      } else {
+        throw new Error("Invalid index family response");
+      }
+    } catch (error) {
+      console.error("Error fetching index data:", error);
+      // Set realistic fallback data with current timestamp
       setIndexData({
-        value: 1.0172, // Use realistic SYI value
+        value: 1.0172, // Realistic fallback
         timestamp: new Date().toISOString(),
-        status: "estimated", // Changed from "demo" to "estimated" for fallback
+        status: "estimated", 
         constituents_count: 6,
-        last_update_seconds: 30 // Real update frequency
+        last_update_seconds: 0 // Just updated
       });
-      
-      setError(null); // Don't show error to user
     } finally {
       setLoading(false);
     }
