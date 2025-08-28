@@ -386,6 +386,27 @@ const IndexDashboardPage = () => {
         </div>
       </section>
 
+      {/* Peg Status Widget Section */}
+      <section className="py-16 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold text-[#0E1A2B] mb-4">
+              Stablecoin Peg Monitoring
+            </h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              Real-time monitoring of stablecoin peg stability with deviation analysis and market intelligence.
+            </p>
+          </div>
+          
+          <div className="max-w-4xl mx-auto">
+            <PegStatusWidget 
+              symbols={["USDT", "USDC", "DAI", "FRAX", "TUSD", "PYUSD"]}
+              linkHref="/peg-monitor"
+            />
+          </div>
+        </div>
+      </section>
+
       {/* Comprehensive Stablecoin Market Overview */}
       <section className="py-16 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
