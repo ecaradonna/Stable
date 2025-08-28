@@ -1,6 +1,7 @@
 """
 StableYield Index Family Service
 Implements calculation logic for SY100, SY-CeFi, SY-DeFi, SY-RPI
+Enhanced with real Coinbase API integration for CeFi data
 """
 
 import numpy as np
@@ -16,6 +17,7 @@ from models.index_family import (
     IndexConstituents, TBillData, WeightingMethod, ConstituentType,
     IndexFactsheet, IndexFamilyOverview
 )
+from services.coinbase_service import get_coinbase_service
 
 logger = logging.getLogger(__name__)
 
