@@ -145,6 +145,7 @@ app.include_router(ai_portfolio_router, prefix="/api/ai-portfolio")  # AI Portfo
 app.include_router(risk_management_router, prefix="/api/risk-management")  # Enhanced Risk Management routes
 app.include_router(index_family_router, prefix="/api/index-family")  # Index Family Management routes
 app.include_router(coinbase_router)  # Coinbase API Integration routes
+app.include_router(pegcheck_router)  # PegCheck Stablecoin Peg Monitoring routes
 
 app.add_middleware(
     CORSMiddleware,
