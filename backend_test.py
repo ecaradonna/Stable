@@ -6149,6 +6149,17 @@ class StableYieldTester:
         await self.test_health_check()
         await self.test_api_root()
         
+        # SYI (StableYield Index) Calculation System Tests - NEW PRIORITY
+        print("\n📈 Testing SYI (StableYield Index) Calculation System...")
+        await self.test_syi_health()
+        await self.test_syi_test_calculation()
+        await self.test_syi_calc_endpoint()
+        await self.test_syi_current()
+        await self.test_syi_history()
+        await self.test_syi_upsert()
+        await self.test_syi_input_validation()
+        await self.test_syi_date_range_validation()
+        
         # Yield data API tests
         print("\n📊 Testing Yield Data APIs...")
         await self.test_yields_all()
