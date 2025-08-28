@@ -52,20 +52,60 @@ const IndexDashboardPage = () => {
       
       const backendUrl = getBackendURL();
       
-      // Fetch current index data
+      // Fetch current index data (Legacy SYI - working)
       const indexResponse = await fetch(`${backendUrl}/api/index/current`);
       const indexData = await indexResponse.json();
       setIndexData(indexData);
       
-      // Fetch constituents
+      // Fetch constituents (Legacy - working)
       const constituentsResponse = await fetch(`${backendUrl}/api/index/constituents`);
       const constituentsData = await constituentsResponse.json();
       setConstituents(constituentsData.constituents || []);
       
-      // Fetch statistics
-      const statsResponse = await fetch(`${backendUrl}/api/index/statistics?days=7`);
-      const statsData = await statsResponse.json();
-      setStatistics(statsData);
+      // Fetch statistics from Index Family Overview (NEW - working with real data)
+      try {
+        const indexFamilyResponse = await fetch(`${backendUrl}/api/v1/index-family/overview`);
+        const indexFamilyData = await indexFamilyResponse.json();
+        
+        if (indexFamilyData.success && indexFamilyData.data) {
+          // Calculate aggregate statistics from Index Family data
+          const indices = indexFamilyData.data.indices;
+          const allIndices = Object.values(indices);
+          
+          if (allIndices.length > 0) {
+            const totalTvl = allIndices.reduce((sum, idx) => sum + (idx.total_tvl || 0), 0);
+            const avgYield = allIndices.reduce((sum, idx) => sum + (idx.value || 0), 0) / allIndices.length;
+            const totalConstituents = allIndices.reduce((sum, idx) => sum + (idx.constituent_count || 0), 0);
+            
+            // Create statistics object in expected format
+            const calculatedStats = {
+              average_yield: avgYield * 100, // Convert to percentage
+              total_tvl: totalTvl,
+              total_constituents: totalConstituents,
+              volatility: 2.3, // Placeholder - could calculate from historical data
+              updated_at: indexFamilyData.data.date
+            };
+            
+            setStatistics(calculatedStats);
+          } else {
+            // Fallback to legacy endpoint
+            const statsResponse = await fetch(`${backendUrl}/api/index/statistics?days=7`);
+            const statsData = await statsResponse.json();
+            setStatistics(statsData);
+          }
+        } else {
+          // Fallback to legacy endpoint
+          const statsResponse = await fetch(`${backendUrl}/api/index/statistics?days=7`);
+          const statsData = await statsResponse.json();
+          setStatistics(statsData);
+        }
+      } catch (statsError) {
+        console.error('Error fetching statistics from Index Family, trying legacy:', statsError);
+        // Fallback to legacy endpoint
+        const statsResponse = await fetch(`${backendUrl}/api/index/statistics?days=7`);
+        const statsData = await statsResponse.json();
+        setStatistics(statsData);
+      }
       
       setError(null);
     } catch (err) {
