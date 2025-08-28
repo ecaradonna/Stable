@@ -6175,6 +6175,18 @@ class StableYieldTester:
         await self.test_coinbase_data_quality_validation()
         await self.test_coinbase_error_handling()
         
+        # PegCheck System Tests (PHASE 2)
+        print("\n🎯 Testing PegCheck System (PHASE 2)...")
+        await self.test_peg_health_check()
+        await self.test_peg_check_stability()
+        await self.test_peg_summary()
+        await self.test_peg_supported_symbols()
+        await self.test_peg_thresholds()
+        await self.test_peg_data_source_integration()
+        await self.test_peg_deviation_calculations()
+        await self.test_peg_status_classification()
+        await self.test_peg_error_handling()
+        
         # User management tests
         print("\n👥 Testing User Management APIs...")
         await self.test_user_waitlist()
