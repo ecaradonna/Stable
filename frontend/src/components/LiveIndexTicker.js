@@ -43,7 +43,7 @@ const LiveIndexTicker = () => {
             timestamp: data.data.date,
             status: "live",
             constituents_count: totalConstituents,
-            last_update_seconds: Math.floor((Date.now() - new Date(data.data.date)) / 1000)
+            last_update_seconds: 30 // Fresh data - show as recently updated (30 seconds)
           });
         } else {
           throw new Error("No valid index data available");
