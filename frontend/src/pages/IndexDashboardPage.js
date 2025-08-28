@@ -69,12 +69,12 @@ const IndexDashboardPage = () => {
         // Create a map of yield data by symbol
         const yieldMap = {};
         if (Array.isArray(yieldsData)) {
-          yieldsData.forEach(yield => {
-            yieldMap[yield.stablecoin] = {
-              currentYield: yield.currentYield,
-              riskScore: yield.riskScore,
-              source: yield.source,
-              liquidity: yield.liquidity
+          yieldsData.forEach(yieldItem => {
+            yieldMap[yieldItem.stablecoin] = {
+              currentYield: yieldItem.currentYield,
+              riskScore: yieldItem.riskScore,
+              source: yieldItem.source,
+              liquidity: yieldItem.liquidity
             };
           });
         }
