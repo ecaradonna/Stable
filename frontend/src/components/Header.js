@@ -67,6 +67,9 @@ const Header = ({ onJoinWaitlist, onDownloadWhitepaper }) => {
             <Link to="/yield-indices" className="text-[#0E1A2B] hover:text-[#2E6049] transition-colors font-medium">
               Yield Indices & Benchmarks
             </Link>
+            <Link to="/peg-monitor" className="text-[#0E1A2B] hover:text-[#2E6049] transition-colors font-medium">
+              Peg Monitor
+            </Link>
             <Link to="/blog" className="text-[#0E1A2B] hover:text-[#2E6049] transition-colors font-medium">
               Market Insights
             </Link>
