@@ -174,7 +174,7 @@ const LiveIndexTicker = () => {
       
       {/* Real-time data status */}
       <div className="mt-2 text-xs text-gray-400">
-        📊 Live data • Index Family: Real-time • CeFi: Coinbase API • Updated: {new Date().toLocaleTimeString()}
+        📊 Live SYI v{indexData.methodology_version} • Weighted RAY Calculation • Updated: {new Date().toLocaleTimeString()}
       </div>
     </div>
   );
