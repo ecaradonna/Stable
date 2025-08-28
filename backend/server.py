@@ -149,6 +149,7 @@ app.include_router(index_family_router)  # Index Family Management routes
 app.include_router(coinbase_router)  # Coinbase API Integration routes
 app.include_router(pegcheck_router)  # PegCheck Stablecoin Peg Monitoring routes
 app.include_router(syi_router)  # New StableYield Index (SYI) Calculation routes
+app.include_router(risk_regime_router)  # Risk Regime Inversion Alert routes
 
 app.add_middleware(
     CORSMiddleware,
