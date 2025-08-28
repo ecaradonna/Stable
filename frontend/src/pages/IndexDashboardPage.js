@@ -33,12 +33,12 @@ const IndexDashboardPage = () => {
   
   // Helper function to calculate realistic stablecoin volatility
   const calculateWeightedVolatility = (indices) => {
-    // Realistic stablecoin volatility ranges by type:
+    // Realistic stablecoin YIELD volatility ranges by type (full percentage numbers):
     const volatilityMap = {
-      'SY100': 0.0025,    // 0.25% - Composite index, lowest volatility
-      'SYCEFI': 0.0035,   // 0.35% - CeFi yields, slightly higher due to counterparty risk
-      'SYDEFI': 0.0055,   // 0.55% - DeFi yields, higher due to smart contract risk
-      'SYRPI': 0.0045     // 0.45% - RWA protocols, moderate risk
+      'SY100': 18,    // 18% - Composite index, diversified yield volatility
+      'SYCEFI': 25,   // 25% - CeFi yields, moderate volatility due to centralized management
+      'SYDEFI': 45,   // 45% - DeFi yields, higher volatility due to protocol risks and market dynamics
+      'SYRPI': 32     // 32% - RWA protocols, moderate-high volatility from traditional asset backing
     };
     
     let totalTvl = 0;
@@ -47,13 +47,13 @@ const IndexDashboardPage = () => {
     indices.forEach(index => {
       const tvl = index.total_tvl || 0;
       const indexCode = index.index_code || 'unknown';
-      const volatility = volatilityMap[indexCode] || 0.004; // Default 0.4% if unknown
+      const volatility = volatilityMap[indexCode] || 28; // Default 28% if unknown
       
       totalTvl += tvl;
       weightedVolatility += volatility * tvl;
     });
     
-    return totalTvl > 0 ? weightedVolatility / totalTvl : 0.003; // Default to 0.3% if no TVL data
+    return totalTvl > 0 ? Math.round(weightedVolatility / totalTvl) : 22; // Default to 22% if no TVL data
   };
 
   const fetchAllData = useCallback(async () => {
