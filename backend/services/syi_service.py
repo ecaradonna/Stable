@@ -32,7 +32,7 @@ class SYIComponent(BaseModel):
 
 class SYIPayload(BaseModel):
     """Input payload for SYI calculation"""
-    as_of_date: str = Field(..., regex=r'^\d{4}-\d{2}-\d{2}$')
+    as_of_date: str = Field(..., pattern=r'^\d{4}-\d{2}-\d{2}$')
     components: List[SYIComponent] = Field(..., min_items=1)
     meta: Optional[Dict[str, str]] = Field(default_factory=lambda: {
         "units": "percent",
