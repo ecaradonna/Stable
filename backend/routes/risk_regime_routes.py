@@ -100,7 +100,7 @@ async def get_current_regime(
     try:
         # Get most recent evaluation
         history = await regime_service.get_regime_history(
-            from_date=(datetime.now().date() - datetime.timedelta(days=7)).strftime('%Y-%m-%d'),
+            from_date=(datetime.now().date() - timedelta(days=7)).strftime('%Y-%m-%d'),
             to_date=datetime.now().date().strftime('%Y-%m-%d'),
             limit=1
         )
