@@ -152,7 +152,10 @@ const BlogPage = () => {
                 Subscribe to our newsletter and get the latest stablecoin yield insights, 
                 market analysis, and platform updates delivered to your inbox weekly.
               </p>
-              <Button className="bg-gradient-to-r from-[#4CC1E9] to-[#007A99] hover:from-[#007A99] hover:to-[#4CC1E9] text-white font-semibold px-8 py-3">
+              <Button 
+                className="bg-gradient-to-r from-[#4CC1E9] to-[#007A99] hover:from-[#007A99] hover:to-[#4CC1E9] text-white font-semibold px-8 py-3"
+                onClick={() => setIsContactOpen(true)}
+              >
                 Subscribe to Newsletter
               </Button>
             </div>
