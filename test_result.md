@@ -403,6 +403,45 @@ backend:
         - working: true
           agent: "testing"
           comment: "✅ SYI (STABLEYIELD INDEX) CALCULATION SYSTEM COMPREHENSIVE TESTING COMPLETE - 91.7% SUCCESS RATE (11/12 tests passed). ALL 6 NEW SYI ENDPOINTS FULLY OPERATIONAL: ✅ GET /api/syi/health (Service healthy, methodology version 2.0.0), ✅ GET /api/syi/test (Reference dataset calculation PASS - Expected: 4.47448%, Actual: 4.47448%, Error: 0.000000), ✅ POST /api/syi/calc (Sample payload calculation working - SYI: 4.47448%, Components: 6, Version: 2.0.0), ✅ GET /api/syi/current (Current SYI: 4.47448% with 6 components using live system data), ✅ GET /api/syi/history (Historical data retrieval working - Found 3 entries from 2025-08-26 to 2025-08-28), ✅ POST /api/syi/upsert (Calculate and store functionality working - Stored SYI: 4.50250% with 3 components). SYI CALCULATION ACCURACY VERIFIED: Reference test dataset calculation returns exactly 4.47448% as expected, demonstrating precise weighted average calculation of Risk-Adjusted Yields (RAY). Methodology implements SYI = Σ (w̃ᵢ × RAYᵢ) where w̃ᵢ = wᵢ / Σwⱼ (normalized weights). INPUT VALIDATION COMPREHENSIVE: ✅ Invalid date format rejection (422 error), ✅ Negative weight rejection (422 error), ✅ Duplicate symbol rejection (422 error), ✅ Empty components rejection (422 error), ✅ Date range validation working, ✅ Query parameter format validation working. SAMPLE PAYLOAD TESTING: Successfully processed exact specification payload with 6 components (USDT 72.5%, USDC 21.8%, DAI 4.4%, TUSD 0.4%, FRAX 0.7%, USDP 0.2%) with corresponding RAY values, producing accurate SYI calculation. TECHNICAL FIXES APPLIED: Fixed Pydantic v2 compatibility issues (regex → pattern), corrected Query parameter aliases for history endpoint. MINOR ISSUE: Date range validation returns HTTP 500 instead of 422 for invalid ranges (non-critical). CONCLUSION: SYI calculation system is COMPLETE, FULLY OPERATIONAL, and PRODUCTION-READY with accurate weighted average methodology, comprehensive input validation, and all 6 API endpoints working correctly. System ready for institutional deployment with precise SYI calculations matching specification requirements."
+        - working: false
+          agent: "testing"
+          comment: "❌ CRITICAL FRONTEND INTEGRATION ISSUE - NEW SYI SYSTEM NOT INTEGRATED WITH FRONTEND COMPONENTS. BACKEND VERIFICATION: ✅ New SYI backend system fully operational (GET /api/syi/current returns 4.47448%, GET /api/syi/health returns healthy status), ✅ All 6 SYI endpoints working correctly with accurate calculations. FRONTEND INTEGRATION TESTING RESULTS: ❌ LiveIndexTicker.js NOT integrated - still uses /api/v1/index-family/overview instead of /api/syi/current, displays 3.3733% instead of new SYI value 4.47448%, ❌ IndexFamilyOverview.js NOT integrated - SY100 index does not use new SYI calculation system, ❌ IndexDashboardPage.js NOT integrated - uses legacy /api/index/current instead of new SYI endpoints, ❌ NO NEW SYI API CALLS - Frontend makes 0 calls to /api/syi/* endpoints, only legacy endpoints called (8 total: /api/v1/index-family/overview, /api/index/current, etc.). DATA FLOW VERIFICATION: ❌ New SYI value (4.47448%) NOT displayed anywhere in frontend, ❌ Frontend shows old values (3.3733%) from legacy system, ✅ Constituents table and RAY columns working with legacy data. INTEGRATION REQUIREMENTS: Frontend components need updates to call /api/syi/current, display new SYI values, integrate SY100 with new calculation system. CONCLUSION: New SYI backend system is production-ready but frontend integration is MISSING. Critical updates needed to LiveIndexTicker.js, IndexFamilyOverview.js, and IndexDashboardPage.js to complete SYI system integration."
+
+  - task: "SYI Frontend Integration - LiveIndexTicker Component"
+    implemented: false
+    working: false
+    file: "/app/frontend/src/components/LiveIndexTicker.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: false
+          agent: "testing"
+          comment: "❌ LiveIndexTicker component NOT integrated with new SYI system. Currently uses /api/v1/index-family/overview endpoint and displays 3.3733% instead of expected 4.47448% from new SYI calculation. Component needs to be updated to call /api/syi/current endpoint to display accurate SYI data from new calculation system."
+
+  - task: "SYI Frontend Integration - IndexFamilyOverview Component"
+    implemented: false
+    working: false
+    file: "/app/frontend/src/components/IndexFamilyOverview.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: false
+          agent: "testing"
+          comment: "❌ IndexFamilyOverview component NOT integrated with new SYI system. SY100 index does not use new SYI calculation methodology. Component uses legacy /api/v1/index-family/overview and /api/v1/index-family/calculate endpoints. SY100 index should integrate with new SYI system to display updated values using new calculation methodology."
+
+  - task: "SYI Frontend Integration - IndexDashboardPage Component"
+    implemented: false
+    working: false
+    file: "/app/frontend/src/pages/IndexDashboardPage.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: false
+          agent: "testing"
+          comment: "❌ IndexDashboardPage NOT integrated with new SYI system. Uses legacy endpoints (/api/index/current, /api/index/constituents, /api/index/statistics) instead of new SYI endpoints. Dashboard does not display new SYI values (4.47448%) and shows old data. Needs integration with /api/syi/current and other SYI endpoints to display updated index values."
         - working: true
           agent: "testing"
           comment: "✅ ENHANCED RISK MANAGEMENT SYSTEM (STEP 14) COMPREHENSIVE TESTING COMPLETE - 85.7% SUCCESS RATE (18/21 tests passed). STEP 14 RISK MANAGEMENT VERIFICATION: ✅ Risk Management Start (10 advanced features, 5 service integrations), ✅ Risk Management Metrics (VaR 95%: 155.42, VaR 99%: 219.82, Concentration: 100%, Risk Level: High), ✅ Risk Management Stress Test (Peg break impact: 0.0%, Severity: Low, Resilience: 100.0), ✅ Risk Management Compliance (Score: 33.3%, 1/3 checks passed, 4 regulatory frameworks), ✅ Risk Management Integration (5/5 services connected), ✅ Risk Management Summary (1 monitored portfolio, 5 scenarios, 4 endpoints). STEP 13 AI PORTFOLIO CONTINUED FUNCTIONALITY: ✅ All Step 13 features remain operational after Step 14 integration, ✅ AI Portfolio Status (8 capabilities, 5 strategies), ✅ AI Portfolio Create (production-ready constraints), ✅ Market Sentiment Analysis (3 symbols analyzed), ✅ Market Regime Detection (low volatility), ✅ AI Insights generation, ✅ Integration verification (5/5 services). STEP 13-14 INTEGRATION SUCCESS: ✅ Both services operational and integrated, ✅ Portfolio data sharing working, ✅ Risk metrics calculated for AI portfolios, ✅ Stress testing functional, ✅ Compliance monitoring active. PRODUCTION FEATURES: Real-time risk monitoring with 60-second intervals, VaR calculations with 95%/99% confidence levels, Expected Shortfall analysis, 5 stress testing scenarios (peg break, DeFi crisis, liquidity crisis, regulatory shock, black swan), Regulatory compliance with Basel III/UCITS/AIFMD/MiFID II, Automated alert generation, Dynamic risk limits, Portfolio integration with Trading Engine. MINOR ISSUES: Risk Management Status API response format (missing fields), Rebalancing execution (no signals generated due to conditions not met). CONCLUSION: Step 14 Enhanced Risk Management system is COMPLETE and FULLY OPERATIONAL with comprehensive integration with Step 13 AI Portfolio Management. Both systems working in harmony providing institutional-grade portfolio management with advanced risk monitoring capabilities."
