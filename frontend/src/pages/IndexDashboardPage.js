@@ -123,6 +123,7 @@ const IndexDashboardPage = () => {
             current_apy: finalYield, // For table display
             risk_tier: finalRisk,
             source: yieldInfo ? yieldInfo.source : 'Market Data',
+            protocol: yieldInfo ? yieldInfo.source : constituent.name || `${constituent.symbol} Protocol`, // For protocol display
             liquidity: yieldInfo ? yieldInfo.liquidity : null,
             // Calculate RAY (Risk-Adjusted Yield)
             ray: finalYield * riskMultiplier,
