@@ -3,6 +3,7 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import SEOHead from "../components/SEOHead";
 import IndexFamilyOverview from "../components/IndexFamilyOverview";
+import PegStatusWidget from "../components/PegStatusWidget";
 import ContactModal from "../components/ContactModal";
 import WhitepaperDownloadModal from "../components/WhitepaperDownloadModal";
 import LiveIndexTicker from "../components/LiveIndexTicker";
