@@ -41,8 +41,8 @@ const IndexFamilyOverview = () => {
           return 'http://localhost:8001';
         }
         
-        // Use same protocol and hostname as current page
-        const protocol = window.location.protocol; // Keeps https: if served over HTTPS
+        // Always use HTTPS in production
+        const protocol = window.location.protocol === 'https:' ? 'https:' : window.location.protocol;
         const hostname = window.location.hostname;
         return `${protocol}//${hostname}`;
       };
