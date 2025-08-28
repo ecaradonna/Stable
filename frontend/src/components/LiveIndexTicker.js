@@ -55,7 +55,7 @@ const LiveIndexTicker = () => {
     // Initial fetch
     fetchIndexData();
     
-    // Set up polling every 30 seconds (for demo, in production use WebSocket)
+    // Set up polling every 30 seconds for real-time updates
     const interval = setInterval(fetchIndexData, 30000);
     
     return () => clearInterval(interval);
