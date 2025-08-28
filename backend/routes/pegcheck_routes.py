@@ -11,8 +11,8 @@ import sys
 import os
 
 # Add pegcheck to Python path
-backend_dir = os.path.dirname(os.path.dirname(__file__))  # /app/backend -> /app
-app_dir = os.path.dirname(backend_dir)  # /app/backend -> /app
+backend_dir = os.path.dirname(os.path.dirname(__file__))  # /app/backend
+app_dir = os.path.dirname(backend_dir)  # /app
 pegcheck_path = os.path.join(app_dir, 'pegcheck')
 if app_dir not in sys.path:
     sys.path.append(app_dir)
