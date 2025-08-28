@@ -5713,6 +5713,19 @@ class StableYieldTester:
         await self.test_binance_api_integration()
         await self.check_backend_logs_for_binance()
         
+        # Coinbase API Integration Tests (NEW)
+        print("\n🏦 Testing Coinbase API Integration...")
+        await self.test_coinbase_status()
+        await self.test_coinbase_yield_data()
+        await self.test_coinbase_cefi_index()
+        await self.test_coinbase_refresh()
+        await self.test_coinbase_health()
+        await self.test_index_family_calculate_with_coinbase()
+        await self.test_index_family_sycefi_value()
+        await self.test_index_family_overview_coinbase()
+        await self.test_coinbase_data_quality_validation()
+        await self.test_coinbase_error_handling()
+        
         # User management tests
         print("\n👥 Testing User Management APIs...")
         await self.test_user_waitlist()
