@@ -7,6 +7,8 @@ from fastapi import APIRouter, HTTPException, Query, Depends
 from datetime import datetime, date
 from typing import List, Dict, Any, Optional
 import logging
+import os
+from motor.motor_asyncio import AsyncIOMotorClient
 
 from services.risk_regime_service import (
     get_risk_regime_service, 
@@ -19,7 +21,11 @@ from models.regime_models import (
     RegimeHistoryResponse, RegimeHealthResponse, RegimeStatsResponse,
     RegimeState, AlertType, AlertLevel
 )
-from database import db
+
+# MongoDB connection
+mongo_url = os.environ['MONGO_URL']
+client = AsyncIOMotorClient(mongo_url)
+db = client[os.environ['DB_NAME']]
 
 router = APIRouter(prefix="/api/regime", tags=["Risk Regime Detection"])
 logger = logging.getLogger(__name__)
