@@ -117,9 +117,9 @@ backend:
           agent: "main"
   - task: "Comprehensive Peg Monitoring System (PegCheck)"
     implemented: true
-    working: true
+    working: false
     file: "/app/pegcheck/"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
     needs_retesting: false
     status_history:
@@ -132,6 +132,9 @@ backend:
         - working: true
           agent: "testing"
           comment: "✅ PEGCHECK SYSTEM (PHASE 2) COMPREHENSIVE TESTING COMPLETE - 92.3% SUCCESS RATE (12/13 tests passed). PEGCHECK SYSTEM VERIFICATION: ✅ PegCheck Health (Service: available, CoinGecko: 0/2 symbols, CryptoCompare: 2/2 symbols, 8 supported symbols), ✅ Peg Stability Analysis (Major stablecoins: 3 symbols analyzed, 0 depegs, max deviation: 2.0 bps; Extended list: 5 symbols, 2 depegs detected - BUSD: 178.0 bps, FRAX: 3499.0 bps), ✅ Peg Summary (Market health: critical due to 2 depegs, 6 symbols tracked, CryptoCompare coverage: 6/6), ✅ Supported Symbols (8 total: 4 major, 2 algorithmic, 2 other), ✅ Thresholds Configuration (Warning: 25 bps, Depeg: 50 bps, Target: $1.00, Primary: CoinGecko, Secondary: CryptoCompare), ✅ Deviation Calculations (All 3 calculations accurate for USDT, USDC, DAI), ✅ Status Classification (All 4 status classifications correct: normal/depeg thresholds working), ✅ Error Handling (Correctly rejected empty symbols, >10 symbols, handled invalid symbols with null prices). DATA SOURCE INTEGRATION: CryptoCompare API working perfectly with real API key (49c985fa050c7ccc690c410257fdb403b752f38154e4c7e491ae2512029acf19), CoinGecko experiencing intermittent issues but system resilient with single-source fallback. REAL-TIME PEG MONITORING: System detecting actual market conditions - BUSD showing 178 bps deviation (1.78% depeg), FRAX showing 3499 bps deviation (34.99% major depeg), normal stablecoins (USDT, USDC, DAI) within 2 bps of peg. CROSS-SOURCE CONSISTENCY: Source consistency analysis working (USDT: 0.0%, USDC: 0.1%, DAI: 1.9% variance between sources). CONCLUSION: PegCheck system is COMPLETE and FULLY OPERATIONAL with comprehensive peg monitoring, real-time deviation analysis, multi-source data integration, and institutional-grade alerting capabilities. Ready for production deployment."
+        - working: false
+          agent: "testing"
+          comment: "❌ CRITICAL FRONTEND INTEGRATION ISSUE - PEG MONITORING SYSTEM FRONTEND BLOCKED BY MIXED CONTENT SECURITY. TESTING RESULTS: ✅ Navigation elements present (Peg Monitor link in header found), ✅ Frontend components implemented (PegMonitorPage.js, PegStatusWidget.js exist), ✅ UI structure correct (homepage loads, navigation responsive), ❌ MIXED CONTENT SECURITY BLOCKING API CALLS: Frontend served over HTTPS but making HTTP API calls to backend, browser blocking insecure requests, preventing real peg data from loading. ❌ ROUTING ISSUES: /peg-monitor and /index-dashboard routes redirecting to homepage, preventing access to peg monitoring pages. ✅ FALLBACK MECHANISM WORKING: System gracefully falls back to mock data when API calls fail, UI remains functional with demo data. FRONTEND IMPLEMENTATION STATUS: All components properly coded and integrated, professional UI design with proper styling, responsive design working on mobile/desktop, but BLOCKED by security and routing issues. IMMEDIATE FIXES NEEDED: 1) Update backend URL detection to use HTTPS endpoints, 2) Fix React Router configuration for /peg-monitor and /index-dashboard routes, 3) Ensure all API calls use secure HTTPS protocol. CONCLUSION: Frontend implementation is COMPLETE but NON-FUNCTIONAL due to mixed content security and routing issues preventing access to peg monitoring features."
   - task: "Yield Data API Endpoints"
     implemented: true
     working: true
