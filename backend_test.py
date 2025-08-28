@@ -1076,6 +1076,455 @@ class StableYieldTester:
             self.log_test("Parameter Validation Valid Params", False, f"Exception: {str(e)}")
     
     # ========================================
+    # PEGCHECK SYSTEM TESTS (PHASE 2)
+    # ========================================
+    
+    async def test_peg_health_check(self):
+        """Test GET /api/peg/health endpoint"""
+        try:
+            async with self.session.get(f"{API_BASE}/peg/health") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    required_fields = ['service', 'status', 'api_status', 'timestamp']
+                    missing_fields = [field for field in required_fields if field not in data]
+                    
+                    if not missing_fields:
+                        service = data.get('service')
+                        status = data.get('status')
+                        api_status = data.get('api_status', {})
+                        available_symbols = data.get('available_symbols', [])
+                        
+                        if service == 'pegcheck' and status in ['available', 'unavailable']:
+                            if status == 'available':
+                                # Check API status details
+                                cg_status = api_status.get('coingecko', 'unknown')
+                                cc_status = api_status.get('cryptocompare', 'unknown')
+                                
+                                self.log_test("PegCheck Health", True, 
+                                            f"Service: {status}, CoinGecko: {cg_status}, CryptoCompare: {cc_status}, Symbols: {len(available_symbols)}")
+                            else:
+                                self.log_test("PegCheck Health", False, 
+                                            f"PegCheck module unavailable - {api_status.get('error', 'Unknown error')}")
+                        else:
+                            self.log_test("PegCheck Health", False, f"Invalid service response: {data}")
+                    else:
+                        self.log_test("PegCheck Health", False, f"Missing fields: {missing_fields}")
+                else:
+                    self.log_test("PegCheck Health", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("PegCheck Health", False, f"Exception: {str(e)}")
+    
+    async def test_peg_check_stability(self):
+        """Test GET /api/peg/check endpoint with multiple symbols"""
+        test_cases = [
+            ("USDT,USDC,DAI", "Major stablecoins"),
+            ("USDT", "Single symbol"),
+            ("USDT,USDC,DAI,BUSD,FRAX", "Extended list")
+        ]
+        
+        for symbols, description in test_cases:
+            try:
+                async with self.session.get(f"{API_BASE}/peg/check?symbols={symbols}") as response:
+                    if response.status == 200:
+                        data = await response.json()
+                        required_fields = ['success', 'data', 'message', 'timestamp']
+                        missing_fields = [field for field in required_fields if field not in data]
+                        
+                        if not missing_fields and data.get('success'):
+                            analysis_data = data.get('data', {})
+                            analysis = analysis_data.get('analysis', {})
+                            results = analysis_data.get('results', [])
+                            source_consistency = analysis_data.get('source_consistency', {})
+                            
+                            # Validate analysis structure
+                            if 'symbols_analyzed' in analysis and 'depegs_detected' in analysis:
+                                symbols_analyzed = analysis['symbols_analyzed']
+                                depegs_detected = analysis['depegs_detected']
+                                max_deviation = analysis.get('max_deviation_bps', 0)
+                                
+                                # Validate results structure
+                                valid_results = 0
+                                for result in results:
+                                    if all(field in result for field in ['symbol', 'deviation', 'peg_status', 'confidence']):
+                                        valid_results += 1
+                                
+                                if valid_results == len(results):
+                                    self.log_test(f"PegCheck Stability ({description})", True, 
+                                                f"Analyzed {symbols_analyzed} symbols, {depegs_detected} depegs, max deviation: {max_deviation:.1f} bps")
+                                else:
+                                    self.log_test(f"PegCheck Stability ({description})", False, 
+                                                f"Invalid result structure: {valid_results}/{len(results)} valid")
+                            else:
+                                self.log_test(f"PegCheck Stability ({description})", False, 
+                                            f"Missing analysis fields: {analysis}")
+                        else:
+                            self.log_test(f"PegCheck Stability ({description})", False, 
+                                        f"Request failed or missing fields: {missing_fields}")
+                    elif response.status == 503:
+                        self.log_test(f"PegCheck Stability ({description})", False, 
+                                    "PegCheck module not available (503)")
+                    else:
+                        self.log_test(f"PegCheck Stability ({description})", False, f"HTTP {response.status}")
+            except Exception as e:
+                self.log_test(f"PegCheck Stability ({description})", False, f"Exception: {str(e)}")
+    
+    async def test_peg_summary(self):
+        """Test GET /api/peg/summary endpoint"""
+        try:
+            async with self.session.get(f"{API_BASE}/peg/summary") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    required_fields = ['success', 'summary', 'timestamp']
+                    missing_fields = [field for field in required_fields if field not in data]
+                    
+                    if not missing_fields and data.get('success'):
+                        summary = data.get('summary', {})
+                        overview = summary.get('overview', {})
+                        key_metrics = summary.get('key_metrics', {})
+                        alerts = summary.get('alerts', [])
+                        data_quality = summary.get('data_quality', {})
+                        
+                        # Validate overview structure
+                        if 'total_symbols' in overview and 'status_distribution' in overview:
+                            total_symbols = overview['total_symbols']
+                            status_dist = overview['status_distribution']
+                            market_health = overview.get('market_health', 'unknown')
+                            
+                            # Validate key metrics
+                            max_deviation = key_metrics.get('max_deviation_bps', 0)
+                            avg_consistency = key_metrics.get('avg_source_consistency', 0)
+                            
+                            # Validate data quality
+                            cg_coverage = data_quality.get('coingecko_coverage', 0)
+                            cc_coverage = data_quality.get('cryptocompare_coverage', 0)
+                            
+                            self.log_test("PegCheck Summary", True, 
+                                        f"Market: {market_health}, Symbols: {total_symbols}, Max deviation: {max_deviation:.1f} bps, "
+                                        f"CG coverage: {cg_coverage}, CC coverage: {cc_coverage}, Alerts: {len(alerts)}")
+                        else:
+                            self.log_test("PegCheck Summary", False, f"Invalid summary structure: {summary}")
+                    else:
+                        self.log_test("PegCheck Summary", False, f"Request failed or missing fields: {missing_fields}")
+                elif response.status == 503:
+                    self.log_test("PegCheck Summary", False, "PegCheck module not available (503)")
+                else:
+                    self.log_test("PegCheck Summary", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("PegCheck Summary", False, f"Exception: {str(e)}")
+    
+    async def test_peg_supported_symbols(self):
+        """Test GET /api/peg/symbols endpoint"""
+        try:
+            async with self.session.get(f"{API_BASE}/peg/symbols") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    required_fields = ['supported_symbols', 'total_count', 'categories']
+                    missing_fields = [field for field in required_fields if field not in data]
+                    
+                    if not missing_fields:
+                        symbols = data.get('supported_symbols', [])
+                        total_count = data.get('total_count', 0)
+                        categories = data.get('categories', {})
+                        
+                        # Validate expected symbols are present
+                        expected_symbols = ['USDT', 'USDC', 'DAI', 'BUSD']
+                        found_symbols = [s for s in expected_symbols if s in symbols]
+                        
+                        if len(found_symbols) >= 3 and total_count > 0:
+                            major = categories.get('major', [])
+                            algorithmic = categories.get('algorithmic', [])
+                            other = categories.get('other', [])
+                            
+                            self.log_test("PegCheck Supported Symbols", True, 
+                                        f"Total: {total_count}, Major: {len(major)}, Algorithmic: {len(algorithmic)}, Other: {len(other)}")
+                        else:
+                            self.log_test("PegCheck Supported Symbols", False, 
+                                        f"Missing expected symbols. Found: {found_symbols}")
+                    else:
+                        self.log_test("PegCheck Supported Symbols", False, f"Missing fields: {missing_fields}")
+                elif response.status == 503:
+                    self.log_test("PegCheck Supported Symbols", False, "PegCheck module not available (503)")
+                else:
+                    self.log_test("PegCheck Supported Symbols", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("PegCheck Supported Symbols", False, f"Exception: {str(e)}")
+    
+    async def test_peg_thresholds(self):
+        """Test GET /api/peg/thresholds endpoint"""
+        try:
+            async with self.session.get(f"{API_BASE}/peg/thresholds") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    
+                    if 'thresholds' in data and 'methodology' in data:
+                        thresholds = data.get('thresholds', {})
+                        methodology = data.get('methodology', {})
+                        
+                        # Validate threshold structure
+                        warning = thresholds.get('warning', {})
+                        depeg = thresholds.get('depeg', {})
+                        
+                        if 'basis_points' in warning and 'basis_points' in depeg:
+                            warning_bps = warning['basis_points']
+                            depeg_bps = depeg['basis_points']
+                            
+                            # Validate expected threshold values (25 bps warning, 50 bps depeg)
+                            if warning_bps == 25 and depeg_bps == 50:
+                                target_price = methodology.get('target_price', 0)
+                                primary_source = methodology.get('primary_source', '')
+                                secondary_source = methodology.get('secondary_source', '')
+                                
+                                self.log_test("PegCheck Thresholds", True, 
+                                            f"Warning: {warning_bps} bps, Depeg: {depeg_bps} bps, "
+                                            f"Target: ${target_price}, Primary: {primary_source}, Secondary: {secondary_source}")
+                            else:
+                                self.log_test("PegCheck Thresholds", False, 
+                                            f"Unexpected threshold values - Warning: {warning_bps} bps, Depeg: {depeg_bps} bps")
+                        else:
+                            self.log_test("PegCheck Thresholds", False, f"Missing threshold basis_points: {thresholds}")
+                    elif 'error' in data:
+                        self.log_test("PegCheck Thresholds", False, f"PegCheck error: {data['error']}")
+                    else:
+                        self.log_test("PegCheck Thresholds", False, f"Invalid response structure: {data}")
+                else:
+                    self.log_test("PegCheck Thresholds", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("PegCheck Thresholds", False, f"Exception: {str(e)}")
+    
+    async def test_peg_data_source_integration(self):
+        """Test data source integration quality"""
+        try:
+            # Test with a known stable symbol to verify data quality
+            async with self.session.get(f"{API_BASE}/peg/check?symbols=USDC") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    
+                    if data.get('success') and 'data' in data:
+                        analysis_data = data['data']
+                        results = analysis_data.get('results', [])
+                        source_consistency = analysis_data.get('source_consistency', {})
+                        
+                        if results:
+                            result = results[0]  # USDC result
+                            symbol = result.get('symbol')
+                            price_usd = result.get('price_usd')
+                            deviation = result.get('deviation', {})
+                            peg_status = result.get('peg_status')
+                            confidence = result.get('confidence', 0)
+                            sources_used = result.get('sources_used', [])
+                            source_prices = result.get('source_prices', {})
+                            
+                            # Validate data quality
+                            if symbol == 'USDC' and price_usd is not None:
+                                bps_diff = deviation.get('basis_points')
+                                cg_price = source_prices.get('coingecko')
+                                cc_price = source_prices.get('cryptocompare')
+                                
+                                # Check if prices are realistic (between $0.95 and $1.05)
+                                realistic_price = 0.95 <= price_usd <= 1.05 if price_usd else False
+                                has_multiple_sources = len(sources_used) >= 2
+                                
+                                if realistic_price and has_multiple_sources:
+                                    consistency = source_consistency.get('USDC', float('nan'))
+                                    consistency_str = f"{consistency:.3f}%" if consistency == consistency else "N/A"
+                                    
+                                    self.log_test("PegCheck Data Source Integration", True, 
+                                                f"USDC: ${price_usd:.6f}, {bps_diff:.1f} bps, Status: {peg_status}, "
+                                                f"Sources: {len(sources_used)}, Consistency: {consistency_str}, Confidence: {confidence:.2f}")
+                                else:
+                                    issues = []
+                                    if not realistic_price:
+                                        issues.append(f"unrealistic price: ${price_usd}")
+                                    if not has_multiple_sources:
+                                        issues.append(f"insufficient sources: {sources_used}")
+                                    
+                                    self.log_test("PegCheck Data Source Integration", False, 
+                                                f"Data quality issues: {', '.join(issues)}")
+                            else:
+                                self.log_test("PegCheck Data Source Integration", False, 
+                                            f"Invalid result structure for USDC: {result}")
+                        else:
+                            self.log_test("PegCheck Data Source Integration", False, "No results returned")
+                    else:
+                        self.log_test("PegCheck Data Source Integration", False, f"Request failed: {data}")
+                elif response.status == 503:
+                    self.log_test("PegCheck Data Source Integration", False, "PegCheck module not available (503)")
+                else:
+                    self.log_test("PegCheck Data Source Integration", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("PegCheck Data Source Integration", False, f"Exception: {str(e)}")
+    
+    async def test_peg_deviation_calculations(self):
+        """Test accuracy of peg deviation calculations"""
+        try:
+            # Test with multiple symbols to verify calculation accuracy
+            async with self.session.get(f"{API_BASE}/peg/check?symbols=USDT,USDC,DAI") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    
+                    if data.get('success') and 'data' in data:
+                        results = data['data'].get('results', [])
+                        
+                        calculation_tests = []
+                        for result in results:
+                            symbol = result.get('symbol')
+                            price_usd = result.get('price_usd')
+                            deviation = result.get('deviation', {})
+                            
+                            if price_usd is not None and price_usd > 0:
+                                # Verify calculation accuracy
+                                abs_diff = deviation.get('absolute')
+                                pct_diff = deviation.get('percentage')
+                                bps_diff = deviation.get('basis_points')
+                                
+                                # Calculate expected values
+                                expected_abs = abs(price_usd - 1.0)
+                                expected_pct = expected_abs / 1.0 * 100
+                                expected_bps = expected_pct * 100
+                                
+                                # Check if calculations are accurate (within 0.1% tolerance)
+                                abs_accurate = abs(abs_diff - expected_abs) < 0.001 if abs_diff is not None else False
+                                pct_accurate = abs(pct_diff - expected_pct) < 0.01 if pct_diff is not None else False
+                                bps_accurate = abs(bps_diff - expected_bps) < 1.0 if bps_diff is not None else False
+                                
+                                if abs_accurate and pct_accurate and bps_accurate:
+                                    calculation_tests.append(f"{symbol}: ✓")
+                                else:
+                                    calculation_tests.append(f"{symbol}: ✗ (abs:{abs_accurate}, pct:{pct_accurate}, bps:{bps_accurate})")
+                        
+                        if calculation_tests:
+                            accurate_count = sum(1 for test in calculation_tests if "✓" in test)
+                            total_count = len(calculation_tests)
+                            
+                            if accurate_count == total_count:
+                                self.log_test("PegCheck Deviation Calculations", True, 
+                                            f"All {total_count} calculations accurate: {', '.join(calculation_tests)}")
+                            else:
+                                self.log_test("PegCheck Deviation Calculations", False, 
+                                            f"Calculation errors: {', '.join(calculation_tests)}")
+                        else:
+                            self.log_test("PegCheck Deviation Calculations", False, "No valid price data for calculations")
+                    else:
+                        self.log_test("PegCheck Deviation Calculations", False, f"Request failed: {data}")
+                elif response.status == 503:
+                    self.log_test("PegCheck Deviation Calculations", False, "PegCheck module not available (503)")
+                else:
+                    self.log_test("PegCheck Deviation Calculations", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("PegCheck Deviation Calculations", False, f"Exception: {str(e)}")
+    
+    async def test_peg_status_classification(self):
+        """Test peg status classification (normal/warning/depeg)"""
+        try:
+            # Test with multiple symbols to check status classification
+            async with self.session.get(f"{API_BASE}/peg/check?symbols=USDT,USDC,DAI,BUSD") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    
+                    if data.get('success') and 'data' in data:
+                        results = data['data'].get('results', [])
+                        config = data['data'].get('configuration', {})
+                        
+                        # Get threshold values
+                        warning_threshold = config.get('warning_threshold_bps', 25)
+                        depeg_threshold = config.get('depeg_threshold_bps', 50)
+                        
+                        status_tests = []
+                        for result in results:
+                            symbol = result.get('symbol')
+                            bps_diff = result.get('deviation', {}).get('basis_points')
+                            peg_status = result.get('peg_status')
+                            is_depegged = result.get('is_depegged', False)
+                            
+                            if bps_diff is not None and peg_status:
+                                # Verify status classification logic
+                                expected_status = "normal"
+                                expected_depeg = False
+                                
+                                if bps_diff >= depeg_threshold:
+                                    expected_status = "depeg"
+                                    expected_depeg = True
+                                elif bps_diff >= warning_threshold:
+                                    expected_status = "warning"
+                                    expected_depeg = False
+                                
+                                status_correct = peg_status == expected_status
+                                depeg_correct = is_depegged == expected_depeg
+                                
+                                if status_correct and depeg_correct:
+                                    status_tests.append(f"{symbol}: {peg_status} ({bps_diff:.1f} bps) ✓")
+                                else:
+                                    status_tests.append(f"{symbol}: {peg_status} vs {expected_status} ({bps_diff:.1f} bps) ✗")
+                        
+                        if status_tests:
+                            correct_count = sum(1 for test in status_tests if "✓" in test)
+                            total_count = len(status_tests)
+                            
+                            if correct_count == total_count:
+                                self.log_test("PegCheck Status Classification", True, 
+                                            f"All {total_count} status classifications correct: {', '.join(status_tests)}")
+                            else:
+                                self.log_test("PegCheck Status Classification", False, 
+                                            f"Classification errors: {', '.join(status_tests)}")
+                        else:
+                            self.log_test("PegCheck Status Classification", False, "No valid data for status classification")
+                    else:
+                        self.log_test("PegCheck Status Classification", False, f"Request failed: {data}")
+                elif response.status == 503:
+                    self.log_test("PegCheck Status Classification", False, "PegCheck module not available (503)")
+                else:
+                    self.log_test("PegCheck Status Classification", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("PegCheck Status Classification", False, f"Exception: {str(e)}")
+    
+    async def test_peg_error_handling(self):
+        """Test error handling for invalid symbols and API failures"""
+        test_cases = [
+            ("INVALID_SYMBOL", "Invalid symbol"),
+            ("", "Empty symbols"),
+            ("USDT,USDC,DAI,BUSD,FRAX,USDP,TUSD,PYUSD,INVALID1,INVALID2,INVALID3", "Too many symbols (>10)")
+        ]
+        
+        for symbols, description in test_cases:
+            try:
+                async with self.session.get(f"{API_BASE}/peg/check?symbols={symbols}") as response:
+                    if symbols == "":
+                        # Empty symbols should return 400
+                        if response.status == 400:
+                            self.log_test(f"PegCheck Error Handling ({description})", True, "Correctly rejected empty symbols")
+                        else:
+                            self.log_test(f"PegCheck Error Handling ({description})", False, f"Expected 400, got {response.status}")
+                    elif len(symbols.split(',')) > 10:
+                        # Too many symbols should return 400
+                        if response.status == 400:
+                            self.log_test(f"PegCheck Error Handling ({description})", True, "Correctly rejected >10 symbols")
+                        else:
+                            self.log_test(f"PegCheck Error Handling ({description})", False, f"Expected 400, got {response.status}")
+                    else:
+                        # Invalid symbols should still return 200 but with NaN values
+                        if response.status == 200:
+                            data = await response.json()
+                            if data.get('success'):
+                                results = data.get('data', {}).get('results', [])
+                                if results:
+                                    result = results[0]
+                                    price = result.get('price_usd')
+                                    if price is None:  # NaN values should be None in JSON
+                                        self.log_test(f"PegCheck Error Handling ({description})", True, "Correctly handled invalid symbol with null price")
+                                    else:
+                                        self.log_test(f"PegCheck Error Handling ({description})", False, f"Expected null price, got {price}")
+                                else:
+                                    self.log_test(f"PegCheck Error Handling ({description})", False, "No results returned")
+                            else:
+                                self.log_test(f"PegCheck Error Handling ({description})", False, f"Request failed: {data}")
+                        elif response.status == 503:
+                            self.log_test(f"PegCheck Error Handling ({description})", False, "PegCheck module not available (503)")
+                        else:
+                            self.log_test(f"PegCheck Error Handling ({description})", False, f"HTTP {response.status}")
+            except Exception as e:
+                self.log_test(f"PegCheck Error Handling ({description})", False, f"Exception: {str(e)}")
+
+    # ========================================
     # COINBASE API INTEGRATION TESTS
     # ========================================
     
