@@ -167,7 +167,7 @@ const IndexDashboardPage = () => {
               avg_yield: avgYield * 100, // Convert to percentage - using correct property name
               total_tvl: totalTvl,
               total_constituents: totalConstituents,
-              avg_volatility: 0.023, // 2.3% in decimal format
+              avg_volatility: calculateWeightedVolatility(allIndices), // Calculate realistic volatility
               updated_at: indexFamilyData.data.date
             };
             
