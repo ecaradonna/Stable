@@ -120,11 +120,13 @@ const IndexDashboardPage = () => {
             ...constituent,
             // Use fresh yield data if available, otherwise intelligent fallback
             raw_apy: finalYield,
+            current_apy: finalYield, // For table display
             risk_tier: finalRisk,
             source: yieldInfo ? yieldInfo.source : 'Market Data',
             liquidity: yieldInfo ? yieldInfo.liquidity : null,
             // Calculate RAY (Risk-Adjusted Yield)
             ray: finalYield * riskMultiplier,
+            ry_apy: finalYield * riskMultiplier, // For table display
             // Add data freshness indicator
             data_source: yieldInfo ? 'live' : 'estimated'
           };
