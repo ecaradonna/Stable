@@ -240,7 +240,7 @@ const MethodologyPage = () => {
         {/* Footer CTA */}
         <section className="py-16">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center bg-gradient-to-br from-[#4CC1E9]/5 to-[#007A99]/5 rounded-2xl p-12 border border-[#4CC1E9]/20">
+            <div className="text-center bg-gradient-to-br from-[#1F4FFF]/5 to-[#E47C3C]/5 rounded-2xl p-12 border border-[#1F4FFF]/20">
               <h3 className="text-3xl font-bold text-[#0E1A2B] mb-4">
                 Ready to Use Professional-Grade Data?
               </h3>
@@ -250,10 +250,17 @@ const MethodologyPage = () => {
               </p>
               <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4">
                 <Button 
-                  className="bg-gradient-to-r from-[#4CC1E9] to-[#007A99] text-white px-6 py-3 text-lg font-semibold"
+                  className="bg-[#E47C3C] hover:bg-[#E47C3C]/90 text-white px-6 py-3 text-lg font-semibold rounded-xl"
                   onClick={() => setIsContactOpen(true)}
                 >
                   Contact for Enterprise Access
+                </Button>
+                <Button 
+                  variant="outline"
+                  className="border-[#1F4FFF] text-[#1F4FFF] hover:bg-[#1F4FFF] hover:text-white px-6 py-3 text-lg font-semibold rounded-xl"
+                  onClick={() => setIsWhitepaperOpen(true)}
+                >
+                  Download Methodology Paper
                 </Button>
               </div>
             </div>
