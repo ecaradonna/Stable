@@ -357,11 +357,11 @@ const ApiDocumentationPage = () => {
             
             <div className="grid md:grid-cols-3 gap-8">
               {pricingPlans.map((plan, index) => (
-                <Card key={index} className={`relative ${plan.popular ? 'ring-2 ring-[#4CC1E9] scale-105' : ''} hover:shadow-lg transition-all`}>
+                <Card key={index} className={`relative ${plan.popular ? 'ring-2 ring-[#E47C3C] scale-105' : ''} hover:shadow-lg transition-all`}>
                   {plan.popular && (
                     <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                      <Badge className="bg-gradient-to-r from-[#4CC1E9] to-[#007A99] text-white">
-                        Most Popular
+                      <Badge className="bg-[#E47C3C] text-white px-4 py-1 font-semibold">
+                        {plan.badge || "Most Popular"}
                       </Badge>
                     </div>
                   )}
@@ -373,13 +373,13 @@ const ApiDocumentationPage = () => {
                     <ul className="space-y-3 mb-6">
                       {plan.features.map((feature, featureIndex) => (
                         <li key={featureIndex} className="flex items-center">
-                          <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
+                          <CheckCircle className="w-4 h-4 text-[#1F4FFF] mr-2" />
                           <span className="text-gray-600">{feature}</span>
                         </li>
                       ))}
                     </ul>
                     <Button 
-                      className={`w-full ${plan.popular ? 'bg-gradient-to-r from-[#4CC1E9] to-[#007A99] text-white' : 'border border-[#4CC1E9] text-[#4CC1E9] hover:bg-[#4CC1E9] hover:text-white'}`}
+                      className={`w-full ${plan.popular ? 'bg-[#E47C3C] hover:bg-[#E47C3C]/90 text-white' : 'border border-[#1F4FFF] text-[#1F4FFF] hover:bg-[#1F4FFF] hover:text-white'}`}
                       variant={plan.popular ? "default" : "outline"}
                       onClick={() => setShowRequestForm(true)}
                     >
