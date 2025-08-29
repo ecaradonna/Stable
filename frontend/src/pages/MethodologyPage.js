@@ -177,12 +177,12 @@ const MethodologyPage = () => {
                   <CardHeader>
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-xl text-[#0E1A2B]">{index.name}</CardTitle>
-                      <Badge className="bg-[#4CC1E9]/10 text-[#4CC1E9]">Live</Badge>
+                      <Badge className="bg-[#1F4FFF]/10 text-[#1F4FFF] border-[#1F4FFF]/20">Live</Badge>
                     </div>
                   </CardHeader>
                   <CardContent>
                     <p className="text-gray-600 mb-4">{index.description}</p>
-                    <div className="bg-[#4CC1E9]/5 rounded-lg p-3">
+                    <div className="bg-[#1F4FFF]/5 rounded-lg p-3 border border-[#1F4FFF]/10">
                       <h4 className="font-semibold text-[#0E1A2B] mb-1">Methodology:</h4>
                       <p className="text-sm text-gray-700">{index.methodology}</p>
                     </div>
