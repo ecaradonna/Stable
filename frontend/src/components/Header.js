@@ -4,6 +4,20 @@ import { Button } from "./ui/button";
 import { FileText } from "lucide-react";
 
 const Header = ({ onJoinWaitlist, onDownloadWhitepaper }) => {
+  const location = useLocation();
+  
+  const isActivePage = (path) => {
+    return location.pathname === path;
+  };
+  
+  const getLinkClassName = (path) => {
+    const baseClasses = "transition-colors font-medium px-3 py-2 rounded-md";
+    if (isActivePage(path)) {
+      return `${baseClasses} text-[#0E1A2B] bg-gray-100 font-semibold`;
+    }
+    return `${baseClasses} text-[#0E1A2B] hover:text-[#2E6049] hover:bg-gray-50`;
+  };
+
   return (
     <header className="sticky top-0 bg-white/95 backdrop-blur-sm border-b border-gray-100 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
