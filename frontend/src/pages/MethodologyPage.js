@@ -196,7 +196,7 @@ const MethodologyPage = () => {
         {/* Quality Assurance */}
         <section className="py-16">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="bg-gradient-to-r from-[#0E1A2B] to-[#2E6049] rounded-2xl p-8 md:p-12 text-white">
+            <div className="bg-gradient-to-r from-[#1F4FFF] to-[#0E1A2B] rounded-2xl p-8 md:p-12 text-white">
               <div className="text-center mb-8">
                 <h2 className="text-3xl font-bold mb-4">Quality Assurance & Monitoring</h2>
                 <p className="text-xl opacity-90">Institutional-grade data validation and reliability</p>
@@ -204,7 +204,7 @@ const MethodologyPage = () => {
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6">
-                  <Target className="w-8 h-8 text-[#4CC1E9] mb-4" />
+                  <Target className="w-8 h-8 text-[#E47C3C] mb-4" />
                   <h3 className="font-bold mb-2">Data Quality</h3>
                   <ul className="text-sm opacity-90 space-y-1">
                     <li>• Outlier detection and filtering</li>
@@ -214,7 +214,7 @@ const MethodologyPage = () => {
                 </div>
                 
                 <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6">
-                  <Shield className="w-8 h-8 text-[#4CC1E9] mb-4" />
+                  <Shield className="w-8 h-8 text-[#E47C3C] mb-4" />
                   <h3 className="font-bold mb-2">Risk Management</h3>
                   <ul className="text-sm opacity-90 space-y-1">
                     <li>• Peg deviation alerts (&gt;50 bps)</li>
@@ -224,7 +224,7 @@ const MethodologyPage = () => {
                 </div>
                 
                 <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6">
-                  <BarChart3 className="w-8 h-8 text-[#4CC1E9] mb-4" />
+                  <BarChart3 className="w-8 h-8 text-[#E47C3C] mb-4" />
                   <h3 className="font-bold mb-2">Performance SLOs</h3>
                   <ul className="text-sm opacity-90 space-y-1">
                     <li>• P95 latency &lt;5 seconds</li>
