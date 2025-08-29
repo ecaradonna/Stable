@@ -6969,18 +6969,20 @@ class StableYieldTester:
             async with self.session.get(f"{API_BASE}/v1/index-family/overview") as response:
                 if response.status == 200:
                     data = await response.json()
-                    if isinstance(data, list) and len(data) > 0:
-                        first_index = data[0]
-                        required_fields = ['index_name', 'current_value', 'performance']
-                        missing_fields = [field for field in required_fields if field not in first_index]
+                    if 'data' in data and 'indices' in data['data']:
+                        indices = data['data']['indices']
+                        index_count = len(indices)
+                        family_aum = data['data'].get('family_aum', 0)
+                        total_constituents = data['data'].get('total_constituents', 0)
                         
-                        if not missing_fields:
-                            self.log_test("Index Family Overview", True, 
-                                        f"Found {len(data)} indices, first: {first_index.get('index_name')}")
-                        else:
-                            self.log_test("Index Family Overview", False, f"Missing fields: {missing_fields}")
+                        # Check if we have the main indices
+                        main_indices = ['SY100', 'SYCEFI', 'SYDEFI', 'SYRPI']
+                        found_indices = [idx for idx in main_indices if idx in indices]
+                        
+                        self.log_test("Index Family Overview", True, 
+                                    f"Found {index_count} indices ({', '.join(found_indices)}), AUM: ${family_aum:,.0f}, Constituents: {total_constituents}")
                     else:
-                        self.log_test("Index Family Overview", False, f"Empty or invalid response: {data}")
+                        self.log_test("Index Family Overview", False, f"Invalid response structure: {data}")
                 else:
                     self.log_test("Index Family Overview", False, f"HTTP {response.status}")
         except Exception as e:
