@@ -338,21 +338,78 @@ const PegMonitorPage = () => {
                     <span>Peg Deviation History</span>
                   </CardTitle>
                   <div className="flex items-center space-x-2">
-                    <Button variant="outline" size="sm">1H</Button>
-                    <Button variant="outline" size="sm">24H</Button>
-                    <Button variant="outline" size="sm" className="bg-[#1F4FFF] text-white">7D</Button>
-                    <Button variant="outline" size="sm">30D</Button>
+                    {['1H', '24H', '7D', '30D'].map((timeframe) => (
+                      <Button 
+                        key={timeframe}
+                        variant="outline" 
+                        size="sm"
+                        className={chartTimeframe === timeframe ? "bg-[#1F4FFF] text-white" : ""}
+                        onClick={() => setChartTimeframe(timeframe)}
+                      >
+                        {timeframe}
+                      </Button>
+                    ))}
                   </div>
                 </div>
               </CardHeader>
               <CardContent>
-                {/* Placeholder for chart */}
-                <div className="h-64 bg-gradient-to-br from-[#1F4FFF]/5 to-[#9FA6B2]/5 rounded-lg flex items-center justify-center border border-gray-100">
-                  <div className="text-center">
-                    <BarChart3 className="w-12 h-12 text-[#9FA6B2] mx-auto mb-4" />
-                    <div className="text-[#9FA6B2] font-medium">Interactive Peg Chart</div>
-                    <div className="text-sm text-gray-500 mt-1">Real-time deviation tracking across time periods</div>
-                  </div>
+                <div className="h-64">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={chartData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                      <XAxis 
+                        dataKey="time" 
+                        stroke="#9FA6B2"
+                        fontSize={12}
+                      />
+                      <YAxis 
+                        stroke="#9FA6B2"
+                        fontSize={12}
+                        domain={['dataMin - 5', 'dataMax + 5']}
+                        tickFormatter={(value) => `${value}bps`}
+                      />
+                      <Tooltip 
+                        contentStyle={{
+                          backgroundColor: 'white',
+                          border: '1px solid #e5e7eb',
+                          borderRadius: '8px'
+                        }}
+                        formatter={(value, name) => [`${value.toFixed(2)}bps`, name]}
+                      />
+                      <ReferenceLine y={0} stroke="#9FA6B2" strokeDasharray="2 2" />
+                      <ReferenceLine y={50} stroke="#D64545" strokeDasharray="2 2" label="Depeg Threshold" />
+                      <ReferenceLine y={-50} stroke="#D64545" strokeDasharray="2 2" />
+                      
+                      <Line 
+                        type="monotone" 
+                        dataKey="USDT" 
+                        stroke="#1F4FFF" 
+                        strokeWidth={2}
+                        dot={{ fill: '#1F4FFF', r: 2 }}
+                      />
+                      <Line 
+                        type="monotone" 
+                        dataKey="USDC" 
+                        stroke="#9FA6B2" 
+                        strokeWidth={2}
+                        dot={{ fill: '#9FA6B2', r: 2 }}
+                      />
+                      <Line 
+                        type="monotone" 
+                        dataKey="DAI" 
+                        stroke="#E47C3C" 
+                        strokeWidth={2}
+                        dot={{ fill: '#E47C3C', r: 2 }}
+                      />
+                      <Line 
+                        type="monotone" 
+                        dataKey="FRAX" 
+                        stroke="#D64545" 
+                        strokeWidth={2}
+                        dot={{ fill: '#D64545', r: 2 }}
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
                 </div>
               </CardContent>
             </Card>
