@@ -7163,6 +7163,57 @@ class StableYieldTester:
         except Exception as e:
             self.log_test("Data Consistency", False, f"Exception: {str(e)}")
 
+    def print_critical_test_summary(self):
+        """Print summary of critical test results"""
+        print("\n" + "=" * 80)
+        print("🎯 CRITICAL BACKEND API TEST SUMMARY")
+        print("=" * 80)
+        
+        total_tests = len(self.test_results)
+        passed_tests = sum(1 for result in self.test_results if result['success'])
+        failed_tests = total_tests - passed_tests
+        success_rate = (passed_tests / total_tests * 100) if total_tests > 0 else 0
+        
+        print(f"📊 Total Tests: {total_tests}")
+        print(f"✅ Passed: {passed_tests}")
+        print(f"❌ Failed: {failed_tests}")
+        print(f"📈 Success Rate: {success_rate:.1f}%")
+        
+        # Critical endpoints status
+        critical_endpoints = [
+            "SYI Current Endpoint",
+            "Index Family Overview", 
+            "Peg Check Endpoint",
+            "Regime Current Endpoint",
+            "Yields All"
+        ]
+        
+        print(f"\n🔥 CRITICAL ENDPOINTS STATUS:")
+        critical_failures = []
+        for endpoint in critical_endpoints:
+            result = next((r for r in self.test_results if endpoint in r['test']), None)
+            if result:
+                status = "✅ PASS" if result['success'] else "❌ FAIL"
+                print(f"  {status} {endpoint}")
+                if not result['success']:
+                    critical_failures.append(result['test'])
+            else:
+                print(f"  ⚠️  SKIP {endpoint} (not tested)")
+        
+        print(f"\n🚨 CRITICAL FAILURES:")
+        if critical_failures:
+            for failure in critical_failures:
+                print(f"  - {failure}")
+        else:
+            print("  None - All critical endpoints working!")
+        
+        # Service health summary
+        health_tests = [r for r in self.test_results if 'Health' in r['test'] or 'Connectivity' in r['test']]
+        healthy_services = sum(1 for r in health_tests if r['success'])
+        print(f"\n🏥 SERVICE HEALTH: {healthy_services}/{len(health_tests)} services healthy")
+        
+        print("=" * 80)
+
     async def run_critical_api_tests(self):
         """Run critical API endpoint tests as specified in review request"""
         print(f"🚀 Starting Critical Backend API Tests (Post-Frontend Redesign)")
