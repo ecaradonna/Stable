@@ -109,7 +109,7 @@ const BlogPage = () => {
                   className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 transform hover:-translate-y-1"
                 >
                   <div className="flex items-center space-x-4 mb-4">
-                    <span className="bg-[#2E6049]/10 text-[#2E6049] px-3 py-1 rounded-full text-sm font-medium">
+                    <span className="bg-[#9FA6B2]/10 text-[#9FA6B2] px-3 py-1 rounded-full text-sm font-medium">
                       {post.category}
                     </span>
                     <div className="flex items-center text-gray-500 text-sm">
