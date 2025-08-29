@@ -147,7 +147,7 @@ const BlogPage = () => {
         {/* Newsletter CTA */}
         <section className="py-16">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="bg-gradient-to-br from-[#4CC1E9]/5 to-[#007A99]/5 rounded-2xl p-12 text-center border border-[#4CC1E9]/20">
+            <div className="bg-gradient-to-br from-[#1F4FFF]/5 to-[#E47C3C]/5 rounded-2xl p-12 text-center border border-[#1F4FFF]/20">
               <h3 className="text-3xl font-bold text-[#0E1A2B] mb-4">
                 Never Miss an Update
               </h3>
@@ -156,7 +156,7 @@ const BlogPage = () => {
                 market analysis, and platform updates delivered to your inbox weekly.
               </p>
               <Button 
-                className="bg-gradient-to-r from-[#4CC1E9] to-[#007A99] hover:from-[#007A99] hover:to-[#4CC1E9] text-white font-semibold px-8 py-3"
+                className="bg-[#E47C3C] hover:bg-[#E47C3C]/90 text-white font-semibold px-8 py-3 rounded-xl"
                 onClick={() => setIsContactOpen(true)}
               >
                 Subscribe to Newsletter
