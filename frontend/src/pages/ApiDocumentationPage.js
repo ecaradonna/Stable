@@ -189,8 +189,8 @@ const ApiDocumentationPage = () => {
         {/* Hero Section */}
         <section className="relative py-20 lg:py-32 overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-gray-50 to-white"></div>
-          <div className="absolute top-20 right-10 w-64 h-64 bg-gradient-to-br from-[#4CC1E9]/10 to-[#007A99]/10 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-20 left-10 w-48 h-48 bg-gradient-to-br from-[#2E6049]/10 to-[#4CC1E9]/10 rounded-full blur-3xl"></div>
+          <div className="absolute top-20 right-10 w-64 h-64 bg-gradient-to-br from-[#1F4FFF]/10 to-[#E47C3C]/10 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-20 left-10 w-48 h-48 bg-gradient-to-br from-[#1F4FFF]/5 to-[#E47C3C]/5 rounded-full blur-3xl"></div>
 
           <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center">
