@@ -244,6 +244,20 @@ const RiskRegimeWidget = ({ onCreateAlert }) => {
             </div>
           )}
           
+          {/* Create Alert Button */}
+          {onCreateAlert && (
+            <div className="mt-3 text-center">
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={onCreateAlert}
+                className="text-xs px-4 py-2 h-8"
+              >
+                Create Alert
+              </Button>
+            </div>
+          )}
+          
           {/* Last Update */}
           <div className="text-xs text-gray-400 text-center">
             📊 Regime Analysis • Updated: {lastUpdate}
