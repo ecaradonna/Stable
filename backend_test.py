@@ -7135,7 +7135,7 @@ class StableYieldTester:
         
         # 2. GET /api/v1/index-family/overview (Index Family data)
         print("\n📊 Index Family Data")
-        await self.test_index_family_overview()
+        await self.test_index_family_overview_endpoint()
         
         # 3. GET /api/peg/check (Peg monitoring system)
         print("\n📊 Peg Monitoring System")
