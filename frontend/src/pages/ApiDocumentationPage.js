@@ -83,31 +83,31 @@ const ApiDocumentationPage = () => {
       icon: Building2,
       title: "Institutional Trading",
       description: "Systematic yield strategies on stablecoins with risk-adjusted optimization and cross-chain coverage.",
-      color: "text-blue-600"
+      color: "text-[#1F4FFF]"
     },
     {
       icon: PieChart,
       title: "Treasury Management",
       description: "Corporate treasury yield maximization with compliance monitoring and liquidity risk tracking.",
-      color: "text-green-600"
+      color: "text-[#1F4FFF]"
     },
     {
       icon: Shield,
       title: "Risk Management",
       description: "Real-time exposure monitoring, scenario analysis, and stress testing for institutional portfolios.",
-      color: "text-red-600"
+      color: "text-[#D64545]"
     },
     {
       icon: Search,
       title: "Research & Analytics",
       description: "Quantitative datasets and historical benchmarks for academic research and advanced market studies.",
-      color: "text-purple-600"
+      color: "text-[#9FA6B2]"
     },
     {
       icon: Zap,
       title: "Pro Traders",
       description: "Real-time Risk ON/OFF alerts via Telegram and TradingView, with SYI vs BTC/ETH/T-Bills comparisons and weekly reports.",
-      color: "text-orange-600"
+      color: "text-[#E47C3C]"
     }
   ];
 
