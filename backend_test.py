@@ -7008,6 +7008,29 @@ class StableYieldTester:
         except Exception as e:
             self.log_test("Peg Check Endpoint", False, f"Exception: {str(e)}")
 
+    async def test_regime_current_endpoint(self):
+        """Test GET /api/regime/current endpoint (Critical)"""
+        try:
+            async with self.session.get(f"{API_BASE}/regime/current") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    required_fields = ['state', 'syi_excess', 'z_score', 'alert_type']
+                    missing_fields = [field for field in required_fields if field not in data]
+                    
+                    if not missing_fields:
+                        state = data.get('state')
+                        syi_excess = data.get('syi_excess')
+                        z_score = data.get('z_score')
+                        alert_type = data.get('alert_type')
+                        self.log_test("Regime Current Endpoint", True, 
+                                    f"State: {state}, SYI Excess: {syi_excess}, Z-Score: {z_score}, Alert: {alert_type}")
+                    else:
+                        self.log_test("Regime Current Endpoint", False, f"Missing fields: {missing_fields}")
+                else:
+                    self.log_test("Regime Current Endpoint", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("Regime Current Endpoint", False, f"Exception: {str(e)}")
+
     async def test_database_connectivity(self):
         """Test database connectivity through health endpoint"""
         try:
