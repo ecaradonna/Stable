@@ -490,7 +490,7 @@ const ApiDocumentationPage = () => {
                   </div>
                   <Button 
                     type="submit"
-                    className="w-full bg-gradient-to-r from-[#4CC1E9] to-[#007A99] hover:from-[#007A99] hover:to-[#4CC1E9] text-white font-semibold py-2 rounded-md"
+                    className="w-full bg-[#E47C3C] hover:bg-[#E47C3C]/90 text-white font-semibold py-2 rounded-md"
                   >
                     Submit Request
                   </Button>
