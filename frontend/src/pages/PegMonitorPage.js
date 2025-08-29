@@ -106,9 +106,9 @@ const PegMonitorPage = () => {
     {
       symbol: "FRAX",
       name: "Frax",
-      price: 1.5038,
-      deviation: 50.38,
-      status: "depegged",
+      price: 0.9981,
+      deviation: -0.19,
+      status: "stable",
       volume24h: "$156M",
       marketCap: "$890M",
       lastUpdate: "1 min ago"
