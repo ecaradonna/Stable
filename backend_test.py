@@ -7209,7 +7209,7 @@ class StableYieldTester:
         await self.test_data_consistency()
         
         # Print final summary
-        self.print_test_summary()
+        self.print_critical_test_summary()
 
     async def run_all_tests(self):
         """Run all backend tests"""
