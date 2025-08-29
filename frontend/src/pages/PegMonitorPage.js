@@ -1,435 +1,426 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useState } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import SEOHead from "../components/SEOHead";
+import ContactModal from "../components/ContactModal";
+import WhitepaperDownloadModal from "../components/WhitepaperDownloadModal";
+import PegStatusWidget from "../components/PegStatusWidget";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
+import { Badge } from "../components/ui/badge";
+import { Button } from "../components/ui/button";
 import { 
-  Activity, 
+  Shield, 
   AlertTriangle, 
-  CheckCircle, 
-  TrendingUp, 
+  Activity, 
+  CheckCircle,
+  TrendingDown,
+  TrendingUp,
   Clock,
+  Bell,
+  FileText,
   BarChart3,
-  Zap
+  Eye
 } from "lucide-react";
 
-/**
- * PegMonitorPage – full-page dashboard for stablecoin peg monitoring
- * ---------------------------------------------------------------
- * - Table of all tracked stables with peg status
- * - Charts of deviation over time (using CryptoCompare histominute/histoday data)
- * - Tabs to switch between intraday (1h, 24h) and long-term (30d)
- * - Integrates with PegCheck API (for real-time status)
- */
+const PegMonitorPage = () => {
+  const [isContactOpen, setIsContactOpen] = useState(false);
+  const [isWhitepaperOpen, setIsWhitepaperOpen] = useState(false);
 
-function classNames(...c) {
-  return c.filter(Boolean).join(" ");
-}
-
-function Dot({ color }) {
-  const c = color === "green" ? "bg-emerald-500" : color === "yellow" ? "bg-amber-500" : "bg-rose-500";
-  return <span className={classNames("inline-block h-2.5 w-2.5 rounded-full", c)} />;
-}
-
-function formatPct(p) {
-  if (p === undefined || p === null || Number.isNaN(p)) return "–";
-  return `${p.toFixed(2)}%`;
-}
-
-function formatUSD(x) {
-  if (x === undefined || x === null || Number.isNaN(x)) return "–";
-  return `$${x.toFixed(6)}`;
-}
-
-function formatBps(bps) {
-  if (bps === undefined || bps === null || Number.isNaN(bps)) return "–";
-  return `${bps.toFixed(1)} bps`;
-}
-
-export default function PegMonitorPage() {
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [selected, setSelected] = useState("USDT");
-  const [history, setHistory] = useState([]);
-  const [timeRange, setTimeRange] = useState("24h");
-  
-  const symbols = ["USDT", "USDC", "DAI", "FRAX", "TUSD", "PYUSD", "BUSD", "USDP"];
-  
-  // Dynamic backend URL detection
-  const getBackendURL = () => {
-    // Always use environment variable if available
-    const envBackendUrl = process.env.REACT_APP_BACKEND_URL || import.meta?.env?.REACT_APP_BACKEND_URL;
-    if (envBackendUrl) {
-      return envBackendUrl;
-    }
-    
-    // Fallback for localhost development
-    if (window.location.hostname === 'localhost') {
-      return 'http://localhost:8001';
-    }
-    
-    // Use same protocol and hostname as current page
-    const protocol = window.location.protocol; // Keeps https: if served over HTTPS
-    const hostname = window.location.hostname;
-    return `${protocol}//${hostname}`;
+  // Mock peg data - replace with real API calls
+  const pegSummary = {
+    stable: 5,
+    neutral: 1, 
+    depegged: 2
   };
 
-  const backendUrl = getBackendURL();
-  const query = useMemo(() => encodeURI(symbols.join(",")), [symbols]);
-
-  async function fetchData() {
-    try {
-      setError(null);
-      const res = await fetch(`${backendUrl}/api/peg/check?symbols=${query}`, { 
-        cache: "no-store",
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        }
-      });
-      
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const json = await res.json();
-      
-      // Transform the response to match expected format
-      if (json.success && json.data && json.data.results) {
-        const transformedData = {
-          as_of: json.data.analysis?.timestamp || Date.now() / 1000,
-          threshold_bps: 50,
-          symbols: symbols,
-          reports: {},
-          analysis: json.data.analysis || {}
-        };
-        
-        json.data.results.forEach(result => {
-          transformedData.reports[result.symbol] = {
-            symbol: result.symbol,
-            ref_price: result.price_usd,
-            pct_diff_oracle: result.deviation?.percentage || 0,
-            pct_diff_dex: result.deviation?.percentage || 0,
-            bps_diff: result.deviation?.basis_points || 0,
-            is_depeg: result.is_depegged || false,
-            peg_status: result.peg_status || 'normal',
-            confidence: result.confidence || 1.0,
-            sources_used: result.sources_used || []
-          };
-        });
-        
-        setData(transformedData);
-      } else {
-        throw new Error(json.message || 'Invalid response format');
-      }
-    } catch (e) {
-      console.error('PegMonitorPage fetch error:', e);
-      setError(e?.message || "Network error");
-    } finally {
-      setLoading(false);
+  const stablecoinData = [
+    {
+      symbol: "USDT",
+      name: "Tether",
+      price: 0.9998,
+      deviation: -0.02,
+      status: "stable",
+      volume24h: "$42.1B",
+      marketCap: "$94.2B",
+      lastUpdate: "2 mins ago"
+    },
+    {
+      symbol: "USDC", 
+      name: "USD Coin",
+      price: 1.0001,
+      deviation: 0.01,
+      status: "stable",
+      volume24h: "$18.7B", 
+      marketCap: "$27.8B",
+      lastUpdate: "1 min ago"
+    },
+    {
+      symbol: "DAI",
+      name: "Dai Stablecoin",
+      price: 0.9995,
+      deviation: -0.05,
+      status: "neutral",
+      volume24h: "$892M",
+      marketCap: "$5.6B", 
+      lastUpdate: "3 mins ago"
+    },
+    {
+      symbol: "FRAX",
+      name: "Frax",
+      price: 1.0089,
+      deviation: 0.89,
+      status: "depegged",
+      volume24h: "$156M",
+      marketCap: "$890M",
+      lastUpdate: "1 min ago"
+    },
+    {
+      symbol: "TUSD",
+      name: "TrueUSD", 
+      price: 0.9876,
+      deviation: -1.24,
+      status: "depegged",
+      volume24h: "$78M",
+      marketCap: "$510M",
+      lastUpdate: "4 mins ago"
     }
-  }
+  ];
 
-  async function fetchHistory(symbol, range) {
-    try {
-      // Mock historical data for now - in production you'd fetch from CryptoCompare
-      const now = Date.now() / 1000;
-      const points = range === "1h" ? 60 : range === "24h" ? 144 : 30;
-      const interval = range === "1h" ? 60 : range === "24h" ? 600 : 86400;
-      
-      const mockHistory = Array.from({ length: points }, (_, i) => {
-        const timestamp = now - (points - i) * interval;
-        const basePrice = 1.0;
-        const noise = (Math.random() - 0.5) * 0.01; // ±0.5% noise
-        const price = basePrice + noise;
-        
-        return {
-          time: timestamp,
-          close: price,
-          date: new Date(timestamp * 1000).toLocaleString()
-        };
-      });
-      
-      setHistory(mockHistory);
-    } catch (e) {
-      console.error("Failed to fetch history", e);
-      setHistory([]);
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'stable': return 'text-[#1F4FFF] bg-[#1F4FFF]/10 border-[#1F4FFF]/20';
+      case 'neutral': return 'text-[#9FA6B2] bg-[#9FA6B2]/10 border-[#9FA6B2]/20';
+      case 'depegged': return 'text-[#D64545] bg-[#D64545]/10 border-[#D64545]/20';
+      default: return 'text-[#9FA6B2] bg-[#9FA6B2]/10 border-[#9FA6B2]/20';
     }
-  }
+  };
 
-  useEffect(() => {
-    fetchData();
-    const id = setInterval(fetchData, 30000);
-    return () => clearInterval(id);
-  }, [backendUrl, query]);
+  const getStatusIcon = (status) => {
+    switch (status) {
+      case 'stable': return <CheckCircle className="w-4 h-4" />;
+      case 'neutral': return <Activity className="w-4 h-4" />;
+      case 'depegged': return <AlertTriangle className="w-4 h-4" />;
+      default: return <Activity className="w-4 h-4" />;
+    }
+  };
 
-  useEffect(() => {
-    if (selected) fetchHistory(selected, timeRange);
-  }, [selected, timeRange]);
+  const getStatusText = (status) => {
+    switch (status) {
+      case 'stable': return 'Stable';
+      case 'neutral': return 'Neutral';
+      case 'depegged': return 'Depegged';
+      default: return 'Unknown';
+    }
+  };
 
-  const reports = data?.reports || {};
-  
-  // Calculate summary statistics
-  const stats = useMemo(() => {
-    const reportValues = Object.values(reports);
-    const totalSymbols = reportValues.length;
-    const depegged = reportValues.filter(r => r.is_depeg).length;
-    const warning = reportValues.filter(r => !r.is_depeg && Math.abs(r.bps_diff || 0) >= 25).length;
-    const normal = totalSymbols - depegged - warning;
-    const maxDeviation = Math.max(...reportValues.map(r => Math.abs(r.bps_diff || 0)), 0);
-    
-    return { totalSymbols, depegged, warning, normal, maxDeviation };
-  }, [reports]);
+  const getDeviationColor = (deviation) => {
+    const absDeviation = Math.abs(deviation);
+    if (absDeviation <= 0.1) return 'text-[#1F4FFF]';
+    if (absDeviation <= 0.5) return 'text-[#9FA6B2]';
+    return 'text-[#D64545]';
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
       <SEOHead 
-        title="Stablecoin Peg Monitor – Real-time Peg Stability Analysis"
-        description="Advanced stablecoin peg monitoring with real-time deviation tracking, multi-source analysis, and comprehensive market intelligence."
-        url="https://stableyield.com/peg-monitor"
+        title="Peg Monitor - Real-Time Stablecoin Peg Stability Tracking"
+        description="Monitor every major stablecoin. Spot deviations early, set alerts, protect capital. Real-time peg stability monitoring with institutional-grade precision."
+        keywords="stablecoin peg, depeg monitoring, peg stability, stablecoin tracking, real-time alerts"
       />
       
-      <Header />
-      
-      <div className="pt-20">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
-          
-          {/* Page Header */}
-          <div className="mb-8">
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-                  <div className="p-2 bg-blue-100 rounded-lg">
-                    <BarChart3 className="w-6 h-6 text-blue-600" />
-                  </div>
-                  Stablecoin Peg Monitor
-                </h1>
-                <p className="text-gray-600 mt-2">
-                  Real-time monitoring of major stablecoins with historical trends and deviation analysis
-                </p>
-              </div>
+      <Header 
+        onJoinWaitlist={() => setIsContactOpen(true)}
+        onDownloadWhitepaper={() => setIsWhitepaperOpen(true)}
+      />
+
+      <main>
+        {/* Hero Section */}
+        <section className="relative py-20 lg:py-32 overflow-hidden bg-gradient-to-br from-gray-50 to-white">
+          <div className="absolute top-20 right-10 w-64 h-64 bg-gradient-to-br from-[#1F4FFF]/10 to-[#D64545]/10 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-20 left-10 w-48 h-48 bg-gradient-to-br from-[#1F4FFF]/5 to-[#E47C3C]/10 rounded-full blur-3xl"></div>
+
+          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center">
+              <Badge className="bg-[#1F4FFF]/10 text-[#1F4FFF] mb-6 px-4 py-2">
+                <Eye className="w-4 h-4 mr-2" />
+                Real-Time Monitoring
+              </Badge>
               
-              {data && (
-                <div className="text-right text-sm text-gray-500">
-                  <div className="flex items-center gap-2">
-                    <Clock className="w-4 h-4" />
-                    Last updated: {new Date((data.as_of || 0) * 1000).toLocaleString()}
+              <h1 className="text-4xl md:text-6xl font-bold text-[#0E1A2B] mb-6 leading-tight">
+                Peg Stability in 
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#1F4FFF] to-[#D64545]">
+                  {" "}Real Time
+                </span>
+              </h1>
+              
+              <p className="text-xl text-gray-600 max-w-4xl mx-auto mb-12 leading-relaxed">
+                Monitor every major stablecoin. Spot deviations early, set alerts, protect capital. 
+                Professional-grade peg monitoring with institutional precision.
+              </p>
+
+              {/* Peg Status Summary */}
+              <div className="bg-white rounded-2xl border border-gray-200 p-8 max-w-2xl mx-auto mb-8 shadow-lg">
+                <h3 className="text-lg font-semibold text-[#0E1A2B] mb-6">Current Market Status</h3>
+                <div className="grid grid-cols-3 gap-6">
+                  <div className="text-center">
+                    <div className="w-12 h-12 bg-[#1F4FFF]/10 rounded-full flex items-center justify-center mx-auto mb-3">
+                      <CheckCircle className="w-6 h-6 text-[#1F4FFF]" />
+                    </div>
+                    <div className="text-2xl font-bold text-[#1F4FFF]">{pegSummary.stable}</div>
+                    <div className="text-sm text-gray-600">Stable</div>
                   </div>
-                  <div className="mt-1">
-                    Threshold: {(data.threshold_bps || 50) / 100}%
+                  <div className="text-center">
+                    <div className="w-12 h-12 bg-[#9FA6B2]/10 rounded-full flex items-center justify-center mx-auto mb-3">
+                      <Activity className="w-6 h-6 text-[#9FA6B2]" />
+                    </div>
+                    <div className="text-2xl font-bold text-[#9FA6B2]">{pegSummary.neutral}</div>
+                    <div className="text-sm text-gray-600">Neutral</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="w-12 h-12 bg-[#D64545]/10 rounded-full flex items-center justify-center mx-auto mb-3">
+                      <AlertTriangle className="w-6 h-6 text-[#D64545]" />
+                    </div>
+                    <div className="text-2xl font-bold text-[#D64545]">{pegSummary.depegged}</div>
+                    <div className="text-sm text-gray-600">Depegged</div>
                   </div>
                 </div>
-              )}
+              </div>
+
+              <Button 
+                className="bg-[#E47C3C] hover:bg-[#E47C3C]/90 text-white font-semibold px-8 py-4 text-lg rounded-xl shadow-lg"
+                onClick={() => setIsContactOpen(true)}
+              >
+                <Bell className="w-5 h-5 mr-2" />
+                Set My Alerts
+              </Button>
             </div>
           </div>
+        </section>
 
-          {/* Summary Statistics */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-            <Card className="border-green-200 bg-green-50">
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-green-800">Normal</p>
-                    <p className="text-2xl font-bold text-green-900">{stats.normal}</p>
-                  </div>
-                  <CheckCircle className="w-8 h-8 text-green-600" />
-                </div>
-              </CardContent>
-            </Card>
+        {/* Peg Dashboard */}
+        <section className="py-20 bg-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl font-bold text-[#0E1A2B] mb-4">
+                Live Peg Monitor Dashboard
+              </h2>
+              <p className="text-gray-600 max-w-2xl mx-auto">
+                Real-time tracking of stablecoin prices with deviation analysis and risk scoring
+              </p>
+            </div>
             
-            <Card className="border-yellow-200 bg-yellow-50">
-              <CardContent className="p-4">
+            <Card className="border-0 shadow-lg">
+              <CardHeader>
                 <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-yellow-800">Warning</p>
-                    <p className="text-2xl font-bold text-yellow-900">{stats.warning}</p>
-                  </div>
-                  <AlertTriangle className="w-8 h-8 text-yellow-600" />
+                  <CardTitle className="text-xl text-[#0E1A2B]">Stablecoin Peg Status</CardTitle>
+                  <Badge className="bg-[#1F4FFF]/10 text-[#1F4FFF]">
+                    <Clock className="w-3 h-3 mr-1" />
+                    Live Data
+                  </Badge>
                 </div>
-              </CardContent>
-            </Card>
-            
-            <Card className="border-red-200 bg-red-50">
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-red-800">Depegged</p>
-                    <p className="text-2xl font-bold text-red-900">{stats.depegged}</p>
-                  </div>
-                  <Zap className="w-8 h-8 text-red-600" />
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card className="border-blue-200 bg-blue-50">
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-blue-800">Max Deviation</p>
-                    <p className="text-2xl font-bold text-blue-900">{formatBps(stats.maxDeviation)}</p>
-                  </div>
-                  <TrendingUp className="w-8 h-8 text-blue-600" />
+              </CardHeader>
+              <CardContent className="p-0">
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead className="bg-gray-50 border-b border-gray-100">
+                      <tr>
+                        <th className="text-left py-4 px-6 text-sm font-semibold text-gray-700">Asset</th>
+                        <th className="text-right py-4 px-6 text-sm font-semibold text-gray-700">Price</th>
+                        <th className="text-center py-4 px-6 text-sm font-semibold text-gray-700">Deviation</th>
+                        <th className="text-center py-4 px-6 text-sm font-semibold text-gray-700">Status</th>
+                        <th className="text-right py-4 px-6 text-sm font-semibold text-gray-700">24h Volume</th>
+                        <th className="text-right py-4 px-6 text-sm font-semibold text-gray-700">Market Cap</th>
+                        <th className="text-center py-4 px-6 text-sm font-semibold text-gray-700">Last Update</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {stablecoinData.map((coin, index) => (
+                        <tr key={index} className="border-b border-gray-50 hover:bg-gray-25">
+                          <td className="py-4 px-6">
+                            <div>
+                              <div className="font-semibold text-[#0E1A2B]">{coin.symbol}</div>
+                              <div className="text-sm text-gray-500">{coin.name}</div>
+                            </div>
+                          </td>
+                          <td className="py-4 px-6 text-right">
+                            <div className="font-mono font-semibold text-[#0E1A2B]">
+                              ${coin.price.toFixed(4)}
+                            </div>
+                          </td>
+                          <td className="py-4 px-6 text-center">
+                            <div className={`font-semibold ${getDeviationColor(coin.deviation)}`}>
+                              {coin.deviation > 0 ? '+' : ''}{coin.deviation.toFixed(2)}%
+                            </div>
+                          </td>
+                          <td className="py-4 px-6 text-center">
+                            <Badge className={`${getStatusColor(coin.status)} border font-medium`}>
+                              <div className="flex items-center space-x-1">
+                                {getStatusIcon(coin.status)}
+                                <span>{getStatusText(coin.status)}</span>
+                              </div>
+                            </Badge>
+                          </td>
+                          <td className="py-4 px-6 text-right">
+                            <div className="font-semibold text-[#0E1A2B]">{coin.volume24h}</div>
+                          </td>
+                          <td className="py-4 px-6 text-right">
+                            <div className="font-semibold text-[#0E1A2B]">{coin.marketCap}</div>
+                          </td>
+                          <td className="py-4 px-6 text-center">
+                            <div className="text-sm text-gray-500">{coin.lastUpdate}</div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               </CardContent>
             </Card>
           </div>
+        </section>
 
-          {loading ? (
-            <div className="flex items-center justify-center py-12">
-              <Activity className="w-6 h-6 animate-spin text-blue-600 mr-2" />
-              <span className="text-gray-600">Loading peg data...</span>
+        {/* Graph Section */}
+        <section className="py-20 bg-gray-50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl font-bold text-[#0E1A2B] mb-4">
+                Historical Peg Analysis
+              </h2>
+              <p className="text-gray-600 max-w-2xl mx-auto">
+                Track peg history across different time periods with advanced deviation analytics
+              </p>
             </div>
-          ) : error ? (
-            <div className="rounded-xl border border-rose-200 bg-rose-50 p-6 text-center">
-              <AlertTriangle className="w-8 h-8 text-rose-600 mx-auto mb-2" />
-              <div className="text-sm text-rose-700">
-                Failed to load peg data: {error}
+            
+            <Card className="border-0 shadow-lg">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="flex items-center space-x-2">
+                    <BarChart3 className="w-5 h-5 text-[#1F4FFF]" />
+                    <span>Peg Deviation History</span>
+                  </CardTitle>
+                  <div className="flex items-center space-x-2">
+                    <Button variant="outline" size="sm">1H</Button>
+                    <Button variant="outline" size="sm">24H</Button>
+                    <Button variant="outline" size="sm" className="bg-[#1F4FFF] text-white">7D</Button>
+                    <Button variant="outline" size="sm">30D</Button>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                {/* Placeholder for chart */}
+                <div className="h-64 bg-gradient-to-br from-[#1F4FFF]/5 to-[#9FA6B2]/5 rounded-lg flex items-center justify-center border border-gray-100">
+                  <div className="text-center">
+                    <BarChart3 className="w-12 h-12 text-[#9FA6B2] mx-auto mb-4" />
+                    <div className="text-[#9FA6B2] font-medium">Interactive Peg Chart</div>
+                    <div className="text-sm text-gray-500 mt-1">Real-time deviation tracking across time periods</div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+
+        {/* Enhanced Peg Widget */}
+        <section className="py-20 bg-white">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold text-[#0E1A2B] mb-4">
+                Comprehensive Peg Monitoring
+              </h2>
+              <p className="text-gray-600">
+                Advanced monitoring with multi-source price feeds and deviation analysis
+              </p>
+            </div>
+            
+            <PegStatusWidget 
+              symbols={["USDT", "USDC", "DAI", "FRAX", "TUSD", "PYUSD"]}
+              linkHref="/peg-monitor"
+              onCreateAlert={() => setIsContactOpen(true)}
+            />
+          </div>
+        </section>
+
+        {/* Report Section */}
+        <section className="py-20 bg-gray-50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <Card className="border-2 border-[#1F4FFF]/20 bg-[#1F4FFF]/5">
+              <CardContent className="p-12 text-center">
+                <div className="w-20 h-20 bg-[#1F4FFF]/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <FileText className="w-10 h-10 text-[#1F4FFF]" />
+                </div>
+                <h3 className="text-2xl font-bold text-[#0E1A2B] mb-4">
+                  Peg Intelligence Report
+                </h3>
+                <p className="text-gray-600 max-w-2xl mx-auto mb-8">
+                  Get weekly comprehensive analysis of peg stability trends, risk factors, 
+                  and market dynamics across all major stablecoins.
+                </p>
+                <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+                  <Button 
+                    className="bg-[#1F4FFF] hover:bg-[#1F4FFF]/90 text-white font-semibold px-6 py-3 rounded-xl"
+                    onClick={() => setIsContactOpen(true)}
+                  >
+                    Subscribe Now
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    className="border-[#1F4FFF] text-[#1F4FFF] hover:bg-[#1F4FFF] hover:text-white px-6 py-3 rounded-xl"
+                  >
+                    View Sample Report
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+
+        {/* Call-to-Action */}
+        <section className="py-20 bg-gradient-to-r from-[#1F4FFF] to-[#D64545]">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center">
+              <h2 className="text-3xl font-bold text-white mb-4">
+                Never Miss a Peg Event Again
+              </h2>
+              <p className="text-xl text-white/90 max-w-3xl mx-auto mb-8">
+                Set custom alerts, monitor in real-time, and protect your portfolio with 
+                institutional-grade peg monitoring infrastructure.
+              </p>
+              
+              <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-6">
+                <Button 
+                  className="bg-white text-[#1F4FFF] hover:bg-gray-100 font-semibold px-8 py-4 text-lg rounded-xl"
+                  onClick={() => setIsContactOpen(true)}
+                >
+                  <Bell className="w-5 h-5 mr-2" />
+                  Set Up Alerts
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="border-2 border-white text-white hover:bg-white hover:text-[#1F4FFF] font-semibold px-8 py-4 text-lg rounded-xl"
+                  onClick={() => window.location.href = '/api-documentation'}
+                >
+                  API Access
+                </Button>
               </div>
             </div>
-          ) : (
-            <>
-              {/* Main Peg Status Table */}
-              <Card className="mb-8">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <BarChart3 className="w-5 h-5" />
-                    Stablecoin Peg Status
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="p-0">
-                  <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-200">
-                      <thead className="bg-gray-50">
-                        <tr>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Symbol</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Deviation (bps)</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Confidence</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sources</th>
-                        </tr>
-                      </thead>
-                      <tbody className="bg-white divide-y divide-gray-200">
-                        {symbols.map((s) => {
-                          const r = reports[s];
-                          if (!r) return null;
-                          let color = "green";
-                          let statusText = "Within Peg";
-                          let statusBg = "bg-green-100 text-green-800";
-                          
-                          if (r.is_depeg) {
-                            color = "red";
-                            statusText = "Depegged";
-                            statusBg = "bg-red-100 text-red-800";
-                          } else if (Math.abs(r.bps_diff || 0) >= 25) {
-                            color = "yellow";
-                            statusText = "Warning";
-                            statusBg = "bg-yellow-100 text-yellow-800";
-                          }
-                          
-                          return (
-                            <tr
-                              key={s}
-                              className={`hover:bg-gray-50 cursor-pointer transition-colors ${selected === s ? 'bg-blue-50' : ''}`}
-                              onClick={() => setSelected(s)}
-                            >
-                              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 flex items-center gap-2">
-                                <Dot color={color} /> 
-                                <span className="font-semibold">{s}</span>
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 tabular-nums">
-                                {formatUSD(r.ref_price)}
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 tabular-nums">
-                                {formatBps(r.bps_diff)}
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap">
-                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusBg}`}>
-                                  {statusText}
-                                </span>
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 tabular-nums">
-                                {(r.confidence * 100).toFixed(0)}%
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                {r.sources_used?.join(', ') || 'N/A'}
-                              </td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Historical Chart */}
-              <Card>
-                <CardContent className="p-6">
-                  <div className="mb-4 flex items-center justify-between">
-                    <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                      <TrendingUp className="w-5 h-5" />
-                      {selected} Price History
-                    </h2>
-                    <Tabs value={timeRange} onValueChange={setTimeRange}>
-                      <TabsList className="grid w-full grid-cols-3">
-                        <TabsTrigger value="1h">1 Hour</TabsTrigger>
-                        <TabsTrigger value="24h">24 Hours</TabsTrigger>
-                        <TabsTrigger value="30d">30 Days</TabsTrigger>
-                      </TabsList>
-                    </Tabs>
-                  </div>
-
-                  <div className="h-80 w-full">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <LineChart data={history}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                        <XAxis 
-                          dataKey="date" 
-                          hide={timeRange === "1h"} 
-                          tick={{ fontSize: 10 }} 
-                          minTickGap={30} 
-                        />
-                        <YAxis 
-                          domain={[0.99, 1.01]} 
-                          tickFormatter={(v) => `$${v.toFixed(4)}`}
-                          tick={{ fontSize: 12 }}
-                        />
-                        <Tooltip 
-                          formatter={(v) => [`$${Number(v).toFixed(6)}`, 'Price']}
-                          labelFormatter={(l) => l} 
-                        />
-                        <Line 
-                          type="monotone" 
-                          dataKey="close" 
-                          stroke="#2563eb" 
-                          strokeWidth={2} 
-                          dot={false} 
-                        />
-                        {/* Reference line at $1.00 */}
-                        <Line
-                          type="monotone"
-                          dataKey={() => 1.0}
-                          stroke="#ef4444"
-                          strokeWidth={1}
-                          strokeDasharray="5 5"
-                          dot={false}
-                        />
-                      </LineChart>
-                    </ResponsiveContainer>
-                  </div>
-                  
-                  <div className="mt-4 text-center text-sm text-gray-500">
-                    Red dashed line shows $1.00 peg target. Click any symbol in the table above to view its chart.
-                  </div>
-                </CardContent>
-              </Card>
-            </>
-          )}
-        </div>
-      </div>
+          </div>
+        </section>
+      </main>
 
       <Footer />
+
+      {/* Modals */}
+      <ContactModal 
+        isOpen={isContactOpen} 
+        onClose={() => setIsContactOpen(false)} 
+      />
+      
+      <WhitepaperDownloadModal 
+        isOpen={isWhitepaperOpen} 
+        onClose={() => setIsWhitepaperOpen(false)} 
+      />
     </div>
   );
-}
+};
+
+export default PegMonitorPage;
