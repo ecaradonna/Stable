@@ -8,30 +8,31 @@ import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card"
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
 import { 
-  Code, 
-  Database, 
-  Zap, 
+  TrendingUp, 
+  BarChart3, 
   Shield, 
-  TrendingUp,
-  BarChart3,
-  Lock,
   Activity,
-  FileText,
-  Mail,
-  CheckCircle,
-  Users,
   Building2,
-  AlertCircle
+  Users,
+  PieChart,
+  Search,
+  Zap,
+  CheckCircle,
+  ArrowRight,
+  Clock,
+  FileText,
+  Mail
 } from "lucide-react";
 
 const ApiDocumentationPage = () => {
   const [isContactOpen, setIsContactOpen] = useState(false);
   const [isWhitepaperOpen, setIsWhitepaperOpen] = useState(false);
+  const [showRequestForm, setShowRequestForm] = useState(false);
   const [formData, setFormData] = useState({
-    company: '',
+    name: '',
     email: '',
-    useCase: '',
-    message: ''
+    company: '',
+    intendedUse: ''
   });
   const [isSubmitted, setIsSubmitted] = useState(false);
 
@@ -40,6 +41,10 @@ const ApiDocumentationPage = () => {
     // In a real application, this would submit to your backend
     console.log('API Access Request:', formData);
     setIsSubmitted(true);
+    setTimeout(() => {
+      setShowRequestForm(false);
+      setIsSubmitted(false);
+    }, 3000);
   };
 
   const handleInputChange = (e) => {
@@ -48,6 +53,123 @@ const ApiDocumentationPage = () => {
       [e.target.name]: e.target.value
     });
   };
+
+  const capabilities = [
+    {
+      icon: TrendingUp,
+      title: "Real-Time Yield Data",
+      description: "Live and historical yields across 50+ DeFi protocols. Includes RAY (Risk-Adjusted Yield), TVL metrics, and liquidity depth."
+    },
+    {
+      icon: BarChart3,
+      title: "StableYield Index (SYI)",
+      description: "The institutional benchmark for stablecoins. Real-time value, historical performance, updated composition, and transparent methodology. Directly comparable to T-Bills and Euribor."
+    },
+    {
+      icon: Shield,
+      title: "Risk Analytics",
+      description: "Continuous monitoring of peg stability, liquidity depth, and counterparty risk. Real-time depeg alerts with resilience scoring."
+    },
+    {
+      icon: Activity,
+      title: "Market Intelligence",
+      description: "Portfolio stress testing, cross-asset correlations, and automated Risk ON/OFF regime detection with confidence scores and evidence."
+    }
+  ];
+
+  const useCases = [
+    {
+      icon: Building2,
+      title: "Institutional Trading",
+      description: "Systematic yield strategies on stablecoins with risk-adjusted optimization and cross-chain coverage.",
+      color: "text-blue-600"
+    },
+    {
+      icon: PieChart,
+      title: "Treasury Management",
+      description: "Corporate treasury yield maximization with compliance monitoring and liquidity risk tracking.",
+      color: "text-green-600"
+    },
+    {
+      icon: Shield,
+      title: "Risk Management",
+      description: "Real-time exposure monitoring, scenario analysis, and stress testing for institutional portfolios.",
+      color: "text-red-600"
+    },
+    {
+      icon: Search,
+      title: "Research & Analytics",
+      description: "Quantitative datasets and historical benchmarks for academic research and advanced market studies.",
+      color: "text-purple-600"
+    },
+    {
+      icon: Zap,
+      title: "Pro Traders",
+      description: "Real-time Risk ON/OFF alerts via Telegram and TradingView, with SYI vs BTC/ETH/T-Bills comparisons and weekly reports.",
+      color: "text-orange-600"
+    }
+  ];
+
+  const accessSteps = [
+    {
+      step: 1,
+      title: "Sign up & request API access",
+      description: "Complete our access request form with your use case details"
+    },
+    {
+      step: 2,
+      title: "Receive approval and your personal API key",
+      description: "Get approved within 24 hours and receive your secure API credentials"
+    },
+    {
+      step: 3,
+      title: "Get full technical documentation",
+      description: "Access comprehensive API docs, code examples, and integration guides"
+    },
+    {
+      step: 4,
+      title: "Integrate in 60 seconds",
+      description: "Connect to TradingView, Telegram Bot, Webhooks, or custom applications"
+    }
+  ];
+
+  const pricingPlans = [
+    {
+      name: "Free",
+      price: "Free",
+      features: [
+        "1k calls/day",
+        "15-min delayed data",
+        "Basic dashboard"
+      ],
+      buttonText: "Get Started",
+      popular: false
+    },
+    {
+      name: "Pro Trader",
+      price: "Contact Sales",
+      features: [
+        "Real-time data",
+        "Risk ON/OFF alerts via Telegram/TradingView",
+        "Weekly market insights report",
+        "100k calls/day"
+      ],
+      buttonText: "Request Access",
+      popular: true
+    },
+    {
+      name: "Enterprise",
+      price: "Contact Sales",
+      features: [
+        "Unlimited access",
+        "SLA guarantees",
+        "Monthly report & advisory",
+        "Custom API endpoints"
+      ],
+      buttonText: "Contact Sales",
+      popular: false
+    }
+  ];
 
   const apiCapabilities = [
     {
