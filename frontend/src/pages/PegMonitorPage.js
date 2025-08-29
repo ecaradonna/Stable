@@ -26,6 +26,44 @@ import {
 const PegMonitorPage = () => {
   const [isContactOpen, setIsContactOpen] = useState(false);
   const [isWhitepaperOpen, setIsWhitepaperOpen] = useState(false);
+  const [chartTimeframe, setChartTimeframe] = useState('7D');
+  const [chartData, setChartData] = useState([]);
+
+  // Generate sample peg chart data
+  useEffect(() => {
+    const generateChartData = () => {
+      const timeframes = {
+        '1H': { points: 60, interval: 'minute' },
+        '24H': { points: 24, interval: 'hour' },
+        '7D': { points: 7, interval: 'day' },
+        '30D': { points: 30, interval: 'day' }
+      };
+      
+      const config = timeframes[chartTimeframe];
+      const data = [];
+      
+      for (let i = 0; i < config.points; i++) {
+        const date = new Date();
+        date.setHours(date.getHours() - (config.points - i));
+        
+        data.push({
+          time: date.toLocaleTimeString('en-US', { 
+            hour: '2-digit', 
+            minute: '2-digit',
+            ...(config.interval === 'day' && { month: 'short', day: 'numeric' })
+          }),
+          USDT: (Math.random() - 0.5) * 4, // -2 to +2 bps
+          USDC: (Math.random() - 0.5) * 3, // -1.5 to +1.5 bps  
+          DAI: (Math.random() - 0.5) * 6,  // -3 to +3 bps
+          FRAX: (Math.random() - 0.5) * 200 + 50, // More volatile, 50 +/- 100 bps
+        });
+      }
+      
+      setChartData(data);
+    };
+    
+    generateChartData();
+  }, [chartTimeframe]);
 
   // Mock peg data - replace with real API calls
   const pegSummary = {
