@@ -123,13 +123,28 @@ const IndexDashboardPage = () => {
           if (yieldsData && Array.isArray(yieldsData) && yieldsData.length > 0) {
             const transformedConstituents = yieldsData.map(yieldItem => ({
               name: yieldItem.stablecoin || yieldItem.symbol || 'Unknown',
-              protocol_name: yieldItem.platform || yieldItem.protocol_name || 'Various Protocols',
-              yield: yieldItem.apy ? (yieldItem.apy * 100).toFixed(2) : '0.00',
-              ray: yieldItem.ray ? (yieldItem.ray * 100).toFixed(2) : (yieldItem.apy ? (yieldItem.apy * 100).toFixed(2) : '0.00'),
+              protocol_name: yieldItem.platform || yieldItem.protocol_name || yieldItem.source || 'Various Protocols',
+              yield: yieldItem.currentYield ? (yieldItem.currentYield).toFixed(2) : (yieldItem.apy ? (yieldItem.apy * 100).toFixed(2) : '0.00'),
+              ray: yieldItem.ray ? (yieldItem.ray * 100).toFixed(2) : (yieldItem.currentYield ? (yieldItem.currentYield).toFixed(2) : '0.00'),
               risk_score: yieldItem.risk_score ? yieldItem.risk_score.toFixed(1) : '5.0',
-              tvl: yieldItem.tvl || '$N/A'
+              tvl: yieldItem.tvl || yieldItem.liquidity || '$N/A'
             }));
-            setConstituents(transformedConstituents);
+            
+            // If we have fewer than 6 constituents from API, add fallback data to match SYI components
+            if (transformedConstituents.length < 6) {
+              const existingNames = transformedConstituents.map(c => c.name);
+              const fallbackConstituents = [
+                { name: 'USDT', protocol_name: 'Tether', yield: '4.20', ray: '4.20', risk_score: '2.1', tvl: '$92.5B' },
+                { name: 'USDC', protocol_name: 'Circle', yield: '4.50', ray: '4.50', risk_score: '1.8', tvl: '$27.8B' },
+                { name: 'FRAX', protocol_name: 'Frax Finance', yield: '6.80', ray: '6.80', risk_score: '4.1', tvl: '$890M' },
+                { name: 'USDP', protocol_name: 'Paxos', yield: '3.42', ray: '3.42', risk_score: '2.5', tvl: '$200M' }
+              ].filter(fallback => !existingNames.includes(fallback.name));
+              
+              const finalConstituents = [...transformedConstituents, ...fallbackConstituents].slice(0, 6);
+              setConstituents(finalConstituents);
+            } else {
+              setConstituents(transformedConstituents.slice(0, 6));
+            }
           } else {
             // Enhanced fallback with 6 constituents matching SYI components
             setConstituents([
