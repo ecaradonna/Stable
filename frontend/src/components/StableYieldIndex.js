@@ -4,7 +4,7 @@ import { Badge } from "./ui/badge";
 import { TrendingUp, Shield, Zap, Target, BarChart3, CheckCircle, ArrowRight } from "lucide-react";
 import { Button } from "./ui/button";
 
-const StableYieldIndex = () => {
+const StableYieldIndex = ({ onJoinWaitlist }) => {
   const indexComponents = [
     {
       icon: BarChart3,
