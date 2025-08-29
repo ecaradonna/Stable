@@ -79,7 +79,7 @@ const Header = ({ onJoinWaitlist, onDownloadWhitepaper }) => {
             <Button 
               onClick={onDownloadWhitepaper}
               variant="outline"
-              className="border-[#4CC1E9] text-[#4CC1E9] hover:bg-[#4CC1E9] hover:text-white font-semibold px-4 py-2 rounded-lg transition-all duration-300"
+              className="border-[#1F4FFF] text-[#1F4FFF] hover:bg-[#1F4FFF] hover:text-white font-semibold px-4 py-2 rounded-lg transition-all duration-300"
             >
               <FileText className="w-4 h-4 mr-2" />
               Whitepaper
@@ -88,7 +88,7 @@ const Header = ({ onJoinWaitlist, onDownloadWhitepaper }) => {
             {/* Contact Us Button */}
             <Button 
               onClick={onJoinWaitlist}
-              className="bg-gradient-to-r from-[#4CC1E9] to-[#007A99] hover:from-[#007A99] hover:to-[#4CC1E9] text-white font-semibold px-6 py-2 rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+              className="bg-[#E47C3C] hover:bg-[#E47C3C]/90 text-white font-semibold px-6 py-2 rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
             >
               Contact Us
             </Button>
