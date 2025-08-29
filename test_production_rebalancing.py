@@ -11,7 +11,7 @@ import os
 from dotenv import load_dotenv
 
 load_dotenv('/app/frontend/.env')
-BACKEND_URL = os.getenv('REACT_APP_BACKEND_URL', 'https://stablecoin-analytics.preview.emergentagent.com')
+BACKEND_URL = os.getenv('REACT_APP_BACKEND_URL', 'https://yield-index-dash.preview.emergentagent.com')
 API_BASE = f"{BACKEND_URL}/api"
 
 async def test_production_rebalancing():
