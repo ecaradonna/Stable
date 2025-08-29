@@ -36,7 +36,7 @@ function formatUSD(x) {
 }
 
 export default function PegStatusWidget({
-  apiBase = "http://localhost:8001/api/peg",
+  apiBase,
   symbols = ["USDT", "USDC", "DAI", "FRAX", "TUSD", "PYUSD"],
   refreshMs = 30000,
   linkHref = "/peg-monitor",
