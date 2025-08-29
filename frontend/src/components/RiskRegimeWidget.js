@@ -13,7 +13,7 @@ import {
   RefreshCw
 } from 'lucide-react';
 
-const RiskRegimeWidget = () => {
+const RiskRegimeWidget = ({ onCreateAlert }) => {
   const [regimeData, setRegimeData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
