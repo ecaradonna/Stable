@@ -257,7 +257,7 @@ const ApiDocumentationPage = () => {
                   <Card key={index} className="hover:shadow-lg transition-shadow">
                     <CardHeader>
                       <div className="flex items-center space-x-4">
-                        <div className="w-12 h-12 bg-gradient-to-r from-[#4CC1E9] to-[#007A99] rounded-lg flex items-center justify-center">
+                        <div className="w-12 h-12 bg-[#1F4FFF] rounded-lg flex items-center justify-center">
                           <IconComponent className="w-6 h-6 text-white" />
                         </div>
                         <CardTitle className="text-xl text-[#0E1A2B]">{capability.title}</CardTitle>
