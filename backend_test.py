@@ -6992,17 +6992,15 @@ class StableYieldTester:
             async with self.session.get(f"{API_BASE}/peg/check") as response:
                 if response.status == 200:
                     data = await response.json()
-                    required_fields = ['symbols_analyzed', 'depegs_detected', 'market_health']
-                    missing_fields = [field for field in required_fields if field not in data]
-                    
-                    if not missing_fields:
-                        symbols = data.get('symbols_analyzed')
-                        depegs = data.get('depegs_detected')
-                        health = data.get('market_health')
+                    if 'data' in data and 'analysis' in data['data']:
+                        analysis = data['data']['analysis']
+                        symbols = analysis.get('symbols_analyzed')
+                        depegs = analysis.get('depegs_detected')
+                        max_deviation = analysis.get('max_deviation_bps')
                         self.log_test("Peg Check Endpoint", True, 
-                                    f"Symbols: {symbols}, Depegs: {depegs}, Health: {health}")
+                                    f"Symbols: {symbols}, Depegs: {depegs}, Max deviation: {max_deviation} bps")
                     else:
-                        self.log_test("Peg Check Endpoint", False, f"Missing fields: {missing_fields}")
+                        self.log_test("Peg Check Endpoint", False, f"Invalid response structure: {data}")
                 else:
                     self.log_test("Peg Check Endpoint", False, f"HTTP {response.status}")
         except Exception as e:
