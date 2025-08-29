@@ -196,7 +196,7 @@ const ApiDocumentationPage = () => {
             <div className="text-center">
               <h1 className="text-4xl md:text-6xl font-bold text-[#0E1A2B] mb-6">
                 StableYield API – Institutional-Grade 
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#4CC1E9] to-[#007A99]">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#1F4FFF] to-[#E47C3C]">
                   {" "}Stablecoin Intelligence
                 </span>
               </h1>
