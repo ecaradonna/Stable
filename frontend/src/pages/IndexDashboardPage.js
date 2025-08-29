@@ -576,7 +576,7 @@ const IndexDashboardPage = () => {
           </div>
           
           <div className="max-w-md mx-auto">
-            <RiskRegimeWidget />
+            <RiskRegimeWidget onCreateAlert={() => setIsContactOpen(true)} />
           </div>
         </div>
       </section>
