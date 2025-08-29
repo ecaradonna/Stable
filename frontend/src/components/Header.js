@@ -22,18 +22,14 @@ const Header = ({ onJoinWaitlist, onDownloadWhitepaper }) => {
     <header className="sticky top-0 bg-white/95 backdrop-blur-sm border-b border-gray-100 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center py-4">
-          {/* Logo */}
+          {/* Logo - Separate from Navigation */}
           <Link to="/" className="flex items-center space-x-3">
-            <div className="relative">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#4CC1E9] to-[#007A99] flex items-center justify-center shadow-lg">
-                <span className="text-white font-bold text-lg">Y</span>
-              </div>
+            <div className="w-10 h-10 bg-gradient-to-r from-[#4CC1E9] to-[#007A99] rounded-lg flex items-center justify-center shadow-lg">
+              <span className="text-white font-bold text-xl">SY</span>
             </div>
-            <div className="hidden sm:block">
-              <span className="text-xl font-bold tracking-wider">
-                <span className="text-[#0E1A2B]">STABLE</span>
-                <span className="text-[#2E6049]">YIELD</span>
-              </span>
+            <div>
+              <div className="text-xl font-bold text-[#0E1A2B]">StableYield</div>
+              <div className="text-xs text-gray-600">Market Intelligence</div>
             </div>
           </Link>
 
