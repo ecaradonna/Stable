@@ -150,7 +150,7 @@ const MethodologyPage = () => {
                         <ul className="space-y-2">
                           {step.details.map((detail, index) => (
                             <li key={index} className="flex items-start">
-                              <div className="w-2 h-2 bg-[#4CC1E9] rounded-full mt-2 mr-3 flex-shrink-0"></div>
+                              <div className="w-2 h-2 bg-[#1F4FFF] rounded-full mt-2 mr-3 flex-shrink-0"></div>
                               <span className="text-gray-700">{detail}</span>
                             </li>
                           ))}
