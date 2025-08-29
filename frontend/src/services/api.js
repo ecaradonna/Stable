@@ -18,7 +18,6 @@ const getBackendURL = () => {
   const hostname = window.location.hostname;
   return `${protocol}//${hostname}`;
 };
-};
 
 const BACKEND_URL = getBackendURL();
 const API = `${BACKEND_URL}/api`;
