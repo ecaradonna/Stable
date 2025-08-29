@@ -319,7 +319,7 @@ const ApiDocumentationPage = () => {
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
               {accessSteps.map((step, index) => (
                 <div key={index} className="text-center">
-                  <div className="w-16 h-16 bg-gradient-to-r from-[#4CC1E9] to-[#007A99] text-white rounded-full flex items-center justify-center font-bold text-xl mb-4 mx-auto">
+                  <div className="w-16 h-16 bg-[#1F4FFF] text-white rounded-full flex items-center justify-center font-bold text-xl mb-4 mx-auto">
                     {step.step}
                   </div>
                   <h3 className="font-semibold text-[#0E1A2B] mb-3">{step.title}</h3>
