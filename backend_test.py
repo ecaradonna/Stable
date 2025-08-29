@@ -6947,11 +6947,11 @@ class StableYieldTester:
             async with self.session.get(f"{API_BASE}/syi/current") as response:
                 if response.status == 200:
                     data = await response.json()
-                    required_fields = ['syi_value', 'methodology_version', 'components_count']
+                    required_fields = ['syi_percent', 'methodology_version', 'components_count']
                     missing_fields = [field for field in required_fields if field not in data]
                     
                     if not missing_fields:
-                        syi_value = data.get('syi_value')
+                        syi_value = data.get('syi_percent')
                         version = data.get('methodology_version')
                         components = data.get('components_count')
                         self.log_test("SYI Current Endpoint", True, 
