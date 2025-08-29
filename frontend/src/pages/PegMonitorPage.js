@@ -55,7 +55,7 @@ const PegMonitorPage = () => {
           USDT: (Math.random() - 0.5) * 4, // -2 to +2 bps
           USDC: (Math.random() - 0.5) * 3, // -1.5 to +1.5 bps  
           DAI: (Math.random() - 0.5) * 6,  // -3 to +3 bps
-          FRAX: (Math.random() - 0.5) * 1000 + 5000, // Major depeg around 5000 bps (50%)
+          FRAX: (Math.random() - 0.5) * 40, // Normal volatility around 0, +/- 20 bps
         });
       }
       
