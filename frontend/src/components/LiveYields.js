@@ -28,7 +28,7 @@ const API = `${BACKEND_URL}/api`;
 
 console.log('LiveYields using Backend URL:', BACKEND_URL); // Debug log
 
-const LiveYields = () => {
+const LiveYields = ({ onJoinWaitlist }) => {
   const [yieldsData, setYieldsData] = useState([]);
   const [riskMetrics, setRiskMetrics] = useState({});
   const [lastUpdated, setLastUpdated] = useState(new Date());
