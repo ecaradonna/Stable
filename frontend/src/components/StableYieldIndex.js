@@ -1,186 +1,190 @@
 import React from "react";
+import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Badge } from "./ui/badge";
-import { TrendingUp, Shield, Zap, Target, BarChart3, CheckCircle, ArrowRight } from "lucide-react";
-import { Button } from "./ui/button";
+import { ArrowRight, BarChart3, Shield, TrendingUp, Activity, CheckCircle, Target, Zap } from "lucide-react";
 
 const StableYieldIndex = ({ onJoinWaitlist }) => {
-  const indexComponents = [
+  const capabilities = [
+    {
+      icon: TrendingUp,
+      title: "Real-Time Yields",
+      description: "Live yield data across 50+ DeFi and CeFi protocols with 30-second updates and historical performance tracking.",
+      color: "text-[#1F4FFF]",
+      bgColor: "bg-[#1F4FFF]/10"
+    },
     {
       icon: BarChart3,
-      title: "Raw Yield Data",
-      description: "Aggregated from DeFi, CeFi, and TradFi sources",
-      color: "text-[#4CC1E9]"
-    },
-    {
-      icon: Shield, 
-      title: "Peg Stability Metrics",
-      description: "Is the stablecoin truly holding $1.00?",
-      color: "text-[#007A99]"
-    },
-    {
-      icon: Zap,
-      title: "Liquidity Metrics", 
-      description: "How easily can capital move without slippage?",
-      color: "text-[#2E6049]"
-    }
-  ];
-
-  const benefits = [
-    {
-      icon: Target,
-      title: "Brings Clarity to a Fragmented Market",
-      description: "Stablecoin yields are scattered across platforms, protocols, and exchanges. The StableYield Index aggregates this into a single reference point, just like the S&P 500 does for equities."
+      title: "SYI Benchmark",
+      description: "The world's first institutional-grade stablecoin yield benchmark, comparable to T-Bills and Euribor.",
+      color: "text-[#1F4FFF]",
+      bgColor: "bg-[#1F4FFF]/10"
     },
     {
       icon: Shield,
-      title: "Separates Signal from Noise", 
-      description: "Not all yields are created equal — some come with hidden risks (illiquidity, depegging, counterparty failure). The Index cuts through hype by weighting yields based on safety and liquidity, not just APY size."
+      title: "Risk Analytics",
+      description: "Advanced peg monitoring, liquidity analysis, and automated risk regime detection with confidence scoring.",
+      color: "text-[#D64545]",
+      bgColor: "bg-[#D64545]/10"
     },
     {
-      icon: BarChart3,
-      title: "Creates a Benchmark for Investors",
-      description: "Funds, institutions, and allocators need benchmarks to measure performance. The StableYield Index becomes the standard yardstick for stablecoin strategies."
-    },
+      icon: Activity,
+      title: "Market Intelligence",
+      description: "Institutional insights, portfolio stress testing, and cross-asset correlations for informed decision making.",
+      color: "text-[#9FA6B2]",
+      bgColor: "bg-[#9FA6B2]/10"
+    }
+  ];
+
+  const whyItMatters = [
     {
       icon: CheckCircle,
-      title: "Supports Transparency & Trust",
-      description: "By publishing a transparent methodology, StableYield positions itself as the data authority for stablecoin yields, helping investors make more informed decisions."
+      title: "Clarity",
+      description: "Cut through the noise with standardized, transparent yield calculations across all major stablecoins.",
+      highlight: "clarity"
     },
     {
-      icon: TrendingUp,
-      title: "Enables Products & Reporting",
-      description: "Just like equity or bond indices underpin ETFs, structured products, and media coverage, the StableYield Index can be licensed to funds, exchanges, custodians, and financial media."
+      icon: Shield,
+      title: "Risk-Adjusted", 
+      description: "Unlike raw APYs, our Risk-Adjusted Yield (RAY) accounts for peg stability, liquidity depth, and protocol risk.",
+      highlight: "risk"
+    },
+    {
+      icon: Target,
+      title: "Benchmark",
+      description: "The industry standard for measuring and comparing stablecoin performance — trusted by institutions globally.",
+      highlight: "benchmark"
+    },
+    {
+      icon: Zap,
+      title: "Transparency",
+      description: "Open methodology, auditable calculations, and real-time data — no black boxes or proprietary secrets.",
+      highlight: "transparency"
     }
   ];
 
   return (
-    <section className="py-20 bg-gradient-to-br from-gray-50 to-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section Header */}
-        <div className="text-center mb-16">
-          <div className="inline-flex items-center px-4 py-2 bg-[#4CC1E9]/10 border border-[#4CC1E9]/20 rounded-full mb-6">
-            <BarChart3 className="w-4 h-4 text-[#4CC1E9] mr-2" />
-            <span className="text-[#007A99] font-semibold text-sm">World's First Stablecoin Yield Benchmark</span>
-          </div>
-          
-          <h2 className="text-3xl md:text-5xl font-bold text-[#0E1A2B] mb-6">
-            What is the StableYield Index?
-          </h2>
-          
-          <div className="max-w-4xl mx-auto">
-            <p className="text-xl text-gray-600 leading-relaxed mb-8">
-              The StableYield Index is the <strong>world's first benchmark for stablecoin yields</strong>. 
-              It measures and tracks how much return (APY) investors can earn on stablecoins — 
-              adjusted for peg stability, liquidity, and risk.
+    <div className="bg-white">
+      {/* What is SYI Section */}
+      <section className="py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <Badge className="bg-[#1F4FFF]/10 text-[#1F4FFF] mb-6 px-4 py-2">
+              What is the StableYield Index?
+            </Badge>
+            <h2 className="text-3xl font-bold text-[#0E1A2B] mb-6">
+              The world's first benchmark for stablecoin yields
+            </h2>
+            <p className="text-xl text-gray-600 max-w-4xl mx-auto mb-8">
+              The StableYield Index measures and tracks how much return investors can earn on stablecoins — 
+              adjusted for peg stability, liquidity, and risk. Unlike simple yield trackers that only display 
+              headline APYs, the StableYield Index goes deeper.
             </p>
-            
-            <div className="bg-gradient-to-r from-[#4CC1E9]/10 to-[#007A99]/10 rounded-2xl p-6 border border-[#4CC1E9]/20">
-              <p className="text-lg text-[#0E1A2B] leading-relaxed">
-                Unlike simple yield trackers that only display headline APYs, the StableYield Index goes deeper. 
-                It creates a <strong>risk-adjusted yield benchmark</strong> that reflects where safe, 
-                sustainable returns actually exist in the stablecoin economy.
+            <div className="bg-[#1F4FFF]/5 border-l-4 border-[#1F4FFF] p-6 max-w-4xl mx-auto rounded-r-lg">
+              <p className="text-lg text-gray-700">
+                It creates a <strong className="text-[#1F4FFF]">risk-adjusted yield benchmark</strong> that reflects 
+                where <strong>safe, sustainable returns</strong> actually exist in the stablecoin economy.
               </p>
             </div>
           </div>
         </div>
+      </section>
 
-        {/* Index Components */}
-        <div className="mb-16">
-          <h3 className="text-2xl font-bold text-[#0E1A2B] text-center mb-8">
-            How the Index Works
-          </h3>
-          <p className="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
-            The StableYield Index blends three critical components to create the most comprehensive 
-            stablecoin yield benchmark:
-          </p>
+      {/* Capabilities Section */}
+      <section className="py-20 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold text-[#0E1A2B] mb-4">
+              Comprehensive Stablecoin Intelligence
+            </h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              Everything you need to understand, analyze, and optimize stablecoin yields in one platform
+            </p>
+          </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {indexComponents.map((component, index) => {
-              const IconComponent = component.icon;
+          <div className="grid md:grid-cols-2 gap-8">
+            {capabilities.map((capability, index) => {
+              const IconComponent = capability.icon;
               return (
-                <Card key={index} className="text-center hover:shadow-lg transition-all duration-300 border-2 hover:border-[#4CC1E9]/30">
+                <Card key={index} className="hover:shadow-lg transition-shadow border-0 shadow-md">
                   <CardHeader>
-                    <div className={`w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-[#4CC1E9]/10 to-[#007A99]/10 flex items-center justify-center`}>
-                      <IconComponent className={`w-8 h-8 ${component.color}`} />
+                    <div className="flex items-center space-x-4">
+                      <div className={`w-12 h-12 ${capability.bgColor} rounded-lg flex items-center justify-center`}>
+                        <IconComponent className={`w-6 h-6 ${capability.color}`} />
+                      </div>
+                      <CardTitle className="text-xl text-[#0E1A2B]">{capability.title}</CardTitle>
                     </div>
-                    <CardTitle className="text-xl text-[#0E1A2B]">{component.title}</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-gray-600">{component.description}</p>
+                    <p className="text-gray-600">{capability.description}</p>
                   </CardContent>
                 </Card>
               );
             })}
           </div>
-          
-          <div className="text-center mt-8">
-            <Badge className="bg-gradient-to-r from-[#4CC1E9] to-[#007A99] text-white px-4 py-2">
-              = Risk-Adjusted Yield Benchmark
-            </Badge>
-          </div>
         </div>
+      </section>
 
-        {/* Why It's Important */}
-        <div className="mb-16">
-          <h3 className="text-2xl md:text-3xl font-bold text-[#0E1A2B] text-center mb-12">
-            Why is it Important?
-          </h3>
+      {/* Why It Matters Section */}
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold text-[#0E1A2B] mb-4">
+              Why StableYield Matters
+            </h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              The stablecoin economy needs reliable, institutional-grade benchmarks
+            </p>
+          </div>
           
-          <div className="space-y-8">
-            {benefits.map((benefit, index) => {
-              const IconComponent = benefit.icon;
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {whyItMatters.map((item, index) => {
+              const IconComponent = item.icon;
               return (
-                <div key={index} className="bg-white rounded-xl p-6 shadow-md hover:shadow-lg transition-shadow border border-gray-100">
-                  <div className="flex items-start space-x-4">
-                    <div className="flex-shrink-0">
-                      <div className="w-12 h-12 bg-gradient-to-br from-[#4CC1E9] to-[#007A99] rounded-lg flex items-center justify-center">
-                        <IconComponent className="w-6 h-6 text-white" />
-                      </div>
-                    </div>
-                    <div className="flex-1">
-                      <h4 className="text-xl font-bold text-[#0E1A2B] mb-3">{benefit.title}</h4>
-                      <p className="text-gray-600 leading-relaxed">{benefit.description}</p>
-                    </div>
+                <div key={index} className="text-center group">
+                  <div className="w-16 h-16 bg-[#1F4FFF]/10 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-[#1F4FFF]/20 transition-colors">
+                    <IconComponent className="w-8 h-8 text-[#1F4FFF]" />
                   </div>
+                  <h3 className="text-xl font-semibold text-[#0E1A2B] mb-3">{item.title}</h3>
+                  <p className="text-gray-600 text-sm leading-relaxed">{item.description}</p>
                 </div>
               );
             })}
           </div>
         </div>
+      </section>
 
-        {/* Bottom Summary */}
-        <div className="bg-gradient-to-r from-[#0E1A2B] to-[#2E6049] rounded-2xl p-8 md:p-12 text-white text-center">
-          <div className="max-w-4xl mx-auto">
-            <h3 className="text-2xl md:text-3xl font-bold mb-6">The Foundation for Smarter Stablecoin Investing</h3>
-            
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 mb-8">
-              <p className="text-xl leading-relaxed">
-                <strong>In short:</strong> The StableYield Index transforms stablecoin yields from a chaotic marketplace 
-                into a transparent, trusted benchmark — the foundation for safer allocation, better reporting, and smarter products.
-              </p>
-            </div>
+      {/* Closing CTA Section */}
+      <section className="py-20 bg-gradient-to-r from-[#1F4FFF] to-[#9FA6B2]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <h2 className="text-3xl font-bold text-white mb-4">
+              Ready to explore stablecoin yields?
+            </h2>
+            <p className="text-xl text-white/90 max-w-2xl mx-auto mb-8">
+              Get instant access to real-time data, risk analytics, and institutional-grade benchmarks
+            </p>
             
             <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-6">
               <Button 
-                className="bg-white text-[#0E1A2B] hover:bg-gray-100 font-semibold px-8 py-3"
+                className="bg-white text-[#1F4FFF] hover:bg-gray-100 font-semibold px-8 py-3 rounded-xl transition-all duration-300"
                 onClick={() => window.location.href = '/index-dashboard'}
               >
-                View Live Index
+                Explore Live Index
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
               <Button 
                 variant="outline" 
-                className="border-white text-white hover:bg-white hover:text-[#0E1A2B] px-8 py-3"
-                onClick={() => window.location.href = '/methodology'}
+                className="border-2 border-white text-white hover:bg-white hover:text-[#1F4FFF] font-semibold px-8 py-3 rounded-xl transition-all duration-300"
+                onClick={onJoinWaitlist}
               >
-                Read Methodology
+                Request API Access
               </Button>
             </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </div>
   );
 };
 
