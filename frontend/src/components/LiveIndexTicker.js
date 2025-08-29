@@ -176,22 +176,24 @@ const LiveIndexTicker = () => {
           </div>
         </div>
         
-        <div className="text-right">
-          <div className="text-xs text-gray-500">
-            {indexData.constituents_count} assets
+        <div className="text-center">
+          <div className="text-xs text-gray-500">Last Update</div>
+          <div className="text-sm font-medium text-[#0E1A2B]">
+            {Math.floor(indexData.last_update_seconds / 60)}m ago
           </div>
-          <div className="text-xs text-gray-500">
-            Updated {Math.floor(indexData.last_update_seconds / 60)}m ago
-          </div>
-          <div className={`text-xs font-medium ${getStatusColor(indexData.status)}`}>
-            {indexData.status.toUpperCase()}
+        </div>
+        
+        <div className="text-center">
+          <div className="text-xs text-gray-500">Status</div>
+          <div className="text-sm font-medium text-[#0E1A2B] capitalize">
+            {indexData.status}
           </div>
         </div>
       </div>
       
       {/* Real-time data status */}
-      <div className="mt-2 text-xs text-gray-400">
-        📊 Live SYI v{indexData.methodology_version} • Weighted RAY Calculation • Updated: {new Date().toLocaleTimeString()}
+      <div className="mt-4 text-center text-xs text-gray-400">
+        📊 Live SYI v{indexData.methodology_version ? indexData.methodology_version : '2.0.0'} • Weighted RAY Calculation • Updated: {new Date().toLocaleTimeString()}
       </div>
     </div>
   );
