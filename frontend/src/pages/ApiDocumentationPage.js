@@ -208,17 +208,21 @@ const ApiDocumentationPage = () => {
 
               {/* Badges */}
               <div className="flex flex-wrap items-center justify-center gap-4 mb-12">
-                <Badge className="bg-green-100 text-green-800 px-4 py-2">
+                <Badge className="bg-[#1F4FFF]/10 text-[#1F4FFF] border-[#1F4FFF]/20 px-4 py-2 font-medium">
                   <CheckCircle className="w-4 h-4 mr-2" />
                   99.9% Uptime SLA
                 </Badge>
-                <Badge className="bg-blue-100 text-blue-800 px-4 py-2">
+                <Badge className="bg-[#1F4FFF]/10 text-[#1F4FFF] border-[#1F4FFF]/20 px-4 py-2 font-medium">
                   <Shield className="w-4 h-4 mr-2" />
                   Enterprise Security
                 </Badge>
-                <Badge className="bg-purple-100 text-purple-800 px-4 py-2">
+                <Badge className="bg-[#1F4FFF]/10 text-[#1F4FFF] border-[#1F4FFF]/20 px-4 py-2 font-medium">
                   <Clock className="w-4 h-4 mr-2" />
                   Real-Time & Historical Data
+                </Badge>
+                <Badge className="bg-[#E47C3C]/10 text-[#E47C3C] border-[#E47C3C]/20 px-4 py-2 font-medium">
+                  <FileText className="w-4 h-4 mr-2" />
+                  MiCA / BMR Compliant
                 </Badge>
               </div>
 
