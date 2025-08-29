@@ -6941,6 +6941,182 @@ class StableYieldTester:
         except Exception as e:
             self.log_test("AI Portfolio Summary", False, f"Exception: {str(e)}")
 
+    async def test_syi_current_endpoint(self):
+        """Test GET /api/syi/current endpoint (Critical)"""
+        try:
+            async with self.session.get(f"{API_BASE}/syi/current") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    required_fields = ['syi_value', 'methodology_version', 'components_count']
+                    missing_fields = [field for field in required_fields if field not in data]
+                    
+                    if not missing_fields:
+                        syi_value = data.get('syi_value')
+                        version = data.get('methodology_version')
+                        components = data.get('components_count')
+                        self.log_test("SYI Current Endpoint", True, 
+                                    f"SYI: {syi_value}%, Version: {version}, Components: {components}")
+                    else:
+                        self.log_test("SYI Current Endpoint", False, f"Missing fields: {missing_fields}")
+                else:
+                    self.log_test("SYI Current Endpoint", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("SYI Current Endpoint", False, f"Exception: {str(e)}")
+
+    async def test_peg_check_endpoint(self):
+        """Test GET /api/peg/check endpoint (Critical)"""
+        try:
+            async with self.session.get(f"{API_BASE}/peg/check") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    required_fields = ['symbols_analyzed', 'depegs_detected', 'market_health']
+                    missing_fields = [field for field in required_fields if field not in data]
+                    
+                    if not missing_fields:
+                        symbols = data.get('symbols_analyzed')
+                        depegs = data.get('depegs_detected')
+                        health = data.get('market_health')
+                        self.log_test("Peg Check Endpoint", True, 
+                                    f"Symbols: {symbols}, Depegs: {depegs}, Health: {health}")
+                    else:
+                        self.log_test("Peg Check Endpoint", False, f"Missing fields: {missing_fields}")
+                else:
+                    self.log_test("Peg Check Endpoint", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("Peg Check Endpoint", False, f"Exception: {str(e)}")
+
+    async def test_database_connectivity(self):
+        """Test database connectivity through health endpoint"""
+        try:
+            async with self.session.get(f"{API_BASE}/health") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    db_status = data.get('database', 'unknown')
+                    if db_status == 'connected':
+                        self.log_test("Database Connectivity", True, "MongoDB connection healthy")
+                    else:
+                        self.log_test("Database Connectivity", False, f"Database status: {db_status}")
+                else:
+                    self.log_test("Database Connectivity", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("Database Connectivity", False, f"Exception: {str(e)}")
+
+    async def test_api_response_formats(self):
+        """Test API response formats and data consistency"""
+        try:
+            # Test multiple endpoints for consistent response format
+            endpoints_to_test = [
+                ("/health", "status"),
+                ("/yields/", None),  # Should be array
+                ("/syi/current", "syi_value")
+            ]
+            
+            consistent_responses = 0
+            total_tests = len(endpoints_to_test)
+            
+            for endpoint, expected_field in endpoints_to_test:
+                try:
+                    async with self.session.get(f"{API_BASE}{endpoint}") as response:
+                        if response.status == 200:
+                            data = await response.json()
+                            if expected_field is None:  # Array expected
+                                if isinstance(data, list):
+                                    consistent_responses += 1
+                            elif expected_field in data:
+                                consistent_responses += 1
+                except:
+                    pass  # Count as inconsistent
+            
+            success_rate = (consistent_responses / total_tests) * 100
+            if success_rate >= 80:
+                self.log_test("API Response Formats", True, f"Consistency: {success_rate:.1f}%")
+            else:
+                self.log_test("API Response Formats", False, f"Low consistency: {success_rate:.1f}%")
+        except Exception as e:
+            self.log_test("API Response Formats", False, f"Exception: {str(e)}")
+
+    async def test_cors_configuration(self):
+        """Test CORS configuration"""
+        try:
+            # Make a preflight request to test CORS
+            headers = {
+                'Origin': 'https://yield-index-dash.preview.emergentagent.com',
+                'Access-Control-Request-Method': 'GET',
+                'Access-Control-Request-Headers': 'Content-Type'
+            }
+            
+            async with self.session.options(f"{API_BASE}/health", headers=headers) as response:
+                cors_headers = response.headers
+                has_cors = 'Access-Control-Allow-Origin' in cors_headers
+                
+                if has_cors or response.status == 200:
+                    self.log_test("CORS Configuration", True, "CORS headers present or endpoint accessible")
+                else:
+                    self.log_test("CORS Configuration", False, f"No CORS headers, status: {response.status}")
+        except Exception as e:
+            self.log_test("CORS Configuration", False, f"Exception: {str(e)}")
+
+    async def test_error_handling_mechanisms(self):
+        """Test error handling and fallback mechanisms"""
+        try:
+            # Test invalid endpoint
+            async with self.session.get(f"{API_BASE}/invalid-endpoint-test") as response:
+                if response.status == 404:
+                    self.log_test("Error Handling - 404", True, "Proper 404 response for invalid endpoint")
+                else:
+                    self.log_test("Error Handling - 404", False, f"Unexpected status: {response.status}")
+            
+            # Test invalid parameters
+            async with self.session.get(f"{API_BASE}/yields/INVALID_COIN") as response:
+                if response.status in [404, 422]:
+                    self.log_test("Error Handling - Invalid Params", True, f"Proper error response: {response.status}")
+                else:
+                    self.log_test("Error Handling - Invalid Params", False, f"Unexpected status: {response.status}")
+                    
+        except Exception as e:
+            self.log_test("Error Handling Mechanisms", False, f"Exception: {str(e)}")
+
+    async def test_data_consistency(self):
+        """Test data consistency across endpoints"""
+        try:
+            # Get data from multiple endpoints and check for consistency
+            syi_data = None
+            yields_data = None
+            
+            # Get SYI data
+            try:
+                async with self.session.get(f"{API_BASE}/syi/current") as response:
+                    if response.status == 200:
+                        syi_data = await response.json()
+            except:
+                pass
+            
+            # Get yields data
+            try:
+                async with self.session.get(f"{API_BASE}/yields/") as response:
+                    if response.status == 200:
+                        yields_data = await response.json()
+            except:
+                pass
+            
+            # Check consistency
+            if syi_data and yields_data:
+                syi_components = syi_data.get('components_count', 0)
+                yields_count = len(yields_data) if isinstance(yields_data, list) else 0
+                
+                # Allow some variance in component counts
+                if abs(syi_components - yields_count) <= 3:
+                    self.log_test("Data Consistency", True, 
+                                f"SYI components ({syi_components}) ~ Yields count ({yields_count})")
+                else:
+                    self.log_test("Data Consistency", False, 
+                                f"Mismatch: SYI components ({syi_components}) vs Yields ({yields_count})")
+            else:
+                self.log_test("Data Consistency", False, "Could not retrieve data for consistency check")
+                
+        except Exception as e:
+            self.log_test("Data Consistency", False, f"Exception: {str(e)}")
+
     async def run_critical_api_tests(self):
         """Run critical API endpoint tests as specified in review request"""
         print(f"🚀 Starting Critical Backend API Tests (Post-Frontend Redesign)")
