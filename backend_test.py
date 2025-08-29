@@ -6963,6 +6963,29 @@ class StableYieldTester:
         except Exception as e:
             self.log_test("SYI Current Endpoint", False, f"Exception: {str(e)}")
 
+    async def test_index_family_overview_endpoint(self):
+        """Test GET /api/v1/index-family/overview endpoint (Critical)"""
+        try:
+            async with self.session.get(f"{API_BASE}/v1/index-family/overview") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if isinstance(data, list) and len(data) > 0:
+                        first_index = data[0]
+                        required_fields = ['index_name', 'current_value', 'performance']
+                        missing_fields = [field for field in required_fields if field not in first_index]
+                        
+                        if not missing_fields:
+                            self.log_test("Index Family Overview", True, 
+                                        f"Found {len(data)} indices, first: {first_index.get('index_name')}")
+                        else:
+                            self.log_test("Index Family Overview", False, f"Missing fields: {missing_fields}")
+                    else:
+                        self.log_test("Index Family Overview", False, f"Empty or invalid response: {data}")
+                else:
+                    self.log_test("Index Family Overview", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("Index Family Overview", False, f"Exception: {str(e)}")
+
     async def test_peg_check_endpoint(self):
         """Test GET /api/peg/check endpoint (Critical)"""
         try:
