@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { Button } from "./ui/button";
 
 /**
  * PegStatusWidget – drop-in widget for StableYield dashboard
