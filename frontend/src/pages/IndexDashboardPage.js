@@ -121,13 +121,13 @@ const IndexDashboardPage = () => {
           
           // Create constituents from yields data instead of indices
           if (yieldsData && Array.isArray(yieldsData) && yieldsData.length > 0) {
-            const transformedConstituents = yieldsData.map(yield => ({
-              name: yield.stablecoin || yield.symbol || 'Unknown',
-              protocol_name: yield.platform || yield.protocol_name || 'Various Protocols',
-              yield: yield.apy ? (yield.apy * 100).toFixed(2) : '0.00',
-              ray: yield.ray ? (yield.ray * 100).toFixed(2) : (yield.apy ? (yield.apy * 100).toFixed(2) : '0.00'),
-              risk_score: yield.risk_score ? yield.risk_score.toFixed(1) : '5.0',
-              tvl: yield.tvl || '$N/A'
+            const transformedConstituents = yieldsData.map(yieldItem => ({
+              name: yieldItem.stablecoin || yieldItem.symbol || 'Unknown',
+              protocol_name: yieldItem.platform || yieldItem.protocol_name || 'Various Protocols',
+              yield: yieldItem.apy ? (yieldItem.apy * 100).toFixed(2) : '0.00',
+              ray: yieldItem.ray ? (yieldItem.ray * 100).toFixed(2) : (yieldItem.apy ? (yieldItem.apy * 100).toFixed(2) : '0.00'),
+              risk_score: yieldItem.risk_score ? yieldItem.risk_score.toFixed(1) : '5.0',
+              tvl: yieldItem.tvl || '$N/A'
             }));
             setConstituents(transformedConstituents);
           } else {
