@@ -228,7 +228,7 @@ const ApiDocumentationPage = () => {
 
               {/* Primary CTA */}
               <Button 
-                className="bg-gradient-to-r from-[#4CC1E9] to-[#007A99] hover:from-[#007A99] hover:to-[#4CC1E9] text-white font-semibold px-12 py-4 text-lg rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                className="bg-[#E47C3C] hover:bg-[#E47C3C]/90 text-white font-semibold px-12 py-4 text-lg rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300"
                 onClick={() => setShowRequestForm(true)}
               >
                 Request API Access
