@@ -6941,6 +6941,56 @@ class StableYieldTester:
         except Exception as e:
             self.log_test("AI Portfolio Summary", False, f"Exception: {str(e)}")
 
+    async def run_critical_api_tests(self):
+        """Run critical API endpoint tests as specified in review request"""
+        print(f"🚀 Starting Critical Backend API Tests (Post-Frontend Redesign)")
+        print(f"📍 Testing against: {API_BASE}")
+        print("=" * 80)
+        
+        # Critical API Endpoints Status Check
+        print("\n🔧 Critical API Endpoints Status Check")
+        await self.test_health_check()
+        await self.test_api_root()
+        
+        # 1. GET /api/syi/current (StableYield Index calculation)
+        print("\n📈 StableYield Index (SYI) Calculation")
+        await self.test_syi_current_endpoint()
+        await self.test_syi_health()
+        
+        # 2. GET /api/v1/index-family/overview (Index Family data)
+        print("\n📊 Index Family Data")
+        await self.test_index_family_overview()
+        
+        # 3. GET /api/peg/check (Peg monitoring system)
+        print("\n📊 Peg Monitoring System")
+        await self.test_peg_check_endpoint()
+        await self.test_pegcheck_health()
+        
+        # 4. GET /api/regime/current (Risk regime system)
+        print("\n⚠️ Risk Regime System")
+        await self.test_regime_current()
+        await self.test_regime_health_check()
+        
+        # 5. GET /api/yields/ (Yield data endpoints)
+        print("\n💰 Yield Data Endpoints")
+        await self.test_yields_all()
+        await self.test_yields_specific()
+        await self.test_yields_summary()
+        
+        # Service Health Verification
+        print("\n🔍 Service Health Verification")
+        await self.test_database_connectivity()
+        await self.test_api_response_formats()
+        await self.test_cors_configuration()
+        
+        # Integration Points Verification
+        print("\n🔗 Integration Points Verification")
+        await self.test_error_handling_mechanisms()
+        await self.test_data_consistency()
+        
+        # Print final summary
+        self.print_test_summary()
+
     async def run_all_tests(self):
         """Run all backend tests"""
         print(f"🚀 Starting StableYield Backend API Tests")
