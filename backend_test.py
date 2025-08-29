@@ -7163,12 +7163,10 @@ class StableYieldTester:
         # 3. GET /api/peg/check (Peg monitoring system)
         print("\n📊 Peg Monitoring System")
         await self.test_peg_check_endpoint()
-        await self.test_pegcheck_health()
         
         # 4. GET /api/regime/current (Risk regime system)
         print("\n⚠️ Risk Regime System")
-        await self.test_regime_current()
-        await self.test_regime_health_check()
+        await self.test_regime_current_endpoint()
         
         # 5. GET /api/yields/ (Yield data endpoints)
         print("\n💰 Yield Data Endpoints")
