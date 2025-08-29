@@ -141,7 +141,8 @@ const ApiDocumentationPage = () => {
       features: [
         "1k calls/day",
         "15-min delayed data",
-        "Basic dashboard"
+        "Basic dashboard",
+        "Community support"
       ],
       buttonText: "Get Started",
       popular: false
@@ -153,19 +154,22 @@ const ApiDocumentationPage = () => {
         "Real-time data",
         "Risk ON/OFF alerts via Telegram/TradingView",
         "Weekly market insights report",
-        "100k calls/day"
+        "100k calls/day",
+        "Priority support"
       ],
       buttonText: "Request Access",
-      popular: true
+      popular: true,
+      badge: "Most Popular"
     },
     {
       name: "Enterprise",
       price: "Contact Sales",
       features: [
         "Unlimited access",
-        "SLA guarantees",
+        "99.9% SLA guarantees",
         "Monthly report & advisory",
-        "Custom API endpoints"
+        "Custom API endpoints",
+        "Dedicated support manager"
       ],
       buttonText: "Contact Sales",
       popular: false
