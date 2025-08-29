@@ -132,11 +132,11 @@ const MethodologyPage = () => {
                     <CardHeader>
                       <div className="flex items-center space-x-4">
                         <div className="flex items-center space-x-3">
-                          <div className="w-10 h-10 bg-gradient-to-r from-[#4CC1E9] to-[#007A99] text-white rounded-full flex items-center justify-center font-bold">
+                          <div className="w-10 h-10 bg-[#1F4FFF] text-white rounded-full flex items-center justify-center font-bold">
                             {step.step}
                           </div>
-                          <div className="w-12 h-12 bg-[#4CC1E9]/10 rounded-lg flex items-center justify-center">
-                            <IconComponent className="w-6 h-6 text-[#4CC1E9]" />
+                          <div className="w-12 h-12 bg-[#1F4FFF]/10 rounded-lg flex items-center justify-center">
+                            <IconComponent className="w-6 h-6 text-[#1F4FFF]" />
                           </div>
                         </div>
                         <div>
