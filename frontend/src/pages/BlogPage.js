@@ -47,14 +47,14 @@ const BlogPage = () => {
         <section className="py-16">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="mb-8">
-              <span className="text-sm font-semibold text-[#4CC1E9] uppercase tracking-wider">Featured Intelligence Report</span>
+              <span className="text-sm font-semibold text-[#1F4FFF] uppercase tracking-wider">Featured Intelligence Report</span>
             </div>
             
             <div className="bg-gradient-to-br from-white to-gray-50 rounded-2xl p-8 md:p-12 shadow-lg border border-gray-100">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
                 <div>
                   <div className="flex items-center space-x-4 mb-4">
-                    <span className="bg-[#4CC1E9]/10 text-[#4CC1E9] px-3 py-1 rounded-full text-sm font-medium">
+                    <span className="bg-[#1F4FFF]/10 text-[#1F4FFF] px-3 py-1 rounded-full text-sm font-medium">
                       {featuredPost.category}
                     </span>
                     <div className="flex items-center text-gray-500 text-sm">
@@ -79,15 +79,15 @@ const BlogPage = () => {
                         day: 'numeric' 
                       })}
                     </span>
-                    <Button className="bg-gradient-to-r from-[#4CC1E9] to-[#007A99] hover:from-[#007A99] hover:to-[#4CC1E9] text-white">
+                    <Button className="bg-[#E47C3C] hover:bg-[#E47C3C]/90 text-white">
                       Read Article
                       <ArrowRight className="w-4 h-4 ml-2" />
                     </Button>
                   </div>
                 </div>
                 
-                <div className="bg-gradient-to-br from-[#4CC1E9]/10 to-[#007A99]/10 rounded-xl p-8 h-64 flex items-center justify-center">
-                  <TrendingUp className="w-24 h-24 text-[#4CC1E9]" />
+                <div className="bg-gradient-to-br from-[#1F4FFF]/10 to-[#E47C3C]/10 rounded-xl p-8 h-64 flex items-center justify-center">
+                  <TrendingUp className="w-24 h-24 text-[#1F4FFF]" />
                 </div>
               </div>
             </div>
