@@ -145,18 +145,34 @@ const LiveIndexTicker = () => {
   }
 
   return (
-    <div className="bg-gradient-to-r from-[#4CC1E9]/10 to-[#007A99]/10 rounded-lg p-4 border border-[#4CC1E9]/20">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-3">
-          <div className={getStatusColor(indexData.status)}>
-            {getStatusIcon(indexData.status)}
+    <div className="bg-gradient-to-r from-[#4CC1E9]/10 to-[#007A99]/10 rounded-lg p-6 border border-[#4CC1E9]/20">
+      {/* Centered Layout */}
+      <div className="text-center">
+        {/* Title */}
+        <div className="text-lg font-semibold text-gray-700 mb-2">StableYield Index (SYI)</div>
+        
+        {/* Main SYI Value - Prominently Displayed */}
+        <div className="mb-4">
+          <div className="text-4xl font-bold text-[#0E1A2B] mb-1">
+            {indexData.value.toFixed(4)}%
           </div>
-          
-          <div>
-            <div className="text-sm text-gray-600">StableYield Index (SYI)</div>
-            <div className="text-2xl font-bold text-[#0E1A2B]">
-              {indexData.value.toFixed(4)}%
+          <div className="flex items-center justify-center space-x-2">
+            <div className={getStatusColor(indexData.status)}>
+              {getStatusIcon(indexData.status)}
             </div>
+            <span className="text-sm text-gray-600 capitalize">
+              {indexData.status} • {indexData.constituents_count} constituents
+            </span>
+          </div>
+        </div>
+      </div>
+      
+      {/* Details Row */}
+      <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+        <div className="text-center">
+          <div className="text-xs text-gray-500">Methodology</div>
+          <div className="text-sm font-medium text-[#0E1A2B]">
+            {indexData.methodology_version ? `v${indexData.methodology_version}` : 'v2.0.0'}
           </div>
         </div>
         
