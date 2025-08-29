@@ -25,8 +25,15 @@ def merge_cefi_refs(coingecko_prices: Dict[str, float],
         # Use CoinGecko as primary if valid
         if not math.isnan(cg_price) and cg_price > 0:
             if not math.isnan(cc_price) and cc_price > 0:
-                # Both sources available - use average but weight CoinGecko higher
-                merged[symbol] = (cg_price * 0.7) + (cc_price * 0.3)
+                # Both sources available - check for consistency before averaging
+                price_diff_pct = abs(cg_price - cc_price) / cg_price * 100
+                
+                # If prices differ by more than 100%, use only CoinGecko (more reliable)
+                if price_diff_pct > 100:
+                    merged[symbol] = cg_price
+                else:
+                    # Prices are reasonably close - use weighted average (CoinGecko preferred)
+                    merged[symbol] = (cg_price * 0.7) + (cc_price * 0.3)
             else:
                 # Only CoinGecko available
                 merged[symbol] = cg_price
