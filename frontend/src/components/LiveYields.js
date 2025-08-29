@@ -10,14 +10,18 @@ import { useToast } from "../hooks/use-toast";
 import axios from "axios";
 
 const getBackendURL = () => {
-  if (window.location.hostname === 'localhost') {
-    return 'http://localhost:8001';
-  }
-  // Always use HTTPS in production/preview environments
-  const envBackendUrl = process.env.REACT_APP_BACKEND_URL || import.meta.env.REACT_APP_BACKEND_URL;
+  // Always use environment variable if available
+  const envBackendUrl = process.env.REACT_APP_BACKEND_URL || import.meta?.env?.REACT_APP_BACKEND_URL;
   if (envBackendUrl) {
     return envBackendUrl;
   }
+  
+  // Fallback for localhost development
+  if (window.location.hostname === 'localhost') {
+    return 'http://localhost:8001';
+  }
+  
+  // Use same protocol and hostname as current page
   const protocol = window.location.protocol === 'https:' ? 'https:' : window.location.protocol;
   const hostname = window.location.hostname;
   return `${protocol}//${hostname}`;
