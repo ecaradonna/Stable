@@ -24,7 +24,7 @@ const Header = ({ onJoinWaitlist, onDownloadWhitepaper }) => {
         <div className="flex justify-between items-center py-4">
           {/* Logo - Separate from Navigation */}
           <Link to="/" className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gradient-to-r from-[#4CC1E9] to-[#007A99] rounded-lg flex items-center justify-center shadow-lg">
+            <div className="w-10 h-10 bg-[#1F4FFF] rounded-lg flex items-center justify-center shadow-lg">
               <span className="text-white font-bold text-xl">SY</span>
             </div>
             <div>
