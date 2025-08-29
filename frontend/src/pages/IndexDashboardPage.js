@@ -557,6 +557,7 @@ const IndexDashboardPage = () => {
             <PegStatusWidget 
               symbols={["USDT", "USDC", "DAI", "FRAX", "TUSD", "PYUSD"]}
               linkHref="/peg-monitor"
+              onCreateAlert={() => setIsContactOpen(true)}
             />
           </div>
         </div>
