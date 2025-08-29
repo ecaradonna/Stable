@@ -27,8 +27,8 @@ const HomePage = () => {
         onDownloadWhitepaper={() => setIsWhitepaperOpen(true)}
       />
       <HeroSection onJoinWaitlist={() => setIsContactOpen(true)} />
-      <LiveYields />
-      <StableYieldIndex />
+      <LiveYields onJoinWaitlist={() => setIsContactOpen(true)} />
+      <StableYieldIndex onJoinWaitlist={() => setIsContactOpen(true)} />
       <QuotationSection 
         onJoinWaitlist={() => setIsContactOpen(true)}
         onDownloadWhitepaper={() => setIsWhitepaperOpen(true)}
