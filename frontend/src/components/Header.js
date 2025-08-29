@@ -33,27 +33,42 @@ const Header = ({ onJoinWaitlist, onDownloadWhitepaper }) => {
             </div>
           </Link>
 
-          {/* Navigation */}
-          <nav className="hidden md:flex items-center space-x-6">
+          {/* Navigation - Separate Section */}
+          <nav className="hidden md:flex items-center space-x-1">
             <Link 
               to="/index-dashboard"
-              className="text-[#0E1A2B] hover:text-[#2E6049] transition-colors font-medium"
+              className={getLinkClassName('/index-dashboard')}
             >
               Live Index
             </Link>
-            <Link to="/yield-indices" className="text-[#0E1A2B] hover:text-[#2E6049] transition-colors font-medium">
+            <Link 
+              to="/yield-indices" 
+              className={getLinkClassName('/yield-indices')}
+            >
               Yield Indices & Benchmarks
             </Link>
-            <Link to="/peg-monitor" className="text-[#0E1A2B] hover:text-[#2E6049] transition-colors font-medium">
+            <Link 
+              to="/peg-monitor" 
+              className={getLinkClassName('/peg-monitor')}
+            >
               Peg Monitor
             </Link>
-            <Link to="/blog" className="text-[#0E1A2B] hover:text-[#2E6049] transition-colors font-medium">
+            <Link 
+              to="/blog" 
+              className={getLinkClassName('/blog')}
+            >
               Market Insights
             </Link>
-            <Link to="/methodology" className="text-[#0E1A2B] hover:text-[#2E6049] transition-colors font-medium">
+            <Link 
+              to="/methodology" 
+              className={getLinkClassName('/methodology')}
+            >
               Index Methodology
             </Link>
-            <Link to="/api-documentation" className="text-[#0E1A2B] hover:text-[#2E6049] transition-colors font-medium">
+            <Link 
+              to="/api-documentation" 
+              className={getLinkClassName('/api-documentation')}
+            >
               API Access
             </Link>
           </nav>
