@@ -97,13 +97,16 @@ const MethodologyPage = () => {
         <section className="py-16 bg-gradient-to-br from-gray-50 to-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center">
-              <div className="inline-flex items-center px-4 py-2 bg-[#4CC1E9]/10 border border-[#4CC1E9]/20 rounded-full mb-6">
-                <BarChart3 className="w-4 h-4 text-[#4CC1E9] mr-2" />
-                <span className="text-[#007A99] font-semibold text-sm">Transparent Methodology</span>
+              <div className="inline-flex items-center px-4 py-2 bg-[#1F4FFF]/10 border border-[#1F4FFF]/20 rounded-full mb-6">
+                <BarChart3 className="w-4 h-4 text-[#1F4FFF] mr-2" />
+                <span className="text-[#1F4FFF] font-semibold text-sm">Transparent Methodology</span>
               </div>
               
               <h1 className="text-4xl md:text-6xl font-bold text-[#0E1A2B] mb-6">
-                StableYield Index Methodology
+                StableYield Index 
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#1F4FFF] to-[#E47C3C]">
+                  {" "}Methodology
+                </span>
               </h1>
               
               <p className="text-xl text-gray-600 max-w-4xl mx-auto">
