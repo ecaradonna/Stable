@@ -192,6 +192,19 @@ export default function PegStatusWidget({
         </div>
       )}
 
+      {onCreateAlert && (
+        <div className="mt-3 text-center">
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={onCreateAlert}
+            className="text-xs px-3 py-1 h-7"
+          >
+            Create Alert
+          </Button>
+        </div>
+      )}
+
       <div className="mt-3 flex items-center justify-between text-[10px] text-gray-500">
         <span>
           Updated: {data ? new Date((data.as_of || 0) * 1000).toLocaleString() : "–"}
