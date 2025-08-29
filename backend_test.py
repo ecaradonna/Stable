@@ -7478,7 +7478,8 @@ class StableYieldTester:
 async def main():
     """Main test runner"""
     async with StableYieldTester() as tester:
-        await tester.run_all_tests()
+        # Run critical API tests as specified in review request
+        await tester.run_critical_api_tests()
 
 if __name__ == "__main__":
     asyncio.run(main())
