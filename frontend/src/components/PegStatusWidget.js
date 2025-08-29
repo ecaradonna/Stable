@@ -39,6 +39,7 @@ export default function PegStatusWidget({
   symbols = ["USDT", "USDC", "DAI", "FRAX", "TUSD", "PYUSD"],
   refreshMs = 30000,
   linkHref = "/peg-monitor",
+  onCreateAlert,
 }) {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
