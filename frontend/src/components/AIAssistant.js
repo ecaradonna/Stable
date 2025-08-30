@@ -389,8 +389,8 @@ const AIAssistant = ({ className = "", onAnalyticsEvent }) => {
               </div>
             </div>
           </div>
-        </DialogContent>
-      </Dialog>
+        </div>
+      )}
     </>
   );
 };
