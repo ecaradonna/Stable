@@ -1,6 +1,6 @@
 """
 StableYield Index Family Service
-Implements calculation logic for SY100, SY-CeFi, SY-DeFi, SY-RPI
+Implements calculation logic for SYC, SY-CeFi, SY-DeFi, SY-RPI
 Enhanced with real Coinbase API integration for CeFi data
 """
 
