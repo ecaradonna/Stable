@@ -337,7 +337,17 @@ const IndexFamilyOverview = () => {
                     {data.constituent_count && (
                       <div className="flex justify-between text-sm">
                         <span className="text-gray-500">Constituents:</span>
-                        <span className="font-medium">{data.constituent_count}</span>
+                        <div className="flex items-center space-x-2">
+                          <span className="font-medium">{data.constituent_count}</span>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-6 px-2 text-xs text-[#1F4FFF] border-[#1F4FFF] hover:bg-[#1F4FFF] hover:text-white"
+                            onClick={() => window.location.href = `/index-dashboard?tab=${key}&view=constituents`}
+                          >
+                            View Details
+                          </Button>
+                        </div>
                       </div>
                     )}
                     
