@@ -7616,6 +7616,18 @@ class StableYieldTester:
         await self.test_peg_status_classification()
         await self.test_peg_error_handling()
         
+        # ENHANCED PEGCHECK SYSTEM TESTS (PHASE 2) - NEW IMPLEMENTATION
+        print("\n🔍 Testing Enhanced PegCheck System (Phase 2) - Multi-Source & Storage...")
+        await self.test_enhanced_pegcheck_health()
+        await self.test_enhanced_pegcheck_sources()
+        await self.test_enhanced_pegcheck_multi_source()
+        await self.test_chainlink_integration()
+        await self.test_uniswap_integration()
+        await self.test_storage_backend_health()
+        await self.test_peg_history_retrieval()
+        await self.test_enhanced_peg_error_handling()
+        await self.test_cross_source_consistency()
+        
         # User management tests
         print("\n👥 Testing User Management APIs...")
         await self.test_user_waitlist()
