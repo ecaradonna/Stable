@@ -580,9 +580,9 @@ class IndexFamilyService:
             logger.error(f"Error calculating SY-DeFi: {e}")
             raise
 
-    async def _calculate_sy100(self, date: datetime, constituents: List[Constituent], 
-                              mode: IndexMode) -> IndexValue:
-        """Calculate SY100 (Top 100 Risk-Adjusted Strategies)"""
+    async def _calculate_syc(self, date: datetime, constituents: List[Constituent], 
+                            mode: IndexMode) -> IndexValue:
+        """Calculate SYC (StableYield Composite Index)"""
         try:
             # Filter eligible strategies (all types with sufficient data)
             eligible_strategies = []
