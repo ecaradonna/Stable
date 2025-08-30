@@ -220,13 +220,13 @@ const AIAssistant = ({ className = "", onAnalyticsEvent }) => {
           {/* Header */}
           <DialogHeader className="flex-row items-center justify-between p-4 border-b border-[#E5E7EB] bg-[#F9FAFB]">
             <div className="flex-1">
-              <DialogTitle className="sy-title text-sm font-semibold text-[#1A1A1A] flex items-center space-x-2">
+              <DialogTitle className="text-sm font-semibold text-[#1A1A1A] flex items-center space-x-2">
                 <div className="w-6 h-6 bg-[#1F4FFF] rounded-full flex items-center justify-center">
                   <Sparkles className="w-3 h-3 text-white" />
                 </div>
                 <span>StableYield AI</span>
               </DialogTitle>
-              <p className="sy-subtitle text-xs text-[#6B7280] mt-0.5">Institutional Market Assistant</p>
+              <p className="text-xs text-[#6B7280] mt-0.5">Institutional Market Assistant</p>
             </div>
             
             {/* Header CTAs */}
