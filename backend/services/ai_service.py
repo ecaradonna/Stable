@@ -121,12 +121,14 @@ Current real-time stablecoin yields, peg status, and risk metrics across major p
     def get_sample_queries(self) -> List[str]:
         """Return sample queries users can ask"""
         return [
-            "What's the current risk-adjusted yield ranking for major stablecoins?",
-            "Compare USDC vs USDT yields across CeFi and DeFi platforms",
-            "Which platforms offer the safest high-yield opportunities?",
-            "Analyze the liquidity and counterparty risk for top yields",
-            "What are the key risk factors I should consider for stablecoin yields?",
-            "Show me institutional-grade yield opportunities with low risk scores"
+            "What is RAY (Risk-Adjusted Yield) and how is it calculated?",
+            "What's the current SYI value and what does it mean?",
+            "Compare USDC vs USDT yields with risk adjustments",
+            "Explain Risk ON vs Risk OFF market regimes", 
+            "Which stablecoins are currently depegged?",
+            "Show me the StableYield Index methodology",
+            "What are the safest high-yield opportunities right now?",
+            "Analyze peg stability across major stablecoins"
         ]
 
 # Import uuid for the service
