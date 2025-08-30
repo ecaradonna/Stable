@@ -80,7 +80,7 @@ const HeroSection = ({ onJoinWaitlist, onDownloadWhitepaper }) => {
               className="bg-[#1F4FFF] hover:bg-[#1F4FFF]/90 text-white font-semibold px-8 py-4 text-lg rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
               onClick={() => window.location.href = '/index-dashboard'}
             >
-              View Live Index
+              Explore Live Index
               <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
             <Button 
