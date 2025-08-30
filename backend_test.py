@@ -1848,7 +1848,7 @@ class StableYieldTester:
             self.log_test("Risk Regime Validation - Invalid Date Range", False, f"Exception: {str(e)}")
 
     # ========================================
-    # PEGCHECK SYSTEM TESTS (PHASE 2)
+    # PEGCHECK SYSTEM TESTS (PHASE 2 & 3)
     # ========================================
     
     async def test_peg_health_check(self):
