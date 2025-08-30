@@ -253,9 +253,9 @@ const RiskAnalyticsPage = () => {
               <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-6">
                 <Button 
                   className="bg-white text-[#0E1A2B] hover:bg-gray-100 font-semibold px-8 py-3"
-                  onClick={() => navigate('/dashboard')}
+                  onClick={() => navigate('/index-dashboard')}
                 >
-                  View Risk Dashboard
+                  View Live Dashboard
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
                 <Button 
