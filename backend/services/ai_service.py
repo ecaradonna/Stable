@@ -229,16 +229,16 @@ Current real-time stablecoin yields, peg status, and risk metrics across major p
             )
 
     def get_sample_queries(self) -> List[str]:
-        """Return sample queries users can ask"""
+        """Return sample queries users can ask - based on key StableYield Q&A"""
         return [
-            "What is RAY (Risk-Adjusted Yield) and how is it calculated?",
-            "What's the current SYI value and what does it mean?",
-            "Compare USDC vs USDT yields with risk adjustments",
-            "Explain Risk ON vs Risk OFF market regimes", 
-            "Which stablecoins are currently depegged?",
-            "Show me the StableYield Index methodology",
-            "What are the safest high-yield opportunities right now?",
-            "Analyze peg stability across major stablecoins"
+            "What is the StableYield Index (SYI)?",
+            "How does SYI help me manage risk?", 
+            "What advantage does it give traders?",
+            "How does it support treasury managers?",
+            "Can I receive automatic alerts?",
+            "How can I access the data?",
+            "What's the advantage over DeFiLlama?",
+            "Why do I need a benchmark for stablecoins?"
         ]
 
 # Import uuid for the service
