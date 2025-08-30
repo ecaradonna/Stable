@@ -117,14 +117,28 @@ async def check_peg_stability(
         default="USDT,USDC,DAI",
         description="Comma-separated list of symbols to check"
     ),
+    with_oracle: bool = Query(
+        default=False,
+        description="Include Chainlink oracle data"
+    ),
+    with_dex: bool = Query(
+        default=False,
+        description="Include Uniswap v3 TWAP data"
+    ),
+    store_result: bool = Query(
+        default=True,
+        description="Store result in database for historical analysis"
+    ),
     _: None = Depends(check_pegcheck_availability)
 ):
     """
-    Check peg stability for specified stablecoins
+    Check peg stability for specified stablecoins with enhanced data sources
     
     Analyzes peg deviation from $1.00 using multiple data sources:
     - CoinGecko (primary CeFi reference)  
     - CryptoCompare (secondary CeFi reference)
+    - Chainlink Oracles (optional, requires ETH_RPC_URL)
+    - Uniswap v3 TWAP (optional, requires ETH_RPC_URL)
     
     Returns detailed analysis including deviation in basis points,
     peg status (normal/warning/depeg), and cross-source consistency.
@@ -138,26 +152,73 @@ async def check_peg_stability(
         if len(symbol_list) > 10:
             raise HTTPException(status_code=400, detail="Maximum 10 symbols allowed")
         
-        logger.info(f"Checking peg stability for symbols: {symbol_list}")
+        logger.info(f"Checking peg stability for symbols: {symbol_list} (oracle: {with_oracle}, dex: {with_dex})")
         
         # Fetch data from sources
         cg_prices = coingecko.fetch(symbol_list)
         cc_prices = cryptocompare.fetch(symbol_list)
         
+        # Optional: Chainlink oracles
+        chainlink_prices = None
+        if with_oracle:
+            try:
+                chainlink_prices = chainlink.fetch(symbol_list)
+                logger.info(f"Chainlink data fetched: {chainlink_prices}")
+            except Exception as e:
+                logger.warning(f"Chainlink fetch error: {e}")
+                chainlink_prices = {symbol: float('nan') for symbol in symbol_list}
+        
+        # Optional: Uniswap v3 TWAP  
+        uniswap_prices = None
+        if with_dex:
+            try:
+                uniswap_prices = uniswap.fetch(symbol_list)
+                logger.info(f"Uniswap data fetched: {uniswap_prices}")
+            except Exception as e:
+                logger.warning(f"Uniswap fetch error: {e}")
+                uniswap_prices = {symbol: float('nan') for symbol in symbol_list}
+        
         # Compute peg analysis
         payload = compute_peg_analysis(
             coingecko_prices=cg_prices,
             cryptocompare_prices=cc_prices,
+            chainlink_prices=chainlink_prices,
+            uniswap_prices=uniswap_prices,
             symbols=symbol_list
         )
         
-        # Format response
+        # Store result if requested and storage is available
+        if store_result and storage_backend:
+            try:
+                await storage_backend.store_peg_check(payload)
+                logger.info(f"Peg check result stored successfully")
+            except Exception as e:
+                logger.warning(f"Failed to store peg check result: {e}")
+        
+        # Format response with enhanced data sources
+        source_prices = {
+            "coingecko": {symbol: round(price, 6) if price == price else None for symbol, price in cg_prices.items()},
+            "cryptocompare": {symbol: round(price, 6) if price == price else None for symbol, price in cc_prices.items()}
+        }
+        
+        if chainlink_prices:
+            source_prices["chainlink"] = {symbol: round(price, 6) if price == price else None for symbol, price in chainlink_prices.items()}
+        
+        if uniswap_prices:
+            source_prices["uniswap"] = {symbol: round(price, 6) if price == price else None for symbol, price in uniswap_prices.items()}
+        
         response_data = {
             "analysis": {
                 "timestamp": payload.as_of,
                 "symbols_analyzed": len(payload.symbols),
                 "depegs_detected": payload.total_depegs,
-                "max_deviation_bps": payload.max_deviation_bps
+                "max_deviation_bps": payload.max_deviation_bps,
+                "data_sources_used": {
+                    "coingecko": True,
+                    "cryptocompare": True,
+                    "chainlink": chainlink_prices is not None,
+                    "uniswap": uniswap_prices is not None
+                }
             },
             "results": [
                 {
@@ -171,34 +232,35 @@ async def check_peg_stability(
                     "peg_status": r.status.value,
                     "is_depegged": r.is_depeg,
                     "confidence": round(r.confidence, 2),
-                    "sources_used": r.sources_used,
-                    "source_prices": {
-                        "coingecko": round(cg_prices.get(r.symbol, float('nan')), 6),
-                        "cryptocompare": round(cc_prices.get(r.symbol, float('nan')), 6)
-                    }
+                    "sources_used": r.sources_used
                 } for r in payload.reports
             ],
+            "source_prices": source_prices,
             "source_consistency": {
                 symbol: round(consistency, 3) if consistency == consistency else None 
                 for symbol, consistency in payload.cefi_consistency.items()
             },
-            "configuration": payload.config
+            "configuration": payload.config,
+            "storage": {
+                "stored": store_result and storage_backend is not None,
+                "backend": STORAGE_TYPE
+            }
         }
         
         return PegCheckResponse(
             success=True,
             data=response_data,
-            message=f"Peg analysis completed for {len(symbol_list)} symbols",
+            message=f"Enhanced peg analysis completed for {len(symbol_list)} symbols using {len(source_prices)} data sources",
             timestamp=datetime.utcnow().isoformat()
         )
         
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Error in peg check: {e}")
+        logger.error(f"Error in enhanced peg check: {e}")
         raise HTTPException(
             status_code=500,
-            detail=f"Peg check failed: {str(e)}"
+            detail=f"Enhanced peg check failed: {str(e)}"
         )
 
 @router.get("/summary", response_model=PegSummaryResponse)
