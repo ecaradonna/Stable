@@ -237,7 +237,7 @@ const AIAssistant = ({ className = "", onAnalyticsEvent }) => {
                 className="text-xs border-[#1F4FFF] text-[#1F4FFF] hover:bg-[#1F4FFF] hover:text-white h-7 px-2"
                 onClick={() => {
                   onAnalyticsEvent?.('bot_alert_subscribe_click');
-                  // Handle alert subscription
+                  window.location.href = '/risk-analytics';
                 }}
               >
                 <Bell className="w-3 h-3 mr-1" />
@@ -255,14 +255,12 @@ const AIAssistant = ({ className = "", onAnalyticsEvent }) => {
                 API Access
               </Button>
               
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleClose}
-                className="hover:bg-gray-100 h-7 w-7 p-0"
+              <button
+                onClick={() => setIsOpen(false)}
+                className="text-[#9FA6B2] hover:text-[#6B7280] p-1"
               >
                 <X className="w-4 h-4" />
-              </Button>
+              </button>
             </div>
           </DialogHeader>
 
