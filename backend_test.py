@@ -17,7 +17,7 @@ from dotenv import load_dotenv
 load_dotenv('/app/frontend/.env')
 
 # Get backend URL from environment - use production URL for testing
-BACKEND_URL = os.getenv('REACT_APP_BACKEND_URL', 'https://yield-index-dash.preview.emergentagent.com')
+BACKEND_URL = os.getenv('REACT_APP_BACKEND_URL', 'https://crypto-yields-1.preview.emergentagent.com')
 API_BASE = f"{BACKEND_URL}/api"
 
 class StableYieldTester:
@@ -7086,7 +7086,7 @@ class StableYieldTester:
         try:
             # Make a preflight request to test CORS
             headers = {
-                'Origin': 'https://yield-index-dash.preview.emergentagent.com',
+                'Origin': 'https://crypto-yields-1.preview.emergentagent.com',
                 'Access-Control-Request-Method': 'GET',
                 'Access-Control-Request-Headers': 'Content-Type'
             }
