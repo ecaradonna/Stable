@@ -206,12 +206,12 @@ const AIAssistant = () => {
             {isLoading && (
               <div className="flex justify-start">
                 <div className="flex items-center space-x-2">
-                  <div className="w-8 h-8 bg-gradient-to-r from-[#4CC1E9] to-[#007A99] rounded-full flex items-center justify-center">
+                  <div className="w-8 h-8 bg-[#1F4FFF] rounded-full flex items-center justify-center">
                     <Bot className="w-4 h-4 text-white" />
                   </div>
                   <div className="bg-gray-100 rounded-lg p-3">
                     <div className="flex items-center space-x-2">
-                      <Loader2 className="w-4 h-4 animate-spin text-[#4CC1E9]" />
+                      <Loader2 className="w-4 h-4 animate-spin text-[#1F4FFF]" />
                       <span className="text-sm text-gray-600">Analyzing...</span>
                     </div>
                   </div>
