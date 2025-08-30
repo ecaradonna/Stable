@@ -231,7 +231,7 @@ const AIAssistant = () => {
                   <button
                     key={index}
                     onClick={() => handleSendMessage(query)}
-                    className="text-left text-sm p-2 bg-white rounded-lg border hover:border-[#4CC1E9] hover:bg-[#4CC1E9]/5 transition-colors"
+                    className="text-left text-sm p-2 bg-white rounded-lg border hover:border-[#1F4FFF] hover:bg-[#1F4FFF]/5 transition-colors"
                     disabled={isLoading}
                   >
                     {query}
