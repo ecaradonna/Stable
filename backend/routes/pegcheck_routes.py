@@ -403,3 +403,186 @@ async def get_peg_thresholds():
     except Exception as e:
         logger.error(f"Error getting thresholds: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/sources")
+async def get_data_sources(
+    _: None = Depends(check_pegcheck_availability)
+):
+    """Get information about available data sources and their health"""
+    try:
+        # Check each source health
+        sources_info = {}
+        
+        # CoinGecko health check
+        try:
+            test_result = coingecko.fetch(["USDT"])
+            sources_info["coingecko"] = {
+                "name": "CoinGecko",
+                "type": "CeFi",
+                "status": "healthy" if test_result.get("USDT", 0) > 0 else "degraded",
+                "description": "Primary CeFi price reference"
+            }
+        except Exception as e:
+            sources_info["coingecko"] = {
+                "name": "CoinGecko", 
+                "type": "CeFi",
+                "status": "error",
+                "error": str(e),
+                "description": "Primary CeFi price reference"
+            }
+        
+        # CryptoCompare health check
+        try:
+            test_result = cryptocompare.fetch(["USDT"])
+            sources_info["cryptocompare"] = {
+                "name": "CryptoCompare",
+                "type": "CeFi", 
+                "status": "healthy" if test_result.get("USDT", 0) > 0 else "degraded",
+                "description": "Secondary CeFi price reference"
+            }
+        except Exception as e:
+            sources_info["cryptocompare"] = {
+                "name": "CryptoCompare",
+                "type": "CeFi",
+                "status": "error", 
+                "error": str(e),
+                "description": "Secondary CeFi price reference"
+            }
+        
+        # Chainlink health check
+        try:
+            chainlink_health = chainlink.health_check()
+            sources_info["chainlink"] = {
+                "name": "Chainlink Oracles",
+                "type": "Oracle",
+                "status": chainlink_health["status"],
+                "description": "On-chain price feeds",
+                "configuration": chainlink_health.get("configured", False),
+                "feeds_available": chainlink_health.get("feeds_available", 0)
+            }
+            if "error" in chainlink_health:
+                sources_info["chainlink"]["error"] = chainlink_health["error"]
+        except Exception as e:
+            sources_info["chainlink"] = {
+                "name": "Chainlink Oracles",
+                "type": "Oracle", 
+                "status": "error",
+                "error": str(e),
+                "description": "On-chain price feeds"
+            }
+        
+        # Uniswap health check
+        try:
+            uniswap_health = uniswap.health_check()
+            sources_info["uniswap"] = {
+                "name": "Uniswap v3 TWAP",
+                "type": "DEX",
+                "status": uniswap_health["status"],
+                "description": "Time-weighted average price from DEX",
+                "configuration": uniswap_health.get("configured", False),
+                "pools_available": uniswap_health.get("pools_available", 0)
+            }
+            if "error" in uniswap_health:
+                sources_info["uniswap"]["error"] = uniswap_health["error"]
+        except Exception as e:
+            sources_info["uniswap"] = {
+                "name": "Uniswap v3 TWAP",
+                "type": "DEX",
+                "status": "error", 
+                "error": str(e),
+                "description": "Time-weighted average price from DEX"
+            }
+        
+        return {
+            "data_sources": sources_info,
+            "configuration": {
+                "eth_rpc_configured": bool(os.getenv("ETH_RPC_URL")),
+                "cryptocompare_api_configured": bool(os.getenv("CRYPTOCOMPARE_API_KEY")),
+                "storage_backend": STORAGE_TYPE
+            },
+            "capabilities": {
+                "cefi_monitoring": True,
+                "oracle_monitoring": bool(os.getenv("ETH_RPC_URL")),
+                "dex_monitoring": bool(os.getenv("ETH_RPC_URL")), 
+                "historical_storage": storage_backend is not None
+            }
+        }
+        
+    except Exception as e:
+        logger.error(f"Error getting data sources info: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/history/{symbol}")
+async def get_peg_history(
+    symbol: str,
+    hours: int = Query(default=24, ge=1, le=168, description="Hours of history to retrieve"),
+    _: None = Depends(check_pegcheck_availability)
+):
+    """Get historical peg data for a symbol"""
+    try:
+        if not storage_backend:
+            raise HTTPException(status_code=503, detail="Storage backend not available")
+        
+        symbol = symbol.upper()
+        history = await storage_backend.get_peg_history(symbol, hours)
+        
+        if not history:
+            return {
+                "symbol": symbol,
+                "hours_requested": hours,
+                "data_points": 0,
+                "history": [],
+                "message": f"No historical data found for {symbol}"
+            }
+        
+        # Format history data
+        formatted_history = [
+            {
+                "timestamp": timestamp.isoformat(),
+                "price_usd": price,
+                "status": status,
+                "deviation_bps": abs(price - 1.0) * 10000 if price > 0 else None
+            }
+            for timestamp, price, status in history
+        ]
+        
+        return {
+            "symbol": symbol,
+            "hours_requested": hours,
+            "data_points": len(formatted_history),
+            "history": formatted_history,
+            "summary": {
+                "min_price": min(h["price_usd"] for h in formatted_history),
+                "max_price": max(h["price_usd"] for h in formatted_history),
+                "avg_price": sum(h["price_usd"] for h in formatted_history) / len(formatted_history),
+                "max_deviation_bps": max(h["deviation_bps"] for h in formatted_history if h["deviation_bps"] is not None)
+            }
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error getting peg history for {symbol}: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/storage/health")
+async def get_storage_health():
+    """Get storage backend health and statistics"""
+    try:
+        if not storage_backend:
+            return {
+                "status": "unavailable",
+                "backend": "none",
+                "error": "No storage backend configured"
+            }
+        
+        health_info = await storage_backend.health_check()
+        return health_info
+        
+    except Exception as e:
+        logger.error(f"Error checking storage health: {e}")
+        return {
+            "status": "error",
+            "backend": STORAGE_TYPE,
+            "error": str(e)
+        }
