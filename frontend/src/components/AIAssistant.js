@@ -215,26 +215,24 @@ const AIAssistant = ({ className = "", onAnalyticsEvent }) => {
 
       {/* AI Panel Dialog */}
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="fixed right-6 bottom-24 w-full max-w-[420px] max-h-[70vh] p-0 border border-[#E5E7EB] rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.08)] bg-white overflow-hidden data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 md:right-6 md:bottom-24 md:w-[420px] sm:max-w-[420px]">
+        <DialogContent className="fixed right-6 bottom-24 w-full max-w-[420px] h-[500px] p-0 border border-[#E5E7EB] rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.08)] bg-white overflow-hidden">
           
           {/* Header */}
-          <DialogHeader className="flex-row items-center justify-between p-4 border-b border-[#E5E7EB] bg-[#F9FAFB]">
+          <div className="flex items-center justify-between p-4 border-b border-[#E5E7EB] bg-[#F9FAFB]">
             <div className="flex-1">
-              <DialogTitle className="text-sm font-semibold text-[#1A1A1A] flex items-center space-x-2">
+              <div className="text-sm font-semibold text-[#1A1A1A] flex items-center space-x-2">
                 <div className="w-6 h-6 bg-[#1F4FFF] rounded-full flex items-center justify-center">
                   <Sparkles className="w-3 h-3 text-white" />
                 </div>
                 <span>StableYield AI</span>
-              </DialogTitle>
+              </div>
               <p className="text-xs text-[#6B7280] mt-0.5">Institutional Market Assistant</p>
             </div>
             
             {/* Header CTAs */}
             <div className="flex items-center space-x-2 ml-4">
-              <Button
-                variant="outline"
-                size="sm"
-                className="text-xs border-[#1F4FFF] text-[#1F4FFF] hover:bg-[#1F4FFF] hover:text-white h-7 px-2"
+              <button
+                className="text-xs border border-[#1F4FFF] text-[#1F4FFF] hover:bg-[#1F4FFF] hover:text-white h-7 px-2 rounded flex items-center"
                 onClick={() => {
                   onAnalyticsEvent?.('bot_alert_subscribe_click');
                   window.location.href = '/risk-analytics';
@@ -242,18 +240,17 @@ const AIAssistant = ({ className = "", onAnalyticsEvent }) => {
               >
                 <Bell className="w-3 h-3 mr-1" />
                 Alerts
-              </Button>
+              </button>
               
-              <Button
-                size="sm"
-                className="text-xs bg-[#E47C3C] hover:bg-[#E47C3C]/90 text-white h-7 px-2"
+              <button
+                className="text-xs bg-[#E47C3C] hover:bg-[#E47C3C]/90 text-white h-7 px-2 rounded"
                 onClick={() => {
                   onAnalyticsEvent?.('bot_api_cta_click');
                   window.location.href = '/api-documentation';
                 }}
               >
                 API Access
-              </Button>
+              </button>
               
               <button
                 onClick={() => setIsOpen(false)}
@@ -262,106 +259,108 @@ const AIAssistant = ({ className = "", onAnalyticsEvent }) => {
                 <X className="w-4 h-4" />
               </button>
             </div>
-          </DialogHeader>
+          </div>
 
           {/* Messages Area */}
-          <div className="flex flex-col h-[calc(70vh-140px)] max-h-96">
+          <div className="flex flex-col h-[320px]">
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
-              {messages.map((message) => (
-                <div key={message.id} className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`flex items-start space-x-2 max-w-[80%] ${message.type === 'user' ? 'flex-row-reverse space-x-reverse' : ''}`}>
-                    
-                    {/* Avatar */}
-                    <div className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 ${
-                      message.type === "user"
-                        ? "bg-[#E47C3C]"
-                        : message.isError
-                        ? "bg-red-500"
-                        : "bg-[#1F4FFF]"
-                    }`}>
-                      {message.type === "user" ? (
-                        <User className="w-4 h-4 text-white" />
-                      ) : (
-                        <Bot className="w-4 h-4 text-white" />
-                      )}
-                    </div>
-
-                    {/* Message Bubble */}
-                    <div className={`rounded-lg p-3 ${
-                      message.type === "user"
-                        ? "bg-[#E47C3C] text-white"
-                        : message.isError
-                        ? "bg-red-50 text-red-700 border border-red-200"
-                        : "bg-[#F9FAFB] text-[#1A1A1A] border border-[#E5E7EB]"
-                    }`}>
-                      <p className="text-sm whitespace-pre-wrap">{message.text}</p>
-                      <p className="text-xs mt-1 opacity-70">
-                        {new Date(message.timestamp).toLocaleTimeString('en-US', {
-                          hour: '2-digit',
-                          minute: '2-digit'
-                        })}
-                      </p>
+              {messages.length === 0 ? (
+                <div className="text-center py-6">
+                  <div className="w-12 h-12 bg-[#1F4FFF] rounded-full flex items-center justify-center mx-auto mb-3">
+                    <Bot className="w-6 h-6 text-white" />
+                  </div>
+                  <p className="text-sm font-medium text-[#1A1A1A] mb-1">👋 Hi, I'm StableYield AI. I can help with stablecoin yields, benchmarks, and market insights.</p>
+                  <p className="text-xs text-[#6B7280]">Ask me anything about our data or indices.</p>
+                </div>
+              ) : (
+                messages.map((message) => (
+                  <div key={message.id} className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}>
+                    <div className={`flex items-start space-x-2 max-w-[80%] ${message.type === 'user' ? 'flex-row-reverse space-x-reverse' : ''}`}>
+                      
+                      {/* Avatar */}
+                      <div className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 ${
+                        message.type === "user"
+                          ? "bg-[#E47C3C]"
+                          : message.isError
+                          ? "bg-red-500"
+                          : "bg-[#1F4FFF]"
+                      }`}>
+                        {message.type === "user" ? (
+                          <User className="w-4 h-4 text-white" />
+                        ) : message.isError ? (
+                          <AlertCircle className="w-4 h-4 text-white" />
+                        ) : (
+                          <Bot className="w-4 h-4 text-white" />
+                        )}
+                      </div>
+                      
+                      {/* Message Content */}
+                      <div className={`px-3 py-2 rounded-xl text-sm ${
+                        message.type === "user"
+                          ? "bg-[#E47C3C] text-white"
+                          : message.isError
+                          ? "bg-red-50 text-red-800 border border-red-200"
+                          : "bg-[#F3F4F6] text-[#1A1A1A]"
+                      }`}>
+                        {message.text}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
-
-              {/* Loading State */}
+                ))
+              )}
+              
               {isLoading && (
                 <div className="flex justify-start">
-                  <div className="flex items-start space-x-2">
-                    <div className="w-7 h-7 bg-[#1F4FFF] rounded-full flex items-center justify-center">
-                      <Bot className="w-4 h-4 text-white" />
+                  <div className="flex items-start space-x-2 max-w-[80%]">
+                    <div className="w-7 h-7 rounded-full bg-[#1F4FFF] flex items-center justify-center flex-shrink-0">
+                      <Loader2 className="w-4 h-4 text-white animate-spin" />
                     </div>
-                    <div className="bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg p-3">
-                      <div className="flex items-center space-x-2">
-                        <Loader2 className="w-4 h-4 animate-spin text-[#1F4FFF]" />
-                        <span className="text-sm text-[#6B7280]">Analyzing market data...</span>
-                      </div>
+                    <div className="px-3 py-2 rounded-xl bg-[#F3F4F6] text-sm text-[#1A1A1A]">
+                      Thinking...
                     </div>
                   </div>
                 </div>
               )}
-
-              <div ref={messagesEndRef} />
             </div>
 
             {/* Quick Prompts */}
-            <div className="p-3 border-t border-[#E5E7EB] bg-[#F9FAFB]">
-              <div className="text-xs font-medium text-[#6B7280] mb-2">Try asking:</div>
-              <div className="grid grid-cols-2 gap-2">
-                {quickPrompts.map((prompt, index) => (
-                  <button
-                    key={index}
-                    onClick={() => handleQuickPromptClick(prompt)}
-                    className="text-left text-xs p-2 bg-white rounded-lg border border-[#E5E7EB] hover:border-[#1F4FFF] hover:text-[#1F4FFF] hover:bg-[#1F4FFF]/5 transition-all duration-150 font-medium"
-                    disabled={isLoading}
-                  >
-                    {prompt}
-                  </button>
-                ))}
+            {messages.length === 0 && (
+              <div className="p-3 border-t border-[#E5E7EB] bg-[#F9FAFB]">
+                <div className="text-xs font-medium text-[#6B7280] mb-2">Try asking:</div>
+                <div className="grid grid-cols-2 gap-2">
+                  {quickPrompts.map((prompt, index) => (
+                    <button
+                      key={index}
+                      onClick={() => handleQuickPromptClick(prompt)}
+                      className="text-left text-xs p-2 bg-white rounded-lg border border-[#E5E7EB] hover:border-[#1F4FFF] hover:text-[#1F4FFF] hover:bg-[#1F4FFF]/5 transition-all duration-150 font-medium"
+                      disabled={isLoading}
+                    >
+                      {prompt}
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Input Area */}
             <div className="p-4 border-t border-[#E5E7EB] bg-white">
               <div className="flex space-x-2">
-                <Input
+                <input
                   ref={inputRef}
                   value={currentMessage}
                   onChange={(e) => setCurrentMessage(e.target.value)}
                   onKeyPress={handleKeyPress}
                   placeholder="Ask me about stablecoin yields..."
-                  className="flex-1 text-sm border-[#E5E7EB] focus:border-[#1F4FFF] focus:ring-[#1F4FFF]"
+                  className="flex-1 px-3 py-2 text-sm border border-[#E5E7EB] rounded-md focus:outline-none focus:border-[#1F4FFF] focus:ring-1 focus:ring-[#1F4FFF]"
                   disabled={isLoading}
                 />
-                <Button
+                <button
                   onClick={() => handleSendMessage()}
                   disabled={!currentMessage.trim() || isLoading}
-                  className="bg-[#E47C3C] hover:bg-[#E47C3C]/90 text-white px-3"
+                  className="bg-[#E47C3C] hover:bg-[#E47C3C]/90 text-white px-3 py-2 rounded-md disabled:opacity-50"
                 >
                   <Send className="w-4 h-4" />
-                </Button>
+                </button>
               </div>
               
               {/* Footer Disclaimer */}
