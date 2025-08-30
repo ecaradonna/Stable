@@ -13,11 +13,11 @@ const Header = ({ onJoinWaitlist, onDownloadWhitepaper }) => {
   };
   
   const getLinkClassName = (path) => {
-    const baseClasses = "font-medium px-3 py-2 rounded-none transition-all duration-200 text-[15px] font-inter relative border-b-2 border-transparent";
+    const baseClasses = "header-nav-item";
     if (isActivePage(path)) {
-      return `${baseClasses} text-[#1F4FFF] border-b-[#1F4FFF]`;
+      return `${baseClasses} active`;
     }
-    return `${baseClasses} text-[#1A1A1A] hover:text-[#1F4FFF] hover:border-b-[#1F4FFF]`;
+    return baseClasses;
   };
 
   const navigationItems = [
