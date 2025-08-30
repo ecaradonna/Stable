@@ -270,6 +270,8 @@ const AIAssistant = ({ className = "", onAnalyticsEvent }) => {
                 <button
                   onClick={() => setIsOpen(false)}
                   className="text-[#9FA6B2] hover:text-[#6B7280] p-1"
+                  aria-label="Close AI Assistant"
+                  type="button"
                 >
                   <X className="w-4 h-4" />
                 </button>
