@@ -196,20 +196,21 @@ const AIAssistant = ({ className = "", onAnalyticsEvent }) => {
       )}
 
       {/* Floating Launcher */}
-      <div className="sy-launcher-wrapper fixed right-6 bottom-6 z-[9999]">
+      <div className="fixed right-6 bottom-6 z-[9999]">
         {/* Live Badge */}
         <div className="absolute -top-2 -right-2 bg-white bg-opacity-90 border border-[#E5E7EB] rounded-full px-2 py-1 shadow-sm">
           <span className="text-[10px] font-semibold text-[#1F4FFF]">AI</span>
         </div>
         
         {/* Launcher Button */}
-        <Button
+        <button
           onClick={handleOpen}
-          className="sy-launcher w-14 h-14 rounded-full bg-[#1F4FFF] hover:bg-[#1B44E6] text-white shadow-[0_10px_24px_rgba(0,0,0,0.15)] hover:shadow-[0_12px_28px_rgba(0,0,0,0.2)] transition-all duration-200 hover:-translate-y-0.5"
+          className="w-14 h-14 rounded-full bg-[#1F4FFF] hover:bg-[#1B44E6] text-white shadow-[0_10px_24px_rgba(0,0,0,0.15)] hover:shadow-[0_12px_28px_rgba(0,0,0,0.2)] transition-all duration-200 hover:-translate-y-0.5 flex items-center justify-center cursor-pointer"
           aria-label="Open StableYield AI Assistant"
+          type="button"
         >
           <MessageCircle className="h-6 w-6" />
-        </Button>
+        </button>
       </div>
 
       {/* AI Panel Dialog */}
