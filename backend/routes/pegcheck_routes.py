@@ -595,3 +595,157 @@ async def get_storage_health():
             "backend": STORAGE_TYPE,
             "error": str(e)
         }
+
+@router.get("/analytics/trends/{symbol}")
+async def get_symbol_trends(
+    symbol: str,
+    hours: int = Query(default=168, ge=1, le=720, description="Hours of history to analyze"),
+    _: None = Depends(check_pegcheck_availability)
+):
+    """Get trend analysis for a specific symbol"""
+    try:
+        if not storage_backend:
+            raise HTTPException(status_code=503, detail="Storage backend not available for trend analysis")
+        
+        # Import trend analyzer
+        from pegcheck.analytics.trend_analyzer import TrendAnalyzer
+        
+        analyzer = TrendAnalyzer(storage_backend)
+        analysis = await analyzer.analyze_symbol_trends(symbol.upper(), hours)
+        
+        if not analysis:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Insufficient data for trend analysis of {symbol.upper()} (minimum 10 data points required)"
+            )
+        
+        return {
+            "symbol": analysis.symbol,
+            "analysis_period_hours": analysis.analysis_period_hours,
+            "data_points": analysis.data_points,
+            "price_metrics": {
+                "avg_price": round(analysis.avg_price, 6),
+                "min_price": round(analysis.min_price, 6),
+                "max_price": round(analysis.max_price, 6),
+                "volatility": round(analysis.price_volatility, 6),
+                "trend": analysis.price_trend
+            },
+            "deviation_metrics": {
+                "avg_deviation_bps": round(analysis.avg_deviation_bps, 1),
+                "max_deviation_bps": round(analysis.max_deviation_bps, 1),
+                "deviation_episodes": analysis.deviation_episodes,
+                "depeg_episodes": analysis.depeg_episodes,
+                "trend": analysis.deviation_trend
+            },
+            "stability_metrics": {
+                "time_in_normal": round(analysis.time_in_normal, 1),
+                "time_in_warning": round(analysis.time_in_warning, 1),
+                "time_in_depeg": round(analysis.time_in_depeg, 1),
+                "risk_score": round(analysis.risk_score, 1),
+                "stability_grade": analysis.stability_grade
+            },
+            "timestamp": datetime.utcnow().isoformat()
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error analyzing trends for {symbol}: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/analytics/market-stability")
+async def get_market_stability_report(
+    symbols: str = Query(
+        default="USDT,USDC,DAI,FRAX,BUSD",
+        description="Comma-separated list of symbols to analyze"
+    ),
+    hours: int = Query(default=168, ge=1, le=720, description="Hours of history to analyze"),
+    _: None = Depends(check_pegcheck_availability)
+):
+    """Get comprehensive market stability report"""
+    try:
+        if not storage_backend:
+            raise HTTPException(status_code=503, detail="Storage backend not available for market analysis")
+        
+        # Parse symbols
+        symbol_list = [s.strip().upper() for s in symbols.split(',') if s.strip()]
+        if not symbol_list:
+            raise HTTPException(status_code=400, detail="No valid symbols provided")
+        
+        # Import trend analyzer
+        from pegcheck.analytics.trend_analyzer import TrendAnalyzer
+        
+        analyzer = TrendAnalyzer(storage_backend)
+        report = await analyzer.get_market_stability_report(symbol_list, hours)
+        
+        if "error" in report:
+            raise HTTPException(status_code=404, detail=report["error"])
+        
+        return report
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error generating market stability report: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/jobs/run-peg-check")
+async def run_manual_peg_check(
+    store_result: bool = Query(default=True, description="Store result in database"),
+    with_oracle: bool = Query(default=False, description="Include Chainlink data"),
+    with_dex: bool = Query(default=False, description="Include Uniswap data"),
+    _: None = Depends(check_pegcheck_availability)
+):
+    """Manually trigger a comprehensive peg check job"""
+    try:
+        if not storage_backend:
+            raise HTTPException(status_code=503, detail="Storage backend not available")
+        
+        from pegcheck.jobs.scheduler import PegCheckScheduler
+        
+        scheduler = PegCheckScheduler(storage_backend, enable_oracle=with_oracle, enable_dex=with_dex)
+        success = await scheduler.run_peg_check_job()
+        
+        if success:
+            return {
+                "success": True,
+                "message": "Peg check job completed successfully",
+                "timestamp": datetime.utcnow().isoformat(),
+                "configuration": {
+                    "oracle_enabled": with_oracle,
+                    "dex_enabled": with_dex,
+                    "result_stored": store_result
+                }
+            }
+        else:
+            raise HTTPException(status_code=500, detail="Peg check job failed")
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error running manual peg check: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/jobs/cleanup")
+async def run_data_cleanup(
+    days_to_keep: int = Query(default=30, ge=7, le=365, description="Days of data to keep"),
+    _: None = Depends(check_pegcheck_availability)
+):
+    """Manually trigger data cleanup job"""
+    try:
+        if not storage_backend:
+            raise HTTPException(status_code=503, detail="Storage backend not available")
+        
+        deleted_count = await storage_backend.cleanup_old_data(days_to_keep)
+        
+        return {
+            "success": True,
+            "message": f"Data cleanup completed",
+            "deleted_records": deleted_count,
+            "days_kept": days_to_keep,
+            "timestamp": datetime.utcnow().isoformat()
+        }
+        
+    except Exception as e:
+        logger.error(f"Error running data cleanup: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
