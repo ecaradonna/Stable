@@ -215,10 +215,10 @@ const AIAssistant = ({ className = "", onAnalyticsEvent }) => {
 
       {/* AI Panel Dialog */}
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="sy-panel fixed right-6 bottom-24 w-full max-w-[420px] max-h-[70vh] p-0 border border-[#E5E7EB] rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.08)] bg-white overflow-hidden sm:right-6 sm:bottom-24 sm:w-[420px] xs:right-0 xs:left-0 xs:bottom-0 xs:max-w-none xs:w-full xs:max-h-[75vh] xs:rounded-t-2xl xs:rounded-b-none">
+        <DialogContent className="fixed right-6 bottom-24 w-full max-w-[420px] max-h-[70vh] p-0 border border-[#E5E7EB] rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.08)] bg-white overflow-hidden data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 md:right-6 md:bottom-24 md:w-[420px] sm:max-w-[420px]">
           
           {/* Header */}
-          <DialogHeader className="sy-header flex-row items-center justify-between p-4 border-b border-[#E5E7EB] bg-[#F9FAFB]">
+          <DialogHeader className="flex-row items-center justify-between p-4 border-b border-[#E5E7EB] bg-[#F9FAFB]">
             <div className="flex-1">
               <DialogTitle className="sy-title text-sm font-semibold text-[#1A1A1A] flex items-center space-x-2">
                 <div className="w-6 h-6 bg-[#1F4FFF] rounded-full flex items-center justify-center">
