@@ -642,7 +642,7 @@ class IndexFamilyService:
             
             return IndexValue(
                 date=date,
-                index_code=IndexCode.SY100,
+                index_code=IndexCode.SYC,
                 value=syc_value,
                 mode=mode,
                 confidence=1.0,
