@@ -49,12 +49,11 @@
 ##
 ## test_plan:
 ##   current_focus:
-##     - "Task name 1"
-##     - "Task name 2"
+##     - "Q&A Integration Testing - AI Chatbot and Web Pages"
 ##   stuck_tasks:
-##     - "Task name with persistent issues"
+##     - "IndexFamilyOverview Component" 
 ##   test_all: false
-##   test_priority: "high_first"  # or "sequential" or "stuck_first"
+##   test_priority: "high_first"
 ##
 ## agent_communication:
 ##     -agent: "main"
