@@ -22,13 +22,22 @@ try:
     from pegcheck.core.config import DEFAULT_SYMBOLS
     from pegcheck.sources import coingecko, cryptocompare, chainlink, uniswap
     from pegcheck.storage.memory import MemoryStorage
-    from pegcheck.storage.postgres import PostgreSQLStorage
+    
+    # Try to import PostgreSQL storage, but make it optional
+    try:
+        from pegcheck.storage.postgres import PostgreSQLStorage
+        POSTGRES_AVAILABLE = True
+    except ImportError as e:
+        logging.warning(f"PostgreSQL storage not available (asyncpg not installed): {e}")
+        POSTGRES_AVAILABLE = False
+        PostgreSQLStorage = None
+    
     PEGCHECK_AVAILABLE = True
     
     # Initialize storage backend
     storage_backend = None
     POSTGRES_URL = os.getenv("POSTGRES_URL")
-    if POSTGRES_URL:
+    if POSTGRES_URL and POSTGRES_AVAILABLE:
         try:
             storage_backend = PostgreSQLStorage(POSTGRES_URL)
             STORAGE_TYPE = "postgresql"
