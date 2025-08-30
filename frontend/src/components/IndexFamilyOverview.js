@@ -88,9 +88,9 @@ const IndexFamilyOverview = () => {
           // Merge with existing SYI-based SYC if available
           const familyIndices = data.data.indices;
           
-          // Only use family SY100 if we don't have new SYI calculation
-          if (!indexData.SY100 && familyIndices.SY100) {
-            indexData.SY100 = familyIndices.SY100;
+          // Only use family SYC if we don't have new SYI calculation
+          if (!indexData.SYC && familyIndices.SYC) {
+            indexData.SYC = familyIndices.SYC;
           }
           
           // Add other indices (SY-CeFi, SY-DeFi, SY-RPI)
