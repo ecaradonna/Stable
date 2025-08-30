@@ -2297,6 +2297,355 @@ class StableYieldTester:
                 self.log_test(f"PegCheck Error Handling ({description})", False, f"Exception: {str(e)}")
 
     # ========================================
+    # PEGCHECK PHASE 3 COMPREHENSIVE TESTS - ANALYTICS & JOB MANAGEMENT
+    # ========================================
+    
+    async def test_pegcheck_phase3_analytics_comprehensive(self):
+        """Comprehensive PegCheck Phase 3 Testing - Advanced Analytics & Job Management"""
+        print("\n📊 COMPREHENSIVE PEGCHECK PHASE 3 TESTING - ADVANCED ANALYTICS & JOB MANAGEMENT")
+        
+        # Phase 3 Analytics Tests
+        analytics_tests = [
+            ("Trend Analysis USDT", f"{API_BASE}/peg/analytics/trends/USDT?hours=168"),
+            ("Trend Analysis USDC", f"{API_BASE}/peg/analytics/trends/USDC?hours=72"),
+            ("Market Stability Report (Major)", f"{API_BASE}/peg/analytics/market-stability?symbols=USDT,USDC,DAI&hours=168"),
+            ("Market Stability Report (Extended)", f"{API_BASE}/peg/analytics/market-stability?symbols=USDT,USDC,DAI,FRAX,BUSD&hours=72"),
+        ]
+        
+        # Phase 3 Job Management Tests
+        job_tests = [
+            ("Manual Peg Check Job", f"{API_BASE}/peg/jobs/run-peg-check?with_oracle=false&with_dex=false", "POST"),
+            ("Data Cleanup Job", f"{API_BASE}/peg/jobs/cleanup?days_to_keep=30", "POST"),
+        ]
+        
+        successful_tests = 0
+        total_tests = len(analytics_tests) + len(job_tests)
+        
+        # Test Analytics Endpoints
+        for test_name, endpoint in analytics_tests:
+            try:
+                async with self.session.get(endpoint) as response:
+                    if response.status == 200:
+                        data = await response.json()
+                        
+                        if "trends" in endpoint:
+                            # Validate trend analysis response
+                            required_fields = ['symbol', 'analysis_period_hours', 'data_points', 'price_metrics', 'deviation_metrics', 'stability_metrics']
+                            missing_fields = [field for field in required_fields if field not in data]
+                            
+                            if not missing_fields:
+                                symbol = data['symbol']
+                                data_points = data['data_points']
+                                stability_grade = data['stability_metrics'].get('stability_grade', 'N/A')
+                                risk_score = data['stability_metrics'].get('risk_score', 0)
+                                avg_deviation = data['deviation_metrics'].get('avg_deviation_bps', 0)
+                                
+                                self.log_test(test_name, True, 
+                                            f"{symbol}: {data_points} points, Grade: {stability_grade}, Risk: {risk_score:.1f}, Avg Dev: {avg_deviation:.1f} bps")
+                                successful_tests += 1
+                            else:
+                                self.log_test(test_name, False, f"Missing fields: {missing_fields}")
+                        
+                        elif "market-stability" in endpoint:
+                            # Validate market stability report
+                            required_fields = ['analysis_period_hours', 'symbols_analyzed', 'market_summary', 'detailed_analysis']
+                            missing_fields = [field for field in required_fields if field not in data]
+                            
+                            if not missing_fields:
+                                symbols_analyzed = data['symbols_analyzed']
+                                market_health = data['market_summary'].get('market_health', 'unknown')
+                                avg_risk_score = data['market_summary'].get('avg_risk_score', 0)
+                                grade_distribution = data['market_summary'].get('grade_distribution', {})
+                                
+                                self.log_test(test_name, True, 
+                                            f"{symbols_analyzed} symbols, Health: {market_health}, Avg Risk: {avg_risk_score:.1f}, Grades: {grade_distribution}")
+                                successful_tests += 1
+                            else:
+                                self.log_test(test_name, False, f"Missing fields: {missing_fields}")
+                        
+                        else:
+                            self.log_test(test_name, True, f"Analytics response received")
+                            successful_tests += 1
+                    
+                    elif response.status == 404:
+                        self.log_test(test_name, False, f"Insufficient data for analysis (404) - expected for new system")
+                    elif response.status == 503:
+                        self.log_test(test_name, False, f"Service unavailable (503) - storage backend required")
+                    else:
+                        self.log_test(test_name, False, f"HTTP {response.status}")
+                        
+            except Exception as e:
+                self.log_test(test_name, False, f"Exception: {str(e)}")
+        
+        # Test Job Management Endpoints
+        for test_name, endpoint, method in job_tests:
+            try:
+                if method == "POST":
+                    async with self.session.post(endpoint) as response:
+                        if response.status == 200:
+                            data = await response.json()
+                            
+                            if "run-peg-check" in endpoint:
+                                # Validate peg check job response
+                                if data.get('success') and 'message' in data and 'configuration' in data:
+                                    config = data['configuration']
+                                    oracle_enabled = config.get('oracle_enabled', False)
+                                    dex_enabled = config.get('dex_enabled', False)
+                                    
+                                    self.log_test(test_name, True, 
+                                                f"Job completed, Oracle: {oracle_enabled}, DEX: {dex_enabled}")
+                                    successful_tests += 1
+                                else:
+                                    self.log_test(test_name, False, f"Invalid job response: {data}")
+                            
+                            elif "cleanup" in endpoint:
+                                # Validate cleanup job response
+                                if data.get('success') and 'deleted_records' in data:
+                                    deleted_records = data.get('deleted_records', 0)
+                                    days_kept = data.get('days_kept', 0)
+                                    
+                                    self.log_test(test_name, True, 
+                                                f"Cleanup completed, {deleted_records} records deleted, {days_kept} days kept")
+                                    successful_tests += 1
+                                else:
+                                    self.log_test(test_name, False, f"Invalid cleanup response: {data}")
+                            
+                            else:
+                                self.log_test(test_name, True, f"Job completed successfully")
+                                successful_tests += 1
+                        
+                        elif response.status == 503:
+                            self.log_test(test_name, False, f"Service unavailable (503) - storage backend required")
+                        else:
+                            self.log_test(test_name, False, f"HTTP {response.status}")
+                            
+            except Exception as e:
+                self.log_test(test_name, False, f"Exception: {str(e)}")
+        
+        # Summary of Phase 3 testing
+        success_rate = (successful_tests / total_tests) * 100
+        self.log_test("PegCheck Phase 3 Summary", successful_tests >= (total_tests * 0.7), 
+                     f"PegCheck Phase 3: {successful_tests}/{total_tests} tests passed ({success_rate:.1f}% success rate)")
+        
+        return successful_tests, total_tests
+
+    async def test_pegcheck_storage_persistence_comprehensive(self):
+        """Test PegCheck Enhanced Storage & Persistence (Phase 3)"""
+        print("\n💾 PEGCHECK ENHANCED STORAGE & PERSISTENCE TESTING (PHASE 3)")
+        
+        storage_tests = [
+            ("Storage Health Check", f"{API_BASE}/peg/storage/health"),
+            ("Historical Data USDT", f"{API_BASE}/peg/history/USDT?hours=24"),
+            ("Historical Data USDC", f"{API_BASE}/peg/history/USDC?hours=72"),
+            ("Historical Data DAI", f"{API_BASE}/peg/history/DAI?hours=168"),
+        ]
+        
+        successful_tests = 0
+        total_tests = len(storage_tests)
+        
+        for test_name, endpoint in storage_tests:
+            try:
+                async with self.session.get(endpoint) as response:
+                    if response.status == 200:
+                        data = await response.json()
+                        
+                        if "storage/health" in endpoint:
+                            # Validate storage health
+                            if 'status' in data:
+                                status = data.get('status', 'unknown')
+                                backend = data.get('backend', 'unknown')
+                                
+                                if status in ['healthy', 'available']:
+                                    self.log_test(test_name, True, f"Status: {status}, Backend: {backend}")
+                                    successful_tests += 1
+                                else:
+                                    self.log_test(test_name, False, f"Unhealthy storage: {status}")
+                            else:
+                                self.log_test(test_name, False, f"Invalid health response: {data}")
+                        
+                        elif "history" in endpoint:
+                            # Validate historical data
+                            required_fields = ['symbol', 'hours_requested', 'data_points', 'history']
+                            missing_fields = [field for field in required_fields if field not in data]
+                            
+                            if not missing_fields:
+                                symbol = data['symbol']
+                                data_points = data['data_points']
+                                hours_requested = data['hours_requested']
+                                
+                                if data_points > 0:
+                                    # Validate history structure
+                                    history = data['history']
+                                    if history and isinstance(history, list):
+                                        first_entry = history[0]
+                                        if 'timestamp' in first_entry and 'price_usd' in first_entry:
+                                            summary = data.get('summary', {})
+                                            min_price = summary.get('min_price', 0)
+                                            max_price = summary.get('max_price', 0)
+                                            
+                                            self.log_test(test_name, True, 
+                                                        f"{symbol}: {data_points} points over {hours_requested}h, Price range: ${min_price:.4f}-${max_price:.4f}")
+                                            successful_tests += 1
+                                        else:
+                                            self.log_test(test_name, False, f"Invalid history entry structure")
+                                    else:
+                                        self.log_test(test_name, False, f"Invalid history format")
+                                else:
+                                    # No data available - acceptable for new system
+                                    self.log_test(test_name, True, f"{symbol}: No historical data (expected for new system)")
+                                    successful_tests += 1
+                            else:
+                                self.log_test(test_name, False, f"Missing fields: {missing_fields}")
+                        
+                        else:
+                            self.log_test(test_name, True, f"Storage response received")
+                            successful_tests += 1
+                    
+                    elif response.status == 503:
+                        self.log_test(test_name, False, f"Service unavailable (503) - storage backend not configured")
+                    else:
+                        self.log_test(test_name, False, f"HTTP {response.status}")
+                        
+            except Exception as e:
+                self.log_test(test_name, False, f"Exception: {str(e)}")
+        
+        # Summary of storage testing
+        success_rate = (successful_tests / total_tests) * 100
+        self.log_test("PegCheck Storage Summary", successful_tests >= (total_tests * 0.75), 
+                     f"Storage & Persistence: {successful_tests}/{total_tests} tests passed ({success_rate:.1f}% success rate)")
+        
+        return successful_tests, total_tests
+
+    async def test_pegcheck_end_to_end_workflow(self):
+        """Test Complete PegCheck End-to-End Workflow (Phase 1-3)"""
+        print("\n🔄 PEGCHECK COMPLETE END-TO-END WORKFLOW TESTING (PHASE 1-3)")
+        
+        workflow_steps = [
+            ("1. Health Check", f"{API_BASE}/peg/health"),
+            ("2. Data Sources Check", f"{API_BASE}/peg/sources"),
+            ("3. Storage Health", f"{API_BASE}/peg/storage/health"),
+            ("4. Manual Peg Check", f"{API_BASE}/peg/jobs/run-peg-check?with_oracle=false&with_dex=false", "POST"),
+            ("5. Peg Analysis", f"{API_BASE}/peg/check?symbols=USDT,USDC,DAI"),
+            ("6. Trend Analysis", f"{API_BASE}/peg/analytics/trends/USDT?hours=24"),
+            ("7. Market Report", f"{API_BASE}/peg/analytics/market-stability?symbols=USDT,USDC,DAI&hours=24"),
+            ("8. Summary Report", f"{API_BASE}/peg/summary"),
+        ]
+        
+        successful_steps = 0
+        total_steps = len(workflow_steps)
+        workflow_data = {}
+        
+        for step_name, endpoint, *method in workflow_steps:
+            try:
+                http_method = method[0] if method else "GET"
+                
+                if http_method == "POST":
+                    async with self.session.post(endpoint) as response:
+                        status_code = response.status
+                        data = await response.json() if response.status == 200 else None
+                else:
+                    async with self.session.get(endpoint) as response:
+                        status_code = response.status
+                        data = await response.json() if response.status == 200 else None
+                
+                if status_code == 200 and data:
+                    # Store workflow data for analysis
+                    workflow_data[step_name] = data
+                    
+                    # Step-specific validation
+                    if "Health Check" in step_name:
+                        if data.get('service') == 'pegcheck' and data.get('status') in ['available', 'healthy']:
+                            self.log_test(step_name, True, f"PegCheck service operational")
+                            successful_steps += 1
+                        else:
+                            self.log_test(step_name, False, f"Service not healthy: {data.get('status')}")
+                    
+                    elif "Data Sources" in step_name:
+                        sources = data.get('data_sources', {})
+                        healthy_sources = sum(1 for s in sources.values() if s.get('status') == 'healthy')
+                        self.log_test(step_name, True, f"{healthy_sources}/{len(sources)} sources healthy")
+                        successful_steps += 1
+                    
+                    elif "Storage Health" in step_name:
+                        status = data.get('status', 'unknown')
+                        if status in ['healthy', 'available']:
+                            self.log_test(step_name, True, f"Storage backend operational: {status}")
+                            successful_steps += 1
+                        else:
+                            self.log_test(step_name, False, f"Storage not healthy: {status}")
+                    
+                    elif "Manual Peg Check" in step_name:
+                        if data.get('success'):
+                            self.log_test(step_name, True, f"Peg check job completed successfully")
+                            successful_steps += 1
+                        else:
+                            self.log_test(step_name, False, f"Peg check job failed")
+                    
+                    elif "Peg Analysis" in step_name:
+                        if data.get('success') and 'analysis' in data.get('data', {}):
+                            analysis = data['data']['analysis']
+                            symbols = analysis.get('symbols_analyzed', 0)
+                            depegs = analysis.get('depegs_detected', 0)
+                            self.log_test(step_name, True, f"{symbols} symbols analyzed, {depegs} depegs detected")
+                            successful_steps += 1
+                        else:
+                            self.log_test(step_name, False, f"Invalid analysis response")
+                    
+                    elif "Trend Analysis" in step_name:
+                        if 'symbol' in data and 'stability_metrics' in data:
+                            symbol = data['symbol']
+                            grade = data['stability_metrics'].get('stability_grade', 'N/A')
+                            self.log_test(step_name, True, f"{symbol} trend analysis complete, Grade: {grade}")
+                            successful_steps += 1
+                        else:
+                            self.log_test(step_name, False, f"Invalid trend analysis response")
+                    
+                    elif "Market Report" in step_name:
+                        if 'market_summary' in data and 'symbols_analyzed' in data:
+                            symbols = data['symbols_analyzed']
+                            health = data['market_summary'].get('market_health', 'unknown')
+                            self.log_test(step_name, True, f"{symbols} symbols, Market health: {health}")
+                            successful_steps += 1
+                        else:
+                            self.log_test(step_name, False, f"Invalid market report response")
+                    
+                    elif "Summary Report" in step_name:
+                        if data.get('success') and 'summary' in data:
+                            summary = data['summary']['overview']
+                            symbols = summary.get('total_symbols', 0)
+                            health = summary.get('market_health', 'unknown')
+                            self.log_test(step_name, True, f"{symbols} symbols tracked, Market: {health}")
+                            successful_steps += 1
+                        else:
+                            self.log_test(step_name, False, f"Invalid summary response")
+                    
+                    else:
+                        self.log_test(step_name, True, f"Step completed successfully")
+                        successful_steps += 1
+                
+                elif status_code == 404:
+                    self.log_test(step_name, False, f"Insufficient data (404) - expected for analytics on new system")
+                elif status_code == 503:
+                    self.log_test(step_name, False, f"Service unavailable (503) - component not configured")
+                else:
+                    self.log_test(step_name, False, f"HTTP {status_code}")
+                    
+            except Exception as e:
+                self.log_test(step_name, False, f"Exception: {str(e)}")
+        
+        # Workflow completion analysis
+        workflow_success_rate = (successful_steps / total_steps) * 100
+        
+        if successful_steps >= 6:  # At least 75% of workflow steps
+            self.log_test("End-to-End Workflow", True, 
+                         f"Workflow: {successful_steps}/{total_steps} steps completed ({workflow_success_rate:.1f}%)")
+        else:
+            self.log_test("End-to-End Workflow", False, 
+                         f"Workflow incomplete: {successful_steps}/{total_steps} steps ({workflow_success_rate:.1f}%)")
+        
+        return successful_steps, total_steps
+
+    # ========================================
     # SYI (STABLEYIELD INDEX) CALCULATION TESTS
     # ========================================
     
