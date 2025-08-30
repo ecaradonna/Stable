@@ -85,8 +85,8 @@ const HeroSection = ({ onJoinWaitlist, onDownloadWhitepaper }) => {
             </Button>
             <Button 
               variant="outline" 
-              className="border-2 border-[#E47C3C] text-[#E47C3C] hover:bg-[#E47C3C] hover:text-white font-semibold px-8 py-4 text-lg rounded-xl transition-all duration-300"
-              onClick={onJoinWaitlist}
+              className="border-2 border-[#E47C3C] text-[#E47C3C] hover:bg-[#E47C3C] hover:text-white font-semibold px-8 py-4 text-lg rounded-xl transition-all duration-300 bg-white"
+              onClick={() => window.location.href = '/api-documentation'}
             >
               Request API Access
             </Button>
