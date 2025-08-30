@@ -305,7 +305,7 @@ const IndexFamilyOverview = () => {
                     <Badge className={getModeColor(data.mode || 'Normal')}>
                       {data.mode || 'Normal'}
                     </Badge>
-                    {data.is_syi_calculated && indexCode === 'SY100' && (
+                    {data.is_syi_calculated && indexCode === 'SYC' && (
                       <Badge className="bg-blue-100 text-blue-800 text-xs">
                         SYI v{data.methodology_version}
                       </Badge>
