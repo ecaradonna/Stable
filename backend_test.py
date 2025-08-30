@@ -7613,6 +7613,16 @@ class StableYieldTester:
         await self.test_user_get()
         await self.test_user_stats()
         
+        # Q&A Integration Testing - AI Chatbot and Web Pages (PRIORITY)
+        print("\n" + "="*80)
+        print("🤖 Q&A INTEGRATION TESTING - AI CHATBOT BACKEND SYSTEMS")
+        print("="*80)
+        await self.test_qa_integration_comprehensive()
+        await self.test_ai_chat_suggestions_quick_prompts()
+        await self.test_ai_live_data_integration()
+        await self.test_ai_error_handling_fallback()
+        await self.test_ai_knowledge_base_accuracy()
+        
         # AI system tests
         print("\n🤖 Testing AI System APIs...")
         await self.test_ai_chat()
