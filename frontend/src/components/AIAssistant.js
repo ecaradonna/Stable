@@ -168,10 +168,10 @@ const AIAssistant = () => {
                   <div
                     className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
                       message.type === "user"
-                        ? "bg-[#2E6049]"
+                        ? "bg-[#E47C3C]"
                         : message.isError
                         ? "bg-red-500"
-                        : "bg-gradient-to-r from-[#4CC1E9] to-[#007A99]"
+                        : "bg-[#1F4FFF]"
                     }`}
                   >
                     {message.type === "user" ? (
