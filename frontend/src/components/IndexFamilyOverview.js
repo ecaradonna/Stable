@@ -343,7 +343,7 @@ const IndexFamilyOverview = () => {
                             size="sm"
                             variant="outline"
                             className="h-6 px-2 text-xs text-[#1F4FFF] border-[#1F4FFF] hover:bg-[#1F4FFF] hover:text-white"
-                            onClick={() => window.location.href = `/index-dashboard?tab=${key}&view=constituents`}
+                            onClick={() => window.location.href = `/index-dashboard?tab=${indexCode}&view=constituents`}
                           >
                             View Details
                           </Button>
