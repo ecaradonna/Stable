@@ -134,15 +134,14 @@ const Header = ({ onJoinWaitlist, onDownloadWhitepaper }) => {
                   Whitepaper
                 </Button>
                 
-                <Button 
-                  onClick={() => {
-                    setIsMenuOpen(false);
-                    window.location.href = '/api-documentation';
-                  }}
-                  className="w-full bg-[#E47C3C] hover:bg-[#E47C3C]/90 text-white font-medium py-2 rounded-md text-[14px]"
-                >
-                  Request API Access
-                </Button>
+                <Link to="/api-documentation">
+                  <Button 
+                    onClick={() => setIsMenuOpen(false)}
+                    className="w-full bg-[#E47C3C] hover:bg-[#E47C3C]/90 text-white font-medium py-2 rounded-md text-[14px]"
+                  >
+                    Request API Access
+                  </Button>
+                </Link>
               </div>
             </div>
           </div>
