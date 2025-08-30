@@ -85,7 +85,7 @@ const IndexFamilyOverview = () => {
         const data = await response.json();
         
         if (data.success && data.data.indices) {
-          // Merge with existing SYI-based SY100 if available
+          // Merge with existing SYI-based SYC if available
           const familyIndices = data.data.indices;
           
           // Only use family SY100 if we don't have new SYI calculation
