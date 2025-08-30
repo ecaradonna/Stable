@@ -635,7 +635,7 @@ class IndexFamilyService:
             final_weights = [w / total_capped for w in capped_weights]
             
             # Calculate weighted index value
-            sy100_value = sum(w * s.ray for w, s in zip(final_weights, top_strategies))
+            syc_value = sum(w * s.ray for w, s in zip(final_weights, top_strategies))
             
             # Calculate HHI
             hhi = sum(w**2 for w in final_weights) * 10000
@@ -643,7 +643,7 @@ class IndexFamilyService:
             return IndexValue(
                 date=date,
                 index_code=IndexCode.SY100,
-                value=sy100_value,
+                value=syc_value,
                 mode=mode,
                 confidence=1.0,
                 hhi=hhi,
