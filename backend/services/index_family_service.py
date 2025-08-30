@@ -594,7 +594,7 @@ class IndexFamilyService:
                     eligible_strategies.append(c)
                     
             if len(eligible_strategies) < 10:
-                logger.warning(f"Insufficient strategies for SY100: {len(eligible_strategies)}")
+                logger.warning(f"Insufficient strategies for SYC: {len(eligible_strategies)}")
                 return IndexValue(
                     date=date,
                     index_code=IndexCode.SY100,
