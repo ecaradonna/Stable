@@ -50,7 +50,7 @@ const IndexFamilyOverview = () => {
       const backendUrl = getBackendURL();
       let indexData = {};
       
-      // First, try to get the new SYI calculation for SY100 index
+      // First, try to get the new SYI calculation for SYC index
       try {
         const syiResponse = await fetch(`${backendUrl}/api/syi/current`);
         const syiData = await syiResponse.json();
