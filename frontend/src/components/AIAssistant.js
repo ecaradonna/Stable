@@ -129,13 +129,13 @@ const AIAssistant = () => {
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogContent className="sm:max-w-[600px] h-[700px] flex flex-col p-0">
           {/* Header */}
-          <DialogHeader className="p-6 pb-4 border-b bg-gradient-to-r from-[#4CC1E9]/5 to-[#007A99]/5">
+          <DialogHeader className="p-6 pb-4 border-b bg-[#1F4FFF]/5">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-gradient-to-r from-[#4CC1E9] to-[#007A99] rounded-full flex items-center justify-center">
+                <div className="w-8 h-8 bg-[#1F4FFF] rounded-full flex items-center justify-center">
                   <Sparkles className="w-4 h-4 text-white" />
                 </div>
-                <DialogTitle className="text-xl font-bold text-[#0E1A2B]">
+                <DialogTitle className="text-xl font-bold text-[#1A1A1A]">
                   StableYield AI
                 </DialogTitle>
               </div>
@@ -148,8 +148,8 @@ const AIAssistant = () => {
                 <X className="w-4 h-4" />
               </Button>
             </div>
-            <p className="text-sm text-gray-600 mt-2">
-              Ask me about stablecoin yields, comparisons, and market analysis
+            <p className="text-sm text-[#6B7280] mt-2">
+              Professional assistant for stablecoin yields, benchmarks, and risk analytics
             </p>
           </DialogHeader>
 
