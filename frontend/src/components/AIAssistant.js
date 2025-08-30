@@ -214,8 +214,12 @@ const AIAssistant = ({ className = "", onAnalyticsEvent }) => {
       </div>
 
       {/* AI Panel Dialog */}
-      <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="fixed right-6 bottom-24 w-full max-w-[420px] h-[500px] p-0 border border-[#E5E7EB] rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.08)] bg-white overflow-hidden">
+      <Dialog open={isOpen} onOpenChange={() => {}}>
+        <DialogContent 
+          className="fixed right-6 bottom-24 w-full max-w-[420px] h-[500px] p-0 border border-[#E5E7EB] rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.08)] bg-white overflow-hidden"
+          onPointerDownOutside={(e) => e.preventDefault()}
+          onInteractOutside={(e) => e.preventDefault()}
+        >
           
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b border-[#E5E7EB] bg-[#F9FAFB]">
@@ -235,6 +239,7 @@ const AIAssistant = ({ className = "", onAnalyticsEvent }) => {
                 className="text-xs border border-[#1F4FFF] text-[#1F4FFF] hover:bg-[#1F4FFF] hover:text-white h-7 px-2 rounded flex items-center"
                 onClick={() => {
                   onAnalyticsEvent?.('bot_alert_subscribe_click');
+                  setIsOpen(false);
                   window.location.href = '/risk-analytics';
                 }}
               >
@@ -246,7 +251,10 @@ const AIAssistant = ({ className = "", onAnalyticsEvent }) => {
                 className="text-xs bg-[#E47C3C] hover:bg-[#E47C3C]/90 text-white h-7 px-2 rounded"
                 onClick={() => {
                   onAnalyticsEvent?.('bot_api_cta_click');
-                  window.location.href = '/api-documentation';
+                  setIsOpen(false);
+                  // Trigger API Access modal opening
+                  const event = new CustomEvent('open-api-modal');
+                  window.dispatchEvent(event);
                 }}
               >
                 API Access
