@@ -83,13 +83,13 @@ const HeroSection = ({ onJoinWaitlist, onDownloadWhitepaper }) => {
               Explore Live Index
               <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
-            <Button 
-              variant="outline" 
-              className="border-2 border-[#E47C3C] text-[#E47C3C] hover:bg-[#E47C3C] hover:text-white font-semibold px-8 py-4 text-lg rounded-xl transition-all duration-300 bg-white"
+            <button 
+              className="inline-flex items-center justify-center border-2 border-[#E47C3C] bg-white text-[#E47C3C] hover:bg-[#E47C3C] hover:text-white font-semibold px-8 py-4 text-lg rounded-xl transition-all duration-300 cursor-pointer gap-2"
               onClick={() => window.location.href = '/api-documentation'}
+              type="button"
             >
               Request API Access
-            </Button>
+            </button>
           </div>
         </div>
       </div>
