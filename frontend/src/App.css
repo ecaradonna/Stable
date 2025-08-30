@@ -32,3 +32,52 @@
         transform: rotate(360deg);
     }
 }
+
+/* Professional Header Menu Hover Styles */
+.header-nav-item {
+    position: relative;
+    display: inline-block;
+    padding: 8px 12px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: 15px;
+    color: #1A1A1A;
+    text-decoration: none;
+    transition: color 150ms ease-in-out;
+}
+
+.header-nav-item::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 12px;
+    right: 12px;
+    height: 1px;
+    background-color: #1F4FFF;
+    transform: scaleX(0);
+    transform-origin: center;
+    transition: transform 150ms ease-in-out;
+}
+
+.header-nav-item:hover {
+    color: #1F4FFF;
+}
+
+.header-nav-item:hover::after {
+    transform: scaleX(1);
+}
+
+.header-nav-item.active {
+    color: #1F4FFF;
+}
+
+.header-nav-item.active::after {
+    transform: scaleX(1);
+}
+
+/* Ensure no layout shifts on hover */
+.header-nav-item:hover {
+    transform: none;
+    margin: 0;
+    padding: 8px 12px;
+}
