@@ -264,8 +264,8 @@ const AIAssistant = () => {
                 )}
               </Button>
             </div>
-            <p className="text-xs text-gray-500 mt-2">
-              Press Enter to send • AI responses include disclaimers
+            <p className="text-xs text-[#9FA6B2] mt-2">
+              Press Enter to send • AI responses are for informational purposes only
             </p>
           </div>
         </DialogContent>
