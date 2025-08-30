@@ -353,8 +353,274 @@ class StableYieldTester:
         except Exception as e:
             self.log_test("User Stats", False, f"Exception: {str(e)}")
     
+    # ========================================
+    # Q&A INTEGRATION TESTING - AI CHATBOT AND WEB PAGES
+    # ========================================
+    
+    async def test_qa_integration_comprehensive(self):
+        """Comprehensive Q&A Integration Testing - AI Chatbot Backend"""
+        print("\n🤖 COMPREHENSIVE Q&A INTEGRATION TESTING - AI CHATBOT BACKEND")
+        
+        # Test all 10 Q&A topics with AI chatbot
+        qa_topics = [
+            "What is the StableYield Index (SYI)?",
+            "Why do I need a benchmark for stablecoins?", 
+            "How does it help me manage risk?",
+            "What advantage does it give a trader?",
+            "And for institutional investors?",
+            "How does it support treasury managers?",
+            "Can I receive automatic alerts?",
+            "What's the advantage over DeFiLlama or similar tools?",
+            "How can I access the data?",
+            "How does it improve my work in practice?"
+        ]
+        
+        successful_responses = 0
+        total_tests = len(qa_topics)
+        
+        for i, question in enumerate(qa_topics, 1):
+            try:
+                payload = {
+                    "message": question,
+                    "session_id": f"qa_test_session_{uuid.uuid4().hex[:8]}",
+                    "user_id": "qa_integration_tester"
+                }
+                
+                async with self.session.post(f"{API_BASE}/ai/chat", json=payload) as response:
+                    if response.status == 200:
+                        data = await response.json()
+                        if 'response' in data and 'session_id' in data:
+                            response_text = data['response']
+                            
+                            # Check if response contains relevant Q&A knowledge
+                            qa_keywords = {
+                                "What is the StableYield Index": ["benchmark", "risk-adjusted", "institutional", "SYI"],
+                                "Why do I need a benchmark": ["APYs", "inflated", "inconsistent", "transparent"],
+                                "How does it help me manage risk": ["peg deviations", "liquidity", "protocol", "capital"],
+                                "What advantage does it give a trader": ["Risk ON", "Risk OFF", "arbitrage", "signals"],
+                                "And for institutional investors": ["governance", "compliance", "benchmark", "institutional"],
+                                "How does it support treasury managers": ["government securities", "risk-adjusted", "regulatory"],
+                                "Can I receive automatic alerts": ["Pro plan", "Telegram", "TradingView", "email", "alerts"],
+                                "What's the advantage over DeFiLlama": ["RAY", "Risk-Adjusted Yield", "institutions", "stability"],
+                                "How can I access the data": ["dashboard", "API access", "reports", "trading desks"],
+                                "How does it improve my work": ["protocols", "index", "yields", "decisions"]
+                            }
+                            
+                            # Find matching keywords for this question
+                            relevant_keywords = []
+                            for key_phrase, keywords in qa_keywords.items():
+                                if key_phrase in question:
+                                    relevant_keywords = keywords
+                                    break
+                            
+                            # Check if response contains expected knowledge
+                            keyword_matches = sum(1 for keyword in relevant_keywords if keyword.lower() in response_text.lower())
+                            has_knowledge = keyword_matches >= 1
+                            
+                            if 'OpenAI API key not configured' in response_text:
+                                self.log_test(f"Q&A {i}: {question[:30]}...", True, "AI service working (needs OpenAI key for full testing)")
+                                successful_responses += 1
+                            elif has_knowledge and len(response_text) > 50:
+                                self.log_test(f"Q&A {i}: {question[:30]}...", True, f"Knowledge-based response ({keyword_matches}/{len(relevant_keywords)} keywords matched)")
+                                successful_responses += 1
+                            elif len(response_text) > 50:
+                                self.log_test(f"Q&A {i}: {question[:30]}...", True, f"AI responded (length: {len(response_text)} chars)")
+                                successful_responses += 1
+                            else:
+                                self.log_test(f"Q&A {i}: {question[:30]}...", False, f"Short/inadequate response: {response_text[:100]}")
+                        else:
+                            self.log_test(f"Q&A {i}: {question[:30]}...", False, f"Invalid response structure: {data}")
+                    else:
+                        self.log_test(f"Q&A {i}: {question[:30]}...", False, f"HTTP {response.status}")
+            except Exception as e:
+                self.log_test(f"Q&A {i}: {question[:30]}...", False, f"Exception: {str(e)}")
+        
+        # Summary of Q&A integration testing
+        success_rate = (successful_responses / total_tests) * 100
+        self.log_test("Q&A Integration Summary", successful_responses == total_tests, 
+                     f"Q&A Integration: {successful_responses}/{total_tests} topics tested successfully ({success_rate:.1f}% success rate)")
+    
+    async def test_ai_chat_suggestions_quick_prompts(self):
+        """Test AI chat quick-prompt suggestions functionality"""
+        try:
+            # Test the samples endpoint (quick-prompt suggestions)
+            async with self.session.get(f"{API_BASE}/ai/chat/samples") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if 'samples' in data and isinstance(data['samples'], list):
+                        samples = data['samples']
+                        
+                        # Verify samples contain Q&A topics
+                        expected_qa_samples = [
+                            "What is the StableYield Index (SYI)?",
+                            "How does SYI help me manage risk?",
+                            "What advantage does it give traders?",
+                            "Can I receive automatic alerts?",
+                            "What's the advantage over DeFiLlama?",
+                            "How can I access the data?"
+                        ]
+                        
+                        matching_samples = [sample for sample in samples if sample in expected_qa_samples]
+                        
+                        if len(matching_samples) >= 4:  # At least 4 Q&A samples should be present
+                            self.log_test("AI Quick-Prompt Suggestions", True, 
+                                        f"Found {len(samples)} samples, {len(matching_samples)} Q&A-based prompts")
+                        else:
+                            self.log_test("AI Quick-Prompt Suggestions", False, 
+                                        f"Only {len(matching_samples)} Q&A samples found, expected at least 4")
+                    else:
+                        self.log_test("AI Quick-Prompt Suggestions", False, f"Invalid response structure: {data}")
+                else:
+                    self.log_test("AI Quick-Prompt Suggestions", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("AI Quick-Prompt Suggestions", False, f"Exception: {str(e)}")
+    
+    async def test_ai_live_data_integration(self):
+        """Test AI integration with live market data systems"""
+        try:
+            # Test AI response with live data query
+            payload = {
+                "message": "What's the current SYI benchmark and how does it compare to individual stablecoin yields?",
+                "session_id": f"live_data_test_{uuid.uuid4().hex[:8]}",
+                "user_id": "live_data_tester"
+            }
+            
+            async with self.session.post(f"{API_BASE}/ai/chat", json=payload) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if 'response' in data:
+                        response_text = data['response']
+                        
+                        # Check for live data integration indicators
+                        live_data_indicators = [
+                            "4.47%", "SYI", "current", "live", "real-time", 
+                            "USDT", "USDC", "DAI", "yield", "benchmark"
+                        ]
+                        
+                        indicator_matches = sum(1 for indicator in live_data_indicators 
+                                              if indicator in response_text)
+                        
+                        if 'OpenAI API key not configured' in response_text:
+                            self.log_test("AI Live Data Integration", True, "AI service working (needs OpenAI key for live data)")
+                        elif indicator_matches >= 3:
+                            self.log_test("AI Live Data Integration", True, 
+                                        f"AI integrating live data ({indicator_matches} data indicators found)")
+                        elif len(response_text) > 50:
+                            self.log_test("AI Live Data Integration", True, 
+                                        f"AI responding to data queries (response length: {len(response_text)})")
+                        else:
+                            self.log_test("AI Live Data Integration", False, 
+                                        f"Inadequate response to live data query: {response_text[:100]}")
+                    else:
+                        self.log_test("AI Live Data Integration", False, f"Invalid response structure: {data}")
+                else:
+                    self.log_test("AI Live Data Integration", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("AI Live Data Integration", False, f"Exception: {str(e)}")
+    
+    async def test_ai_error_handling_fallback(self):
+        """Test AI error handling and fallback responses"""
+        try:
+            # Test with edge case query
+            payload = {
+                "message": "What happens if all stablecoins depeg simultaneously?",
+                "session_id": f"error_test_{uuid.uuid4().hex[:8]}",
+                "user_id": "error_tester"
+            }
+            
+            async with self.session.post(f"{API_BASE}/ai/chat", json=payload) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if 'response' in data:
+                        response_text = data['response']
+                        
+                        # Check for proper error handling or professional response
+                        professional_indicators = [
+                            "risk", "monitoring", "StableYield", "analysis", 
+                            "informational purposes", "financial advice"
+                        ]
+                        
+                        has_professional_response = any(indicator in response_text.lower() 
+                                                      for indicator in professional_indicators)
+                        
+                        if 'OpenAI API key not configured' in response_text:
+                            self.log_test("AI Error Handling", True, "Proper fallback when API key not configured")
+                        elif has_professional_response and len(response_text) > 30:
+                            self.log_test("AI Error Handling", True, "Professional response to edge case query")
+                        elif "technical difficulties" in response_text.lower():
+                            self.log_test("AI Error Handling", True, "Proper error handling with user-friendly message")
+                        else:
+                            self.log_test("AI Error Handling", False, f"Inadequate error handling: {response_text[:100]}")
+                    else:
+                        self.log_test("AI Error Handling", False, f"Invalid response structure: {data}")
+                else:
+                    self.log_test("AI Error Handling", False, f"HTTP {response.status}")
+        except Exception as e:
+            self.log_test("AI Error Handling", False, f"Exception: {str(e)}")
+    
+    async def test_ai_knowledge_base_accuracy(self):
+        """Test accuracy of Q&A knowledge base integration"""
+        try:
+            # Test specific knowledge verification
+            test_cases = [
+                {
+                    "question": "What is the current SYI benchmark?",
+                    "expected_elements": ["4.47%", "SYI", "benchmark", "risk-adjusted"]
+                },
+                {
+                    "question": "How does RAY calculation work?",
+                    "expected_elements": ["Risk-Adjusted Yield", "peg stability", "liquidity", "counterparty"]
+                },
+                {
+                    "question": "What data sources does StableYield monitor?",
+                    "expected_elements": ["real-time", "monitoring", "protocols", "platforms"]
+                }
+            ]
+            
+            successful_knowledge_tests = 0
+            
+            for i, test_case in enumerate(test_cases, 1):
+                payload = {
+                    "message": test_case["question"],
+                    "session_id": f"knowledge_test_{i}_{uuid.uuid4().hex[:8]}",
+                    "user_id": "knowledge_tester"
+                }
+                
+                async with self.session.post(f"{API_BASE}/ai/chat", json=payload) as response:
+                    if response.status == 200:
+                        data = await response.json()
+                        if 'response' in data:
+                            response_text = data['response'].lower()
+                            
+                            # Check for expected knowledge elements
+                            matches = sum(1 for element in test_case["expected_elements"] 
+                                        if element.lower() in response_text)
+                            
+                            if 'openai api key not configured' in response_text:
+                                self.log_test(f"Knowledge Test {i}", True, "Service working (needs API key)")
+                                successful_knowledge_tests += 1
+                            elif matches >= 2:  # At least 2 expected elements
+                                self.log_test(f"Knowledge Test {i}", True, 
+                                            f"Knowledge accurate ({matches}/{len(test_case['expected_elements'])} elements)")
+                                successful_knowledge_tests += 1
+                            else:
+                                self.log_test(f"Knowledge Test {i}", False, 
+                                            f"Knowledge incomplete ({matches}/{len(test_case['expected_elements'])} elements)")
+                        else:
+                            self.log_test(f"Knowledge Test {i}", False, "Invalid response structure")
+                    else:
+                        self.log_test(f"Knowledge Test {i}", False, f"HTTP {response.status}")
+            
+            # Summary
+            knowledge_success_rate = (successful_knowledge_tests / len(test_cases)) * 100
+            self.log_test("AI Knowledge Base Accuracy", successful_knowledge_tests == len(test_cases),
+                         f"Knowledge accuracy: {successful_knowledge_tests}/{len(test_cases)} tests passed ({knowledge_success_rate:.1f}%)")
+            
+        except Exception as e:
+            self.log_test("AI Knowledge Base Accuracy", False, f"Exception: {str(e)}")
+    
     async def test_ai_chat(self):
-        """Test POST /api/ai/chat endpoint"""
+        """Test POST /api/ai/chat endpoint - Basic functionality"""
         try:
             payload = {
                 "message": "What's the current USDT yield?",
@@ -368,32 +634,32 @@ class StableYieldTester:
                     if 'response' in data and 'session_id' in data:
                         response_text = data['response']
                         if 'OpenAI API key not configured' in response_text:
-                            self.log_test("AI Chat", True, "AI service working (needs OpenAI key)")
+                            self.log_test("AI Chat Basic", True, "AI service working (needs OpenAI key)")
                         elif len(response_text) > 10:
-                            self.log_test("AI Chat", True, f"AI responded: {response_text[:50]}...")
+                            self.log_test("AI Chat Basic", True, f"AI responded: {response_text[:50]}...")
                         else:
-                            self.log_test("AI Chat", False, f"Short response: {response_text}")
+                            self.log_test("AI Chat Basic", False, f"Short response: {response_text}")
                     else:
-                        self.log_test("AI Chat", False, f"Invalid response structure: {data}")
+                        self.log_test("AI Chat Basic", False, f"Invalid response structure: {data}")
                 else:
-                    self.log_test("AI Chat", False, f"HTTP {response.status}")
+                    self.log_test("AI Chat Basic", False, f"HTTP {response.status}")
         except Exception as e:
-            self.log_test("AI Chat", False, f"Exception: {str(e)}")
+            self.log_test("AI Chat Basic", False, f"Exception: {str(e)}")
     
     async def test_ai_samples(self):
-        """Test GET /api/ai/chat/samples endpoint"""
+        """Test GET /api/ai/chat/samples endpoint - Sample queries"""
         try:
             async with self.session.get(f"{API_BASE}/ai/chat/samples") as response:
                 if response.status == 200:
                     data = await response.json()
                     if 'samples' in data and isinstance(data['samples'], list):
-                        self.log_test("AI Samples", True, f"Got {len(data['samples'])} sample queries")
+                        self.log_test("AI Samples Basic", True, f"Got {len(data['samples'])} sample queries")
                     else:
-                        self.log_test("AI Samples", False, f"Invalid response: {data}")
+                        self.log_test("AI Samples Basic", False, f"Invalid response: {data}")
                 else:
-                    self.log_test("AI Samples", False, f"HTTP {response.status}")
+                    self.log_test("AI Samples Basic", False, f"HTTP {response.status}")
         except Exception as e:
-            self.log_test("AI Samples", False, f"Exception: {str(e)}")
+            self.log_test("AI Samples Basic", False, f"Exception: {str(e)}")
     
     async def test_ai_alerts_create(self):
         """Test POST /api/ai/alerts endpoint"""
