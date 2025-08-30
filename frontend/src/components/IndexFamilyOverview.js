@@ -56,9 +56,9 @@ const IndexFamilyOverview = () => {
         const syiData = await syiResponse.json();
         
         if (syiData.success) {
-          // Use new SYI calculation as the SY100 index
-          indexData.SY100 = {
-            index_code: 'SY100',
+          // Use new SYI calculation as the SYC index
+          indexData.SYC = {
+            index_code: 'SYC',
             value: syiData.syi_decimal, // Use decimal format (e.g., 0.0447448)
             mode: 'Normal',
             constituent_count: syiData.components_count,
