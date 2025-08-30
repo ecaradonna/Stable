@@ -1,6 +1,6 @@
 """
 API Routes for StableYield Index Family
-Exposes endpoints for SY100, SY-CeFi, SY-DeFi, SY-RPI
+Exposes endpoints for SYC, SY-CeFi, SY-DeFi, SY-RPI
 """
 
 from fastapi import APIRouter, HTTPException, Depends, Query
