@@ -8262,6 +8262,12 @@ class StableYieldTester:
         await self.test_enhanced_peg_error_handling()
         await self.test_cross_source_consistency()
         
+        # PEGCHECK PHASE 3 COMPREHENSIVE TESTS - ANALYTICS & JOB MANAGEMENT (NEW PRIORITY)
+        print("\n📊 Testing PegCheck Phase 3 - Advanced Analytics & Job Management...")
+        await self.test_pegcheck_phase3_analytics_comprehensive()
+        await self.test_pegcheck_storage_persistence_comprehensive()
+        await self.test_pegcheck_end_to_end_workflow()
+        
         # User management tests
         print("\n👥 Testing User Management APIs...")
         await self.test_user_waitlist()
