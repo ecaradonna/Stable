@@ -161,7 +161,7 @@ async def calculate_indices(
         
         # Check if calculation already exists and force is not set
         if not force:
-            existing = await service.get_index_value(IndexCode.SY100, target_date)
+            existing = await service.get_index_value(IndexCode.SYC, target_date)
             if existing and existing.date.date() == target_date.date():
                 return {
                     "success": True,
