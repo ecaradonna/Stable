@@ -79,12 +79,13 @@ const Header = ({ onJoinWaitlist, onDownloadWhitepaper }) => {
             </Button>
             
             {/* Primary CTA - Request API Access */}
-            <Button 
-              onClick={() => window.location.href = '/api-documentation'}
-              className="bg-[#E47C3C] hover:bg-[#E47C3C]/90 text-white font-medium px-[18px] py-[10px] rounded-md transition-all duration-200 shadow-sm hover:shadow-md text-[14px]"
-            >
-              Request API Access
-            </Button>
+            <Link to="/api-documentation">
+              <Button 
+                className="bg-[#E47C3C] hover:bg-[#E47C3C]/90 text-white font-medium px-[18px] py-[10px] rounded-md transition-all duration-200 shadow-sm hover:shadow-md text-[14px]"
+              >
+                Request API Access
+              </Button>
+            </Link>
           </div>
 
           {/* Mobile Menu Button */}
