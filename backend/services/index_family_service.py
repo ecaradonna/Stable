@@ -653,7 +653,7 @@ class IndexFamilyService:
             )
             
         except Exception as e:
-            logger.error(f"Error calculating SY100: {e}")
+            logger.error(f"Error calculating SYC: {e}")
             raise
 
     # Helper methods
