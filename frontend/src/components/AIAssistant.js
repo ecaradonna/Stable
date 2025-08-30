@@ -255,7 +255,7 @@ const AIAssistant = () => {
               <Button
                 onClick={() => handleSendMessage()}
                 disabled={!currentMessage.trim() || isLoading}
-                className="bg-gradient-to-r from-[#4CC1E9] to-[#007A99] hover:from-[#007A99] hover:to-[#4CC1E9] text-white"
+                className="bg-[#E47C3C] hover:bg-[#E47C3C]/90 text-white"
               >
                 {isLoading ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
