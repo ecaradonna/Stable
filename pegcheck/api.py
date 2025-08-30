@@ -94,14 +94,20 @@ async def peg_check(
         # Optional: Chainlink oracles
         chainlink_prices = None
         if with_oracle:
-            # TODO: Implement chainlink module when needed
-            chainlink_prices = {}
+            try:
+                chainlink_prices = chainlink.fetch(symbol_list)
+            except Exception as e:
+                print(f"Chainlink fetch error: {e}")
+                chainlink_prices = {symbol: float('nan') for symbol in symbol_list}
         
         # Optional: Uniswap v3 TWAP  
         uniswap_prices = None
         if with_dex:
-            # TODO: Implement uniswap module when needed
-            uniswap_prices = {}
+            try:
+                uniswap_prices = uniswap.fetch(symbol_list)
+            except Exception as e:
+                print(f"Uniswap fetch error: {e}")
+                uniswap_prices = {symbol: float('nan') for symbol in symbol_list}
         
         # Compute peg analysis
         payload = compute_peg_analysis(
