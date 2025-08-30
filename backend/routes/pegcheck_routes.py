@@ -20,11 +20,31 @@ if app_dir not in sys.path:
 try:
     from pegcheck.core.compute import compute_peg_analysis
     from pegcheck.core.config import DEFAULT_SYMBOLS
-    from pegcheck.sources import coingecko, cryptocompare
+    from pegcheck.sources import coingecko, cryptocompare, chainlink, uniswap
+    from pegcheck.storage.memory import MemoryStorage
+    from pegcheck.storage.postgres import PostgreSQLStorage
     PEGCHECK_AVAILABLE = True
+    
+    # Initialize storage backend
+    storage_backend = None
+    POSTGRES_URL = os.getenv("POSTGRES_URL")
+    if POSTGRES_URL:
+        try:
+            storage_backend = PostgreSQLStorage(POSTGRES_URL)
+            STORAGE_TYPE = "postgresql"
+        except Exception as e:
+            logging.warning(f"PostgreSQL storage failed, falling back to memory: {e}")
+            storage_backend = MemoryStorage()
+            STORAGE_TYPE = "memory"
+    else:
+        storage_backend = MemoryStorage()
+        STORAGE_TYPE = "memory"
+        
 except ImportError as e:
     logging.warning(f"PegCheck module not available: {e}")
     PEGCHECK_AVAILABLE = False
+    storage_backend = None
+    STORAGE_TYPE = "none"
 
 from pydantic import BaseModel
 
