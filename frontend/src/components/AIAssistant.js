@@ -252,12 +252,16 @@ const AIAssistant = ({ className = "", onAnalyticsEvent }) => {
                 
                 <button
                   className="text-xs bg-[#E47C3C] hover:bg-[#E47C3C]/90 text-white h-7 px-2 rounded"
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
                     onAnalyticsEvent?.('bot_api_cta_click');
                     setIsOpen(false);
-                    // Trigger API Access modal opening
-                    const event = new CustomEvent('open-api-modal');
-                    window.dispatchEvent(event);
+                    // Small delay to ensure modal closes first
+                    setTimeout(() => {
+                      const event = new CustomEvent('open-api-modal');
+                      window.dispatchEvent(event);
+                    }, 100);
                   }}
                 >
                   API Access
