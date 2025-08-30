@@ -75,9 +75,9 @@ const YieldIndicesPage = () => {
 
   const indexSuite = [
     {
-      code: "SY100",
-      name: "StableYield Index",
-      description: "Composite benchmark tracking risk-adjusted yields across the entire stablecoin ecosystem.",
+      code: "SYC",
+      name: "StableYield Composite Index",
+      description: "Risk-adjusted composite benchmark across all stablecoin yield sources",
       value: "4.47%",
       constituents: "47 assets",
       color: "border-[#1F4FFF] bg-[#1F4FFF]/5",
