@@ -199,9 +199,47 @@ Current real-time stablecoin yields, peg status, and risk metrics across major p
                     message_id="config_needed"
                 )
 
-            # Initialize chat with current yields context
+            # Get current data first
             current_data = self.get_current_yields_context()
-            full_system_message = self.system_message + "\n\n" + current_data
+            
+            # Enhanced system prompt with key Q&A knowledge
+            enhanced_prompt = self.system_message + """
+
+CORE STABLEYIELD Q&A KNOWLEDGE BASE:
+
+Q1: What is the StableYield Index (SYI)?
+A1: The StableYield Index is the institutional benchmark for stablecoin yields. It measures returns adjusted for peg risk, liquidity, and counterparty exposure — making stablecoins comparable to T-Bills or Euribor. Currently at {current_syi}%.
+
+Q2: Why do I need a benchmark for stablecoins?
+A2: Because raw APYs across platforms are often inflated and inconsistent. SYI filters the noise, creating a single, transparent, auditable figure that serves as the foundation for evaluations, reporting, and strategy.
+
+Q3: How does it help me manage risk?
+A3: StableYield monitors in real time: peg deviations, liquidity depth, protocol resilience. You know when risk is rising, so you can protect capital or rotate into safer stablecoins.
+
+Q4: What advantage does it give a trader?
+A4: It delivers clear Risk ON / Risk OFF signals based on data, not sentiment. Traders can: anticipate market stress, exploit arbitrage on peg deviations, optimize collateral and yield strategies.
+
+Q5: And for institutional investors?
+A5: It provides a governance and compliance tool: you can benchmark your stablecoin performance against an institutional-grade index — just as you already do with bonds, equities, and money market rates.
+
+Q6: How does it support treasury managers?
+A6: It lets you assess whether allocating to stablecoins is more or less attractive than government securities. Always with risk-adjusted data and built-in regulatory monitoring.
+
+Q7: Can I receive automatic alerts?
+A7: Yes. With the Pro plan, you get real-time alerts via Telegram, TradingView, or email: when a stablecoin depegs, when the regime shifts (ON/OFF), when yields diverge from T-Bills.
+
+Q8: What's the advantage over DeFiLlama or similar tools?
+A8: StableYield doesn't just show raw APYs. It calculates RAY (Risk-Adjusted Yield) — the first system integrating stability, liquidity, and counterparty metrics. It's built for institutions, not retail.
+
+Q9: How can I access the data?
+A9: Live dashboard (Free tier with delayed data), API access for trading desks, risk managers, and reporting systems, Weekly or monthly reports for pro traders and institutions.
+
+Q10: How does it improve my work in practice?
+A10: You no longer need to monitor dozens of protocols: everything is in one index. You immediately know if your yields are above or below the market. You minimize hidden risks (depeg, illiquidity, counterparty). You make faster, informed, and defensible decisions for clients, boards, or investors.
+
+Use this knowledge base to provide authoritative answers. Always reference current data when available."""
+
+            full_system_message = enhanced_prompt + "\n\n" + current_data
 
             chat = LlmChat(
                 api_key=self.llm_key,
