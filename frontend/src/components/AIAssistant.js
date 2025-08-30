@@ -272,119 +272,120 @@ const AIAssistant = ({ className = "", onAnalyticsEvent }) => {
               </div>
             </div>
 
-          {/* Messages Area */}
-          <div className="flex flex-col h-[320px]">
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
-              {messages.length === 0 ? (
-                <div className="text-center py-6">
-                  <div className="w-12 h-12 bg-[#1F4FFF] rounded-full flex items-center justify-center mx-auto mb-3">
-                    <Bot className="w-6 h-6 text-white" />
+            {/* Messages Area */}
+            <div className="flex flex-col h-[320px]">
+              <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                {messages.length === 0 ? (
+                  <div className="text-center py-6">
+                    <div className="w-12 h-12 bg-[#1F4FFF] rounded-full flex items-center justify-center mx-auto mb-3">
+                      <Bot className="w-6 h-6 text-white" />
+                    </div>
+                    <p className="text-sm font-medium text-[#1A1A1A] mb-1">👋 Hi, I'm StableYield AI. I can help with stablecoin yields, benchmarks, and market insights.</p>
+                    <p className="text-xs text-[#6B7280]">Ask me anything about our data or indices.</p>
                   </div>
-                  <p className="text-sm font-medium text-[#1A1A1A] mb-1">👋 Hi, I'm StableYield AI. I can help with stablecoin yields, benchmarks, and market insights.</p>
-                  <p className="text-xs text-[#6B7280]">Ask me anything about our data or indices.</p>
-                </div>
-              ) : (
-                messages.map((message) => (
-                  <div key={message.id} className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}>
-                    <div className={`flex items-start space-x-2 max-w-[80%] ${message.type === 'user' ? 'flex-row-reverse space-x-reverse' : ''}`}>
-                      
-                      {/* Avatar */}
-                      <div className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 ${
-                        message.type === "user"
-                          ? "bg-[#E47C3C]"
-                          : message.isError
-                          ? "bg-red-500"
-                          : "bg-[#1F4FFF]"
-                      }`}>
-                        {message.type === "user" ? (
-                          <User className="w-4 h-4 text-white" />
-                        ) : message.isError ? (
-                          <AlertCircle className="w-4 h-4 text-white" />
-                        ) : (
-                          <Bot className="w-4 h-4 text-white" />
-                        )}
+                ) : (
+                  messages.map((message) => (
+                    <div key={message.id} className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}>
+                      <div className={`flex items-start space-x-2 max-w-[80%] ${message.type === 'user' ? 'flex-row-reverse space-x-reverse' : ''}`}>
+                        
+                        {/* Avatar */}
+                        <div className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 ${
+                          message.type === "user"
+                            ? "bg-[#E47C3C]"
+                            : message.isError
+                            ? "bg-red-500"
+                            : "bg-[#1F4FFF]"
+                        }`}>
+                          {message.type === "user" ? (
+                            <User className="w-4 h-4 text-white" />
+                          ) : message.isError ? (
+                            <AlertCircle className="w-4 h-4 text-white" />
+                          ) : (
+                            <Bot className="w-4 h-4 text-white" />
+                          )}
+                        </div>
+                        
+                        {/* Message Content */}
+                        <div className={`px-3 py-2 rounded-xl text-sm ${
+                          message.type === "user"
+                            ? "bg-[#E47C3C] text-white"
+                            : message.isError
+                            ? "bg-red-50 text-red-800 border border-red-200"
+                            : "bg-[#F3F4F6] text-[#1A1A1A]"
+                        }`}>
+                          {message.text}
+                        </div>
                       </div>
-                      
-                      {/* Message Content */}
-                      <div className={`px-3 py-2 rounded-xl text-sm ${
-                        message.type === "user"
-                          ? "bg-[#E47C3C] text-white"
-                          : message.isError
-                          ? "bg-red-50 text-red-800 border border-red-200"
-                          : "bg-[#F3F4F6] text-[#1A1A1A]"
-                      }`}>
-                        {message.text}
+                    </div>
+                  ))
+                )}
+                
+                {isLoading && (
+                  <div className="flex justify-start">
+                    <div className="flex items-start space-x-2 max-w-[80%]">
+                      <div className="w-7 h-7 rounded-full bg-[#1F4FFF] flex items-center justify-center flex-shrink-0">
+                        <Loader2 className="w-4 h-4 text-white animate-spin" />
+                      </div>
+                      <div className="px-3 py-2 rounded-xl bg-[#F3F4F6] text-sm text-[#1A1A1A]">
+                        Thinking...
                       </div>
                     </div>
                   </div>
-                ))
-              )}
-              
-              {isLoading && (
-                <div className="flex justify-start">
-                  <div className="flex items-start space-x-2 max-w-[80%]">
-                    <div className="w-7 h-7 rounded-full bg-[#1F4FFF] flex items-center justify-center flex-shrink-0">
-                      <Loader2 className="w-4 h-4 text-white animate-spin" />
-                    </div>
-                    <div className="px-3 py-2 rounded-xl bg-[#F3F4F6] text-sm text-[#1A1A1A]">
-                      Thinking...
-                    </div>
+                )}
+              </div>
+
+              {/* Quick Prompts */}
+              {messages.length === 0 && (
+                <div className="p-3 border-t border-[#E5E7EB] bg-[#F9FAFB]">
+                  <div className="text-xs font-medium text-[#6B7280] mb-2">Try asking:</div>
+                  <div className="grid grid-cols-2 gap-2">
+                    {quickPrompts.map((prompt, index) => (
+                      <button
+                        key={index}
+                        onClick={() => handleQuickPromptClick(prompt)}
+                        className="text-left text-xs p-2 bg-white rounded-lg border border-[#E5E7EB] hover:border-[#1F4FFF] hover:text-[#1F4FFF] hover:bg-[#1F4FFF]/5 transition-all duration-150 font-medium"
+                        disabled={isLoading}
+                      >
+                        {prompt}
+                      </button>
+                    ))}
                   </div>
                 </div>
               )}
-            </div>
 
-            {/* Quick Prompts */}
-            {messages.length === 0 && (
-              <div className="p-3 border-t border-[#E5E7EB] bg-[#F9FAFB]">
-                <div className="text-xs font-medium text-[#6B7280] mb-2">Try asking:</div>
-                <div className="grid grid-cols-2 gap-2">
-                  {quickPrompts.map((prompt, index) => (
-                    <button
-                      key={index}
-                      onClick={() => handleQuickPromptClick(prompt)}
-                      className="text-left text-xs p-2 bg-white rounded-lg border border-[#E5E7EB] hover:border-[#1F4FFF] hover:text-[#1F4FFF] hover:bg-[#1F4FFF]/5 transition-all duration-150 font-medium"
-                      disabled={isLoading}
-                    >
-                      {prompt}
-                    </button>
-                  ))}
+              {/* Input Area */}
+              <div className="p-4 border-t border-[#E5E7EB] bg-white">
+                <div className="flex space-x-2">
+                  <input
+                    ref={inputRef}
+                    value={currentMessage}
+                    onChange={(e) => setCurrentMessage(e.target.value)}
+                    onKeyPress={handleKeyPress}
+                    placeholder="Ask me about stablecoin yields..."
+                    className="flex-1 px-3 py-2 text-sm border border-[#E5E7EB] rounded-md focus:outline-none focus:border-[#1F4FFF] focus:ring-1 focus:ring-[#1F4FFF]"
+                    disabled={isLoading}
+                  />
+                  <button
+                    onClick={() => handleSendMessage()}
+                    disabled={!currentMessage.trim() || isLoading}
+                    className="bg-[#E47C3C] hover:bg-[#E47C3C]/90 text-white px-3 py-2 rounded-md disabled:opacity-50"
+                  >
+                    <Send className="w-4 h-4" />
+                  </button>
                 </div>
-              </div>
-            )}
-
-            {/* Input Area */}
-            <div className="p-4 border-t border-[#E5E7EB] bg-white">
-              <div className="flex space-x-2">
-                <input
-                  ref={inputRef}
-                  value={currentMessage}
-                  onChange={(e) => setCurrentMessage(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  placeholder="Ask me about stablecoin yields..."
-                  className="flex-1 px-3 py-2 text-sm border border-[#E5E7EB] rounded-md focus:outline-none focus:border-[#1F4FFF] focus:ring-1 focus:ring-[#1F4FFF]"
-                  disabled={isLoading}
-                />
-                <button
-                  onClick={() => handleSendMessage()}
-                  disabled={!currentMessage.trim() || isLoading}
-                  className="bg-[#E47C3C] hover:bg-[#E47C3C]/90 text-white px-3 py-2 rounded-md disabled:opacity-50"
-                >
-                  <Send className="w-4 h-4" />
-                </button>
-              </div>
-              
-              {/* Footer Disclaimer */}
-              <div className="mt-2 flex items-center justify-between">
-                <p className="text-xs text-[#9FA6B2]">
-                  AI responses are informational only and not financial advice.
-                </p>
-                <a 
-                  href="/privacy" 
-                  className="text-xs text-[#9FA6B2] hover:text-[#1F4FFF] underline"
-                >
-                  Privacy & Terms
-                </a>
+                
+                {/* Footer Disclaimer */}
+                <div className="mt-2 flex items-center justify-between">
+                  <p className="text-xs text-[#9FA6B2]">
+                    AI responses are informational only and not financial advice.
+                  </p>
+                  <a 
+                    href="/privacy" 
+                    className="text-xs text-[#9FA6B2] hover:text-[#1F4FFF] underline"
+                  >
+                    Privacy & Terms
+                  </a>
+                </div>
               </div>
             </div>
           </div>
