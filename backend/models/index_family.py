@@ -11,7 +11,7 @@ from enum import Enum
 class IndexCode(str, Enum):
     """Index codes for the StableYield family"""
     SYI = "SYI"          # Original StableYield Index  
-    SY100 = "SY100"      # Top 100 risk-adjusted strategies
+    SYC = "SYC"          # StableYield Composite Index (formerly SY100)
     SYCEFI = "SYCEFI"    # CeFi benchmark
     SYDEFI = "SYDEFI"    # DeFi benchmark  
     SYRPI = "SYRPI"      # Risk Premium Index
