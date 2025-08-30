@@ -1,272 +1,383 @@
-import React, { useState, useRef, useEffect } from "react";
-import { Button } from "./ui/button";
-import { Input } from "./ui/input";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
-import { MessageCircle, Send, Sparkles, X, Loader2, Bot, User } from "lucide-react";
-import { aiApi } from "../services/api";
+import React, { useState, useEffect, useRef } from 'react';
+import { Button } from './ui/button';
+import { Input } from './ui/input';
+import { Badge } from './ui/badge';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
+import { 
+  MessageCircle, 
+  Send, 
+  X, 
+  Sparkles,
+  Bot,
+  User,
+  Loader2,
+  AlertCircle,
+  TrendingUp,
+  Shield,
+  Bell
+} from 'lucide-react';
+import { aiApi } from '../services/api';
 
-const AIAssistant = () => {
+const AIAssistant = ({ className = "", onAnalyticsEvent }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState([
-    {
-      type: "ai",
-      content: "👋 Hi! I'm StableYield AI. I can help you with current stablecoin yields, comparisons, and market analysis. What would you like to know?",
-      timestamp: new Date()
-    }
-  ]);
+  const [messages, setMessages] = useState([]);
   const [currentMessage, setCurrentMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [sessionId] = useState(() => `session_${Date.now()}`);
-  const [sampleQueries, setSampleQueries] = useState([]);
+  const [sessionId] = useState(() => `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`);
+  const [showProactiveToast, setShowProactiveToast] = useState(false);
+  const [hasShownToast, setHasShownToast] = useState(false);
   const messagesEndRef = useRef(null);
+  const inputRef = useRef(null);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
+  // Proactive nudge logic
   useEffect(() => {
-    scrollToBottom();
+    // Show proactive toast once per session on specific pages
+    const currentPath = window.location.pathname;
+    const shouldShowToast = ['/index-dashboard', '/api-documentation', '/'].includes(currentPath);
+    const hasToastShown = sessionStorage.getItem('sy-ai-toast-shown');
+    
+    if (shouldShowToast && !hasToastShown && !hasShownToast && window.innerWidth > 768) {
+      const timer = setTimeout(() => {
+        setShowProactiveToast(true);
+        setHasShownToast(true);
+        sessionStorage.setItem('sy-ai-toast-shown', 'true');
+        
+        // Auto-hide after 5s
+        setTimeout(() => setShowProactiveToast(false), 5000);
+        
+        // Analytics
+        onAnalyticsEvent?.('bot_proactive_nudge_shown', { page: currentPath });
+      }, 6000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [hasShownToast, onAnalyticsEvent]);
+
+  // Initialize welcome message
+  useEffect(() => {
+    if (messages.length === 0) {
+      setMessages([{
+        id: 'welcome',
+        type: 'ai',
+        text: "👋 Hi, I'm StableYield AI. I can help with stablecoin yields, benchmarks (SYI), peg stability, and Risk ON/OFF signals.",
+        timestamp: new Date().toISOString(),
+        isError: false
+      }]);
+    }
+  }, [messages.length]);
+
+  // Scroll to bottom when messages change
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // Load sample queries when component mounts
+  // Focus input when opened
   useEffect(() => {
-    const loadSamples = async () => {
-      try {
-        const response = await aiApi.getSamples();
-        setSampleQueries(response.data.samples || []);
-      } catch (error) {
-        console.error("Failed to load sample queries:", error);
-      }
-    };
-    
-    if (isOpen) {
-      loadSamples();
+    if (isOpen && inputRef.current) {
+      inputRef.current.focus();
     }
   }, [isOpen]);
 
-  const handleSendMessage = async (message = currentMessage) => {
-    if (!message.trim() || isLoading) return;
+  const quickPrompts = [
+    "What is RAY?",
+    "Today's SYI value", 
+    "Risk regime now",
+    "Compare USDC vs USDT",
+    "Set peg alert",
+    "API pricing plans"
+  ];
 
-    const userMessage = {
-      type: "user",
-      content: message,
-      timestamp: new Date()
-    };
+  const handleSendMessage = async (messageText) => {
+    const message = messageText || currentMessage.trim();
+    if (!message) return;
 
-    setMessages(prev => [...prev, userMessage]);
-    setCurrentMessage("");
+    // Analytics
+    onAnalyticsEvent?.('bot_message_send', { 
+      session_id: sessionId,
+      message_type: messageText ? 'quick_prompt' : 'manual',
+      message_preview: message.substring(0, 50)
+    });
+
     setIsLoading(true);
+    setCurrentMessage("");
+
+    // Add user message
+    const userMessage = {
+      id: `user_${Date.now()}`,
+      type: 'user',
+      text: message,
+      timestamp: new Date().toISOString(),
+      isError: false
+    };
+    
+    setMessages(prev => [...prev, userMessage]);
 
     try {
       const response = await aiApi.chat({
-        session_id: sessionId,
-        message: message
+        message,
+        session_id: sessionId
       });
 
+      // Add AI response
       const aiMessage = {
-        type: "ai",
-        content: response.data.response,
-        timestamp: new Date(),
-        messageId: response.data.message_id
+        id: response.message_id || `ai_${Date.now()}`,
+        type: 'ai',
+        text: response.response,
+        timestamp: new Date().toISOString(),
+        isError: false
       };
-
+      
       setMessages(prev => [...prev, aiMessage]);
-      
+
     } catch (error) {
-      console.error("AI chat error:", error);
+      console.error('AI chat error:', error);
       
-      let errorContent = "I apologize, but I'm experiencing technical difficulties. Please try again later.";
-      
-      // Handle specific error cases
-      if (error.response?.status === 500 && error.response?.data?.detail?.includes('OpenAI API key')) {
-        errorContent = "🔑 The AI assistant is ready but needs an OpenAI API key to be configured by the administrator. Please contact support for assistance.";
-      } else if (error.response?.data?.detail) {
-        errorContent = error.response.data.detail;
-      }
-      
+      // Add error message
       const errorMessage = {
-        type: "ai",
-        content: errorContent,
-        timestamp: new Date(),
+        id: `error_${Date.now()}`,
+        type: 'ai',
+        text: "I apologize, but I'm experiencing technical difficulties. Please try again later or contact support for assistance.\n\n⚠️ *AI responses are for informational purposes only and do not constitute financial advice.*",
+        timestamp: new Date().toISOString(),
         isError: true
       };
-
+      
       setMessages(prev => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
     }
   };
 
+  const handleQuickPromptClick = (prompt) => {
+    onAnalyticsEvent?.('bot_quick_prompt_click', { prompt });
+    handleSendMessage(prompt);
+  };
+
+  const handleOpen = () => {
+    setIsOpen(true);
+    onAnalyticsEvent?.('bot_open', { session_id: sessionId });
+    
+    // Hide toast if shown
+    setShowProactiveToast(false);
+  };
+
+  const handleClose = () => {
+    setIsOpen(false);
+    onAnalyticsEvent?.('bot_close', { session_id: sessionId });
+  };
+
   const handleKeyPress = (e) => {
-    if (e.key === "Enter" && !e.shiftKey) {
+    if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage();
     }
   };
 
-  const formatMessage = (content) => {
-    // Simple formatting for better readability
-    return content
-      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-      .replace(/\*(.*?)\*/g, '<em>$1</em>')
-      .replace(/\n/g, '<br />');
-  };
-
   return (
     <>
-      {/* Floating Button */}
-      <div className="fixed bottom-6 right-6 z-[9999]">
+      {/* Proactive Toast */}
+      {showProactiveToast && (
+        <div className="sy-proactive-toast fixed right-24 bottom-28 bg-white border border-[#E5E7EB] rounded-lg shadow-lg p-3 max-w-xs z-[9998] animate-in slide-in-from-right-5 fade-in duration-300">
+          <div className="flex items-start space-x-2">
+            <div className="w-6 h-6 bg-[#1F4FFF] rounded-full flex items-center justify-center flex-shrink-0">
+              <Sparkles className="w-3 h-3 text-white" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-[#1A1A1A] mb-1">New: Risk ON/OFF alerts</p>
+              <p className="text-xs text-[#6B7280]">Ask me to activate.</p>
+            </div>
+            <button 
+              onClick={() => setShowProactiveToast(false)}
+              className="text-[#9FA6B2] hover:text-[#6B7280]"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Floating Launcher */}
+      <div className="sy-launcher-wrapper fixed right-6 bottom-6 z-[9999]">
+        {/* Live Badge */}
+        <div className="absolute -top-2 -right-2 bg-white bg-opacity-90 border border-[#E5E7EB] rounded-full px-2 py-1 shadow-sm">
+          <span className="text-[10px] font-semibold text-[#1F4FFF]">AI</span>
+        </div>
+        
+        {/* Launcher Button */}
         <Button
-          onClick={() => setIsOpen(true)}
-          className="h-14 w-14 rounded-full bg-[#E47C3C] hover:bg-[#E47C3C]/90 text-white shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-110"
-          aria-label="Open AI Assistant"
+          onClick={handleOpen}
+          className="sy-launcher w-14 h-14 rounded-full bg-[#1F4FFF] hover:bg-[#1B44E6] text-white shadow-[0_10px_24px_rgba(0,0,0,0.15)] hover:shadow-[0_12px_28px_rgba(0,0,0,0.2)] transition-all duration-200 hover:-translate-y-0.5"
+          aria-label="Open StableYield AI Assistant"
         >
           <MessageCircle className="h-6 w-6" />
         </Button>
       </div>
 
-      {/* Chat Dialog */}
+      {/* AI Panel Dialog */}
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="sm:max-w-[600px] h-[700px] flex flex-col p-0">
+        <DialogContent className="sy-panel fixed right-6 bottom-24 w-full max-w-[420px] max-h-[70vh] p-0 border border-[#E5E7EB] rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.08)] bg-white overflow-hidden sm:right-6 sm:bottom-24 sm:w-[420px] xs:right-0 xs:left-0 xs:bottom-0 xs:max-w-none xs:w-full xs:max-h-[75vh] xs:rounded-t-2xl xs:rounded-b-none">
+          
           {/* Header */}
-          <DialogHeader className="p-6 pb-4 border-b bg-[#1F4FFF]/5">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-[#1F4FFF] rounded-full flex items-center justify-center">
-                  <Sparkles className="w-4 h-4 text-white" />
+          <DialogHeader className="sy-header flex-row items-center justify-between p-4 border-b border-[#E5E7EB] bg-[#F9FAFB]">
+            <div className="flex-1">
+              <DialogTitle className="sy-title text-sm font-semibold text-[#1A1A1A] flex items-center space-x-2">
+                <div className="w-6 h-6 bg-[#1F4FFF] rounded-full flex items-center justify-center">
+                  <Sparkles className="w-3 h-3 text-white" />
                 </div>
-                <DialogTitle className="text-xl font-bold text-[#1A1A1A]">
-                  StableYield AI
-                </DialogTitle>
-              </div>
+                <span>StableYield AI</span>
+              </DialogTitle>
+              <p className="sy-subtitle text-xs text-[#6B7280] mt-0.5">Institutional Market Assistant</p>
+            </div>
+            
+            {/* Header CTAs */}
+            <div className="flex items-center space-x-2 ml-4">
+              <Button
+                variant="outline"
+                size="sm"
+                className="text-xs border-[#1F4FFF] text-[#1F4FFF] hover:bg-[#1F4FFF] hover:text-white h-7 px-2"
+                onClick={() => {
+                  onAnalyticsEvent?.('bot_alert_subscribe_click');
+                  // Handle alert subscription
+                }}
+              >
+                <Bell className="w-3 h-3 mr-1" />
+                Alerts
+              </Button>
+              
+              <Button
+                size="sm"
+                className="text-xs bg-[#E47C3C] hover:bg-[#E47C3C]/90 text-white h-7 px-2"
+                onClick={() => {
+                  onAnalyticsEvent?.('bot_api_cta_click');
+                  window.location.href = '/api-documentation';
+                }}
+              >
+                API Access
+              </Button>
+              
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => setIsOpen(false)}
-                className="hover:bg-gray-100"
+                onClick={handleClose}
+                className="hover:bg-gray-100 h-7 w-7 p-0"
               >
                 <X className="w-4 h-4" />
               </Button>
             </div>
-            <p className="text-sm text-[#6B7280] mt-2">
-              Professional assistant for stablecoin yields, benchmarks, and risk analytics
-            </p>
           </DialogHeader>
 
-          {/* Messages */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
-            {messages.map((message, index) => (
-              <div
-                key={index}
-                className={`flex ${message.type === "user" ? "justify-end" : "justify-start"}`}
-              >
-                <div
-                  className={`flex items-start space-x-2 max-w-[80%] ${
-                    message.type === "user" ? "flex-row-reverse space-x-reverse" : ""
-                  }`}
-                >
-                  <div
-                    className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+          {/* Messages Area */}
+          <div className="flex flex-col h-[calc(70vh-140px)] max-h-96">
+            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+              {messages.map((message) => (
+                <div key={message.id} className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}>
+                  <div className={`flex items-start space-x-2 max-w-[80%] ${message.type === 'user' ? 'flex-row-reverse space-x-reverse' : ''}`}>
+                    
+                    {/* Avatar */}
+                    <div className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 ${
                       message.type === "user"
                         ? "bg-[#E47C3C]"
                         : message.isError
                         ? "bg-red-500"
                         : "bg-[#1F4FFF]"
-                    }`}
-                  >
-                    {message.type === "user" ? (
-                      <User className="w-4 h-4 text-white" />
-                    ) : (
-                      <Bot className="w-4 h-4 text-white" />
-                    )}
-                  </div>
-                  <div
-                    className={`rounded-lg p-3 ${
+                    }`}>
+                      {message.type === "user" ? (
+                        <User className="w-4 h-4 text-white" />
+                      ) : (
+                        <Bot className="w-4 h-4 text-white" />
+                      )}
+                    </div>
+
+                    {/* Message Bubble */}
+                    <div className={`rounded-lg p-3 ${
                       message.type === "user"
                         ? "bg-[#E47C3C] text-white"
                         : message.isError
                         ? "bg-red-50 text-red-700 border border-red-200"
-                        : "bg-gray-100 text-[#1A1A1A]"
-                    }`}
-                  >
-                    <div
-                      className="text-sm leading-relaxed whitespace-pre-wrap"
-                      dangerouslySetInnerHTML={{
-                        __html: formatMessage(message.content)
-                      }}
-                    />
-                    <div className="text-xs opacity-70 mt-2">
-                      {message.timestamp.toLocaleTimeString()}
+                        : "bg-[#F9FAFB] text-[#1A1A1A] border border-[#E5E7EB]"
+                    }`}>
+                      <p className="text-sm whitespace-pre-wrap">{message.text}</p>
+                      <p className="text-xs mt-1 opacity-70">
+                        {new Date(message.timestamp).toLocaleTimeString('en-US', {
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
+                      </p>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
-            
-            {isLoading && (
-              <div className="flex justify-start">
-                <div className="flex items-center space-x-2">
-                  <div className="w-8 h-8 bg-[#1F4FFF] rounded-full flex items-center justify-center">
-                    <Bot className="w-4 h-4 text-white" />
-                  </div>
-                  <div className="bg-gray-100 rounded-lg p-3">
-                    <div className="flex items-center space-x-2">
-                      <Loader2 className="w-4 h-4 animate-spin text-[#1F4FFF]" />
-                      <span className="text-sm text-gray-600">Analyzing...</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-            
-            <div ref={messagesEndRef} />
-          </div>
+              ))}
 
-          {/* Sample Queries */}
-          {messages.length === 1 && sampleQueries.length > 0 && (
-            <div className="p-4 border-t bg-gray-50">
-              <p className="text-sm font-medium text-[#0E1A2B] mb-2">Try asking:</p>
-              <div className="grid grid-cols-1 gap-2">
-                {sampleQueries.slice(0, 4).map((query, index) => (
+              {/* Loading State */}
+              {isLoading && (
+                <div className="flex justify-start">
+                  <div className="flex items-start space-x-2">
+                    <div className="w-7 h-7 bg-[#1F4FFF] rounded-full flex items-center justify-center">
+                      <Bot className="w-4 h-4 text-white" />
+                    </div>
+                    <div className="bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg p-3">
+                      <div className="flex items-center space-x-2">
+                        <Loader2 className="w-4 h-4 animate-spin text-[#1F4FFF]" />
+                        <span className="text-sm text-[#6B7280]">Analyzing market data...</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div ref={messagesEndRef} />
+            </div>
+
+            {/* Quick Prompts */}
+            <div className="sy-qp p-3 border-t border-[#E5E7EB] bg-[#F9FAFB]">
+              <div className="text-xs font-medium text-[#6B7280] mb-2">Try asking:</div>
+              <div className="grid grid-cols-2 gap-2">
+                {quickPrompts.map((prompt, index) => (
                   <button
                     key={index}
-                    onClick={() => handleSendMessage(query)}
-                    className="text-left text-sm p-2 bg-white rounded-lg border hover:border-[#1F4FFF] hover:bg-[#1F4FFF]/5 transition-colors"
+                    onClick={() => handleQuickPromptClick(prompt)}
+                    className="sy-qp-button text-left text-xs p-2 bg-white rounded-lg border border-[#E5E7EB] hover:border-[#1F4FFF] hover:text-[#1F4FFF] hover:bg-[#1F4FFF]/5 transition-all duration-150 font-medium"
                     disabled={isLoading}
                   >
-                    {query}
+                    {prompt}
                   </button>
                 ))}
               </div>
             </div>
-          )}
 
-          {/* Input */}
-          <div className="p-4 border-t">
-            <div className="flex space-x-2">
-              <Input
-                value={currentMessage}
-                onChange={(e) => setCurrentMessage(e.target.value)}
-                onKeyPress={handleKeyPress}
-                placeholder="Ask me about stablecoin yields..."
-                disabled={isLoading}
-                className="flex-1"
-              />
-              <Button
-                onClick={() => handleSendMessage()}
-                disabled={!currentMessage.trim() || isLoading}
-                className="bg-[#E47C3C] hover:bg-[#E47C3C]/90 text-white"
-              >
-                {isLoading ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
+            {/* Input Area */}
+            <div className="p-4 border-t border-[#E5E7EB] bg-white">
+              <div className="flex space-x-2">
+                <Input
+                  ref={inputRef}
+                  value={currentMessage}
+                  onChange={(e) => setCurrentMessage(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  placeholder="Ask me about stablecoin yields..."
+                  className="flex-1 text-sm border-[#E5E7EB] focus:border-[#1F4FFF] focus:ring-[#1F4FFF]"
+                  disabled={isLoading}
+                />
+                <Button
+                  onClick={() => handleSendMessage()}
+                  disabled={!currentMessage.trim() || isLoading}
+                  className="bg-[#E47C3C] hover:bg-[#E47C3C]/90 text-white px-3"
+                >
                   <Send className="w-4 h-4" />
-                )}
-              </Button>
+                </Button>
+              </div>
+              
+              {/* Footer Disclaimer */}
+              <div className="mt-2 flex items-center justify-between">
+                <p className="text-xs text-[#9FA6B2]">
+                  AI responses are informational only and not financial advice.
+                </p>
+                <a 
+                  href="/privacy" 
+                  className="text-xs text-[#9FA6B2] hover:text-[#1F4FFF] underline"
+                >
+                  Privacy & Terms
+                </a>
+              </div>
             </div>
-            <p className="text-xs text-[#9FA6B2] mt-2">
-              Press Enter to send • AI responses are for informational purposes only
-            </p>
           </div>
         </DialogContent>
       </Dialog>
