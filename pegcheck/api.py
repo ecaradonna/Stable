@@ -11,7 +11,7 @@ from datetime import datetime
 
 from .core.config import DEFAULT_SYMBOLS
 from .core.compute import compute_peg_analysis
-from .sources import coingecko, cryptocompare
+from .sources import coingecko, cryptocompare, chainlink, uniswap
 
 # Create FastAPI app
 app = FastAPI(
