@@ -70,7 +70,7 @@ const IndexFamilyOverview = () => {
           };
         }
       } catch (syiError) {
-        console.warn('New SYI system unavailable, using fallback for SY100:', syiError);
+        console.warn('New SYI system unavailable, using fallback for SYC:', syiError);
       }
       
       // Then get the other indices from the Index Family system
