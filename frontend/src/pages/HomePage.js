@@ -25,14 +25,14 @@ const HomePage = () => {
         url="https://stableyield.com/"
       />
       <Header 
-        onJoinWaitlist={() => setIsContactOpen(true)}
+        onJoinWaitlist={() => setIsApiAccessOpen(true)}
         onDownloadWhitepaper={() => setIsWhitepaperOpen(true)}
       />
-      <HeroSection onJoinWaitlist={() => setIsContactOpen(true)} />
-      <LiveYields onJoinWaitlist={() => setIsContactOpen(true)} />
-      <StableYieldIndex onJoinWaitlist={() => setIsContactOpen(true)} />
+      <HeroSection onJoinWaitlist={() => setIsApiAccessOpen(true)} />
+      <LiveYields onJoinWaitlist={() => setIsApiAccessOpen(true)} />
+      <StableYieldIndex onJoinWaitlist={() => setIsApiAccessOpen(true)} />
       <QuotationSection 
-        onJoinWaitlist={() => setIsContactOpen(true)}
+        onJoinWaitlist={() => setIsApiAccessOpen(true)}
         onDownloadWhitepaper={() => setIsWhitepaperOpen(true)}
       />
       <WhyStableYield />
@@ -40,6 +40,10 @@ const HomePage = () => {
       <ContactModal 
         isOpen={isContactOpen} 
         onClose={() => setIsContactOpen(false)} 
+      />
+      <ApiAccessModal 
+        isOpen={isApiAccessOpen} 
+        onClose={() => setIsApiAccessOpen(false)} 
       />
       <WhitepaperDownloadModal 
         isOpen={isWhitepaperOpen} 
