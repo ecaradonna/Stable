@@ -329,14 +329,14 @@ const AIAssistant = ({ className = "", onAnalyticsEvent }) => {
             </div>
 
             {/* Quick Prompts */}
-            <div className="sy-qp p-3 border-t border-[#E5E7EB] bg-[#F9FAFB]">
+            <div className="p-3 border-t border-[#E5E7EB] bg-[#F9FAFB]">
               <div className="text-xs font-medium text-[#6B7280] mb-2">Try asking:</div>
               <div className="grid grid-cols-2 gap-2">
                 {quickPrompts.map((prompt, index) => (
                   <button
                     key={index}
                     onClick={() => handleQuickPromptClick(prompt)}
-                    className="sy-qp-button text-left text-xs p-2 bg-white rounded-lg border border-[#E5E7EB] hover:border-[#1F4FFF] hover:text-[#1F4FFF] hover:bg-[#1F4FFF]/5 transition-all duration-150 font-medium"
+                    className="text-left text-xs p-2 bg-white rounded-lg border border-[#E5E7EB] hover:border-[#1F4FFF] hover:text-[#1F4FFF] hover:bg-[#1F4FFF]/5 transition-all duration-150 font-medium"
                     disabled={isLoading}
                   >
                     {prompt}
