@@ -118,8 +118,8 @@ const IndexFamilyOverview = () => {
       
       // Fallback to mock data with new SYI value
       setIndices({
-        SY100: {
-          index_code: 'SY100',
+        SYC: {
+          index_code: 'SYC',
           value: 0.0447448, // Use new SYI expected value
           mode: 'Normal',
           constituent_count: 6,
