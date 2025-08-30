@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Header from "../components/Header";
 import HeroSection from "../components/HeroSection";
 import LiveYields from "../components/LiveYields";
@@ -16,6 +16,18 @@ const HomePage = () => {
   const [isContactOpen, setIsContactOpen] = useState(false);
   const [isApiAccessOpen, setIsApiAccessOpen] = useState(false);
   const [isWhitepaperOpen, setIsWhitepaperOpen] = useState(false);
+
+  // Listen for API modal events from AI Assistant
+  useEffect(() => {
+    const handleApiModalEvent = () => {
+      setIsApiAccessOpen(true);
+    };
+
+    window.addEventListener('open-api-modal', handleApiModalEvent);
+    return () => {
+      window.removeEventListener('open-api-modal', handleApiModalEvent);
+    };
+  }, []);
 
   return (
     <div className="min-h-screen bg-white">
