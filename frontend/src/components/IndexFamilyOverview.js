@@ -163,14 +163,14 @@ const IndexFamilyOverview = () => {
 
   const getIndexConfig = (indexCode) => {
     const configs = {
-      SY100: {
-        name: 'StableYield 100',
-        description: 'Top 100 risk-adjusted stablecoin yield strategies',
-        color: 'text-[#4CC1E9]',
-        bgColor: 'bg-[#4CC1E9]/10',
-        borderColor: 'border-[#4CC1E9]/20',
+      SYC: {
+        name: 'StableYield Composite Index',
+        description: 'Comprehensive benchmark across all stablecoin yield sources',
+        color: 'text-[#1F4FFF]',
+        bgColor: 'bg-[#1F4FFF]/10',
+        borderColor: 'border-[#1F4FFF]/20',
         icon: Target,
-        methodology: 'Equal-risk weighting (inverse volatility)'
+        methodology: 'Risk-adjusted yield composite of top strategies'
       },
       SYCEFI: {
         name: 'SY-CeFi Index',
