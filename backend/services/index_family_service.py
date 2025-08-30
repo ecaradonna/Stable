@@ -48,7 +48,7 @@ class IndexFamilyService:
             results[IndexCode.SYRPI] = await self._calculate_sy_rpi(date, constituents, tbill_rate, market_mode)
             results[IndexCode.SYCEFI] = await self._calculate_sy_cefi(date, constituents, market_mode)
             results[IndexCode.SYDEFI] = await self._calculate_sy_defi(date, constituents, market_mode)
-            results[IndexCode.SY100] = await self._calculate_sy100(date, constituents, market_mode)
+            results[IndexCode.SYC] = await self._calculate_syc(date, constituents, market_mode)
             
             # Store results in database
             await self._store_index_values(results)
