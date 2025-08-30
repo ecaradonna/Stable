@@ -466,6 +466,20 @@ backend:
           comment: "Previous engineer completed integration of 10 Q&A across the StableYield platform: 1) AI chatbot knowledge base with all 10 Q&A and quick-prompt suggestions, 2) Market Insights page (BlogPage.js) with full accordion of 10 Q&A, 3) Homepage with shortened 3-4 key Q&A in WhyStableYield component. Need to verify all integrations are working properly across bot and web pages."
         - working: true
           agent: "testing"
+          comment: "✅ Q&A INTEGRATION TESTING COMPLETE with 100% success rate. All Q&A properly integrated across AI chatbot, Homepage (4 Q&A), Market Insights (10 Q&A), with proper functionality, professional UI, and mobile responsiveness confirmed."
+  - task: "Enhanced PegCheck Data Sources - Chainlink & Uniswap v3 TWAP (Phase 2)"
+    implemented: true
+    working: "NA"
+    file: "/app/pegcheck/sources/chainlink.py, /app/pegcheck/sources/uniswap.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "PHASE 2 IMPLEMENTATION: Enhanced pegcheck system with optional data sources (Chainlink price feeds, Uniswap v3 TWAP) and comprehensive data persistence (PostgreSQL/TimescaleDB with memory fallback). Created chainlink.py for on-chain oracle price feeds with RPC integration, uniswap.py for DEX TWAP calculations, postgres.py/memory.py storage backends for historical data persistence. Updated pegcheck API/CLI to support --with_oracle and --with_dex flags, enhanced backend routes with historical endpoints, storage health checks, and multi-source consistency analysis. System now provides institutional-grade peg monitoring with 4 data sources, time-series storage, and advanced reliability metrics."
+        - working: true
+          agent: "testing"
           comment: "✅ RISK REGIME INVERSION ALERT SYSTEM FRONTEND INTEGRATION FULLY OPERATIONAL - Comprehensive testing completed with 100% SUCCESS RATE. FRONTEND INTEGRATION VERIFICATION: ✅ Risk Regime Widget properly integrated into Index Dashboard page (/index-dashboard), ✅ 'Risk Regime Inversion Alert' section displays correctly with professional styling, ✅ RiskRegimeWidget component renders perfectly with all technical indicators. API INTEGRATION SUCCESS: ✅ Backend /api/regime/current endpoint working (HTTP 200), ✅ API returns proper regime data: state='NEU', syi_excess=-0.0085, z_score=0, breadth_pct=40, alert_type='Early-Warning', ✅ Frontend processes API responses correctly and displays formatted data. TECHNICAL INDICATORS DISPLAY: ✅ SYI Excess: -85bps (properly formatted in basis points), ✅ Z-Score: 0.00 (decimal format with 2 places), ✅ Momentum: 0bps (basis points format), ✅ Breadth: 40% (percentage format), ✅ Regime State Badge: 'Neutral' with appropriate gray styling, ✅ Color coding working (red for negative SYI Excess, appropriate colors for each indicator). UI/UX FUNCTIONALITY: ✅ Widget displays with professional institutional-grade styling, ✅ Responsive design works correctly on mobile (390x844) and desktop (1920x1080), ✅ Loading states and error handling implemented with graceful fallback to demo data, ✅ Proper icons (Activity icon for Neutral state) and badge styling, ✅ Update timestamp displays correctly ('Updated: 10:03:38 PM'). INTEGRATION WITH EXISTING DASHBOARD: ✅ Risk Regime Widget doesn't break existing functionality, ✅ Index Family section still working properly, ✅ Peg Monitoring section remains functional, ✅ Index Constituents section displays correctly, ✅ Overall page performance maintained. REGIME STATE SCENARIOS: ✅ Neutral state displays correctly with gray styling and Activity icon, ✅ 'Initializing or no clear regime signal' description shown appropriately, ✅ Early-Warning alert type properly indicated. CONCLUSION: Risk Regime Inversion Alert system frontend integration is COMPLETE and FULLY OPERATIONAL. Widget displays realistic regime data with proper formatting, handles API integration seamlessly, maintains professional UI/UX standards, and integrates perfectly with existing dashboard components."
         - working: true
           agent: "testing"
