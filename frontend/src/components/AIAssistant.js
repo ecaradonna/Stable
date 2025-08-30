@@ -183,10 +183,10 @@ const AIAssistant = () => {
                   <div
                     className={`rounded-lg p-3 ${
                       message.type === "user"
-                        ? "bg-[#2E6049] text-white"
+                        ? "bg-[#E47C3C] text-white"
                         : message.isError
                         ? "bg-red-50 text-red-700 border border-red-200"
-                        : "bg-gray-100 text-[#0E1A2B]"
+                        : "bg-gray-100 text-[#1A1A1A]"
                     }`}
                   >
                     <div
