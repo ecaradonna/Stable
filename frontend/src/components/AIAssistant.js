@@ -213,61 +213,65 @@ const AIAssistant = ({ className = "", onAnalyticsEvent }) => {
         </button>
       </div>
 
-      {/* AI Panel Dialog */}
-      <Dialog open={isOpen} onOpenChange={() => {}}>
-        <DialogContent 
-          className="fixed right-6 bottom-24 w-full max-w-[420px] h-[500px] p-0 border border-[#E5E7EB] rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.08)] bg-white overflow-hidden"
-          onPointerDownOutside={(e) => e.preventDefault()}
-          onInteractOutside={(e) => e.preventDefault()}
-        >
+      {/* AI Panel Modal */}
+      {isOpen && (
+        <div className="fixed inset-0 z-[9999] flex items-end justify-end p-6">
+          {/* Backdrop */}
+          <div 
+            className="absolute inset-0 bg-black/20" 
+            onClick={() => setIsOpen(false)}
+          />
           
-          {/* Header */}
-          <div className="flex items-center justify-between p-4 border-b border-[#E5E7EB] bg-[#F9FAFB]">
-            <div className="flex-1">
-              <div className="text-sm font-semibold text-[#1A1A1A] flex items-center space-x-2">
-                <div className="w-6 h-6 bg-[#1F4FFF] rounded-full flex items-center justify-center">
-                  <Sparkles className="w-3 h-3 text-white" />
-                </div>
-                <span>StableYield AI</span>
-              </div>
-              <p className="text-xs text-[#6B7280] mt-0.5">Institutional Market Assistant</p>
-            </div>
+          {/* Modal */}
+          <div className="relative w-full max-w-[420px] h-[500px] bg-white rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.08)] border border-[#E5E7EB] overflow-hidden mb-20">
             
-            {/* Header CTAs */}
-            <div className="flex items-center space-x-2 ml-4">
-              <button
-                className="text-xs border border-[#1F4FFF] text-[#1F4FFF] hover:bg-[#1F4FFF] hover:text-white h-7 px-2 rounded flex items-center"
-                onClick={() => {
-                  onAnalyticsEvent?.('bot_alert_subscribe_click');
-                  setIsOpen(false);
-                  window.location.href = '/risk-analytics';
-                }}
-              >
-                <Bell className="w-3 h-3 mr-1" />
-                Alerts
-              </button>
+            {/* Header */}
+            <div className="flex items-center justify-between p-4 border-b border-[#E5E7EB] bg-[#F9FAFB]">
+              <div className="flex-1">
+                <div className="text-sm font-semibold text-[#1A1A1A] flex items-center space-x-2">
+                  <div className="w-6 h-6 bg-[#1F4FFF] rounded-full flex items-center justify-center">
+                    <Sparkles className="w-3 h-3 text-white" />
+                  </div>
+                  <span>StableYield AI</span>
+                </div>
+                <p className="text-xs text-[#6B7280] mt-0.5">Institutional Market Assistant</p>
+              </div>
               
-              <button
-                className="text-xs bg-[#E47C3C] hover:bg-[#E47C3C]/90 text-white h-7 px-2 rounded"
-                onClick={() => {
-                  onAnalyticsEvent?.('bot_api_cta_click');
-                  setIsOpen(false);
-                  // Trigger API Access modal opening
-                  const event = new CustomEvent('open-api-modal');
-                  window.dispatchEvent(event);
-                }}
-              >
-                API Access
-              </button>
-              
-              <button
-                onClick={() => setIsOpen(false)}
-                className="text-[#9FA6B2] hover:text-[#6B7280] p-1"
-              >
-                <X className="w-4 h-4" />
-              </button>
+              {/* Header CTAs */}
+              <div className="flex items-center space-x-2 ml-4">
+                <button
+                  className="text-xs border border-[#1F4FFF] text-[#1F4FFF] hover:bg-[#1F4FFF] hover:text-white h-7 px-2 rounded flex items-center"
+                  onClick={() => {
+                    onAnalyticsEvent?.('bot_alert_subscribe_click');
+                    setIsOpen(false);
+                    window.location.href = '/risk-analytics';
+                  }}
+                >
+                  <Bell className="w-3 h-3 mr-1" />
+                  Alerts
+                </button>
+                
+                <button
+                  className="text-xs bg-[#E47C3C] hover:bg-[#E47C3C]/90 text-white h-7 px-2 rounded"
+                  onClick={() => {
+                    onAnalyticsEvent?.('bot_api_cta_click');
+                    setIsOpen(false);
+                    // Trigger API Access modal opening
+                    const event = new CustomEvent('open-api-modal');
+                    window.dispatchEvent(event);
+                  }}
+                >
+                  API Access
+                </button>
+                
+                <button
+                  onClick={() => setIsOpen(false)}
+                  className="text-[#9FA6B2] hover:text-[#6B7280] p-1"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
             </div>
-          </div>
 
           {/* Messages Area */}
           <div className="flex flex-col h-[320px]">
