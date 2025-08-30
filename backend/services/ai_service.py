@@ -82,9 +82,9 @@ Current real-time stablecoin yields, peg status, and risk metrics across major p
     async def process_query(self, message: str, session_id: str) -> ChatResponse:
         """Process user query and return AI response"""
         try:
-            if self.openai_key == 'YOUR_OPENAI_KEY_HERE':
+            if self.llm_key == 'YOUR_API_KEY_HERE' or not self.llm_key:
                 return ChatResponse(
-                    response="🔑 StableYield AI is ready but requires OpenAI API key configuration. Please contact your administrator to activate the full AI assistant functionality for professional market intelligence.",
+                    response="👋 Hi! I'm StableYield AI. I can help you with current stablecoin yields, comparisons, and market analysis. What would you like to know?\n\n🔑 *Note: AI functionality requires API key configuration. Please contact your administrator to activate full assistant capabilities.*",
                     session_id=session_id,
                     message_id="config_needed"
                 )
@@ -94,7 +94,7 @@ Current real-time stablecoin yields, peg status, and risk metrics across major p
             full_system_message = self.system_message + "\n\n" + current_data
 
             chat = LlmChat(
-                api_key=self.openai_key,
+                api_key=self.llm_key,
                 session_id=session_id,
                 system_message=full_system_message
             ).with_model("openai", "gpt-4o-mini")
@@ -113,7 +113,7 @@ Current real-time stablecoin yields, peg status, and risk metrics across major p
 
         except Exception as e:
             return ChatResponse(
-                response=f"I apologize, but I'm experiencing technical difficulties accessing the market intelligence systems. Please try again later. Error: {str(e)}",
+                response=f"I apologize, but I'm experiencing technical difficulties accessing the market intelligence systems. Please try again later.\n\n⚠️ *AI responses are for informational purposes only and do not constitute financial advice.*",
                 session_id=session_id,
                 message_id="error"
             )
