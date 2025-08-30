@@ -79,12 +79,12 @@ const AIAssistant = ({ className = "", onAnalyticsEvent }) => {
   }, [isOpen]);
 
   const quickPrompts = [
-    "What is RAY?",
-    "Today's SYI value", 
-    "Risk regime now",
-    "Compare USDC vs USDT",
-    "Set peg alert",
-    "API pricing plans"
+    "What is the StableYield Index (SYI)?",
+    "How does SYI help me manage risk?", 
+    "What advantage does it give traders?",
+    "Can I receive automatic alerts?",
+    "What's the advantage over DeFiLlama?",
+    "How can I access the data?"
   ];
 
   const handleSendMessage = async (messageText) => {
