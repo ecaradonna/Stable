@@ -36,7 +36,7 @@ const IndexDashboardPage = () => {
   const calculateWeightedVolatility = (indices) => {
     // Realistic stablecoin YIELD volatility ranges by type (full percentage numbers):
     const volatilityMap = {
-      'SY100': 18,    // 18% - Composite index, diversified yield volatility
+      'SYC': 18,    // 18% - Composite index, diversified yield volatility
       'SYCEFI': 25,   // 25% - CeFi yields, moderate volatility due to centralized management
       'SYDEFI': 45,   // 45% - DeFi yields, higher volatility due to protocol risks and market dynamics
       'SYRPI': 32     // 32% - RWA protocols, moderate-high volatility from traditional asset backing
