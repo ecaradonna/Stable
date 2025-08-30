@@ -7,12 +7,14 @@ import QuotationSection from "../components/QuotationSection";
 import WhyStableYield from "../components/WhyStableYield";
 import Footer from "../components/Footer";
 import ContactModal from "../components/ContactModal";
+import ApiAccessModal from "../components/ApiAccessModal";
 import WhitepaperDownloadModal from "../components/WhitepaperDownloadModal";
 import AIAssistant from "../components/AIAssistant";
 import SEOHead from "../components/SEOHead";
 
 const HomePage = () => {
   const [isContactOpen, setIsContactOpen] = useState(false);
+  const [isApiAccessOpen, setIsApiAccessOpen] = useState(false);
   const [isWhitepaperOpen, setIsWhitepaperOpen] = useState(false);
 
   return (
