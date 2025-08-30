@@ -58,26 +58,83 @@ AVAILABLE DATA CONTEXT:
 Current real-time stablecoin yields, peg status, and risk metrics across major platforms."""
 
     def get_current_yields_context(self) -> str:
-        """Get current yield data to provide context to the AI"""
+        """Get current yields and market data for AI context"""
         try:
-            # In production, this would query the actual database
-            # For now, using mock data
-            context = "STABLEYIELD CURRENT MARKET INTELLIGENCE (Last Updated: " + datetime.now().strftime("%Y-%m-%d %H:%M") + "):\n\n"
+            import requests
+            import json
+            from datetime import datetime
             
-            for yield_item in mockYieldData:
-                context += f"• {yield_item['stablecoin']} ({yield_item['name']}): {yield_item['currentYield']:.2f}%\n"
-                context += f"  Platform: {yield_item['source']} ({yield_item['sourceType']})\n"
-                context += f"  Risk Level: {yield_item['riskScore']}, Liquidity: {yield_item['liquidity']}\n"
-                context += f"  24h Change: {yield_item['change24h']:+.2f}%\n\n"
+            context_data = []
             
-            context += "\nRISK ASSESSMENT FRAMEWORK:\n"
-            context += "- Low Risk: Regulated CeFi platforms, major DeFi protocols with proven track records\n"
-            context += "- Medium Risk: Established protocols with moderate exposure, emerging platforms\n"
-            context += "- High Risk: New protocols, complex strategies, high yield outliers\n\n"
+            # Try to get live SYI data
+            try:
+                syi_response = requests.get('http://localhost:8001/api/syi/current', timeout=5)
+                if syi_response.status_code == 200:
+                    syi_data = syi_response.json()
+                    if syi_data.get('success'):
+                        context_data.append(f"Current StableYield Index (SYI): {syi_data.get('syi_percent', 'N/A')}%")
+                        context_data.append(f"SYI Components: {syi_data.get('components_count', 'N/A')} stablecoins")
+                        context_data.append(f"Methodology Version: {syi_data.get('methodology_version', 'N/A')}")
+            except Exception as e:
+                context_data.append("SYI: Live data temporarily unavailable")
             
-            return context
+            # Try to get peg monitoring data
+            try:
+                peg_response = requests.get('http://localhost:8001/api/peg/check?symbols=USDT,USDC,DAI,FRAX,TUSD,PYUSD', timeout=5)
+                if peg_response.status_code == 200:
+                    peg_data = peg_response.json()
+                    if peg_data.get('success') and peg_data.get('data', {}).get('results'):
+                        peg_statuses = []
+                        for result in peg_data['data']['results']:
+                            symbol = result.get('symbol', 'Unknown')
+                            price = result.get('price_usd', 0)
+                            deviation = result.get('deviation', {}).get('percentage', 0)
+                            status = "Stable" if abs(deviation) < 0.5 else "Depegged" if abs(deviation) > 5 else "Monitoring"
+                            peg_statuses.append(f"{symbol}: ${price:.4f} ({deviation:+.2f}%, {status})")
+                        context_data.append("Current Peg Status:")
+                        context_data.extend(peg_statuses)
+            except Exception as e:
+                context_data.append("Peg Monitor: Live data temporarily unavailable")
+            
+            # Try to get risk regime data
+            try:
+                regime_response = requests.get('http://localhost:8001/api/regime/current', timeout=5)
+                if regime_response.status_code == 200:
+                    regime_data = regime_response.json()
+                    if regime_data.get('success'):
+                        regime_status = regime_data.get('data', {}).get('current_regime', 'Unknown')
+                        confidence = regime_data.get('data', {}).get('confidence', 0)
+                        context_data.append(f"Current Risk Regime: {regime_status} (confidence: {confidence:.1%})")
+            except Exception as e:
+                context_data.append("Risk Regime: Live data temporarily unavailable")
+            
+            # Try to get yields data
+            try:
+                yields_response = requests.get('http://localhost:8001/api/yields/', timeout=5)
+                if yields_response.status_code == 200:
+                    yields_data = yields_response.json()
+                    if isinstance(yields_data, list) and len(yields_data) > 0:
+                        context_data.append(f"Live Yields Available: {len(yields_data)} active opportunities")
+                        top_yields = []
+                        for yield_item in yields_data[:3]:  # Top 3 yields
+                            symbol = yield_item.get('stablecoin', 'Unknown')
+                            apy = yield_item.get('currentYield', 0)
+                            source = yield_item.get('source', 'Unknown')
+                            top_yields.append(f"{symbol}: {apy:.2f}% APY ({source})")
+                        if top_yields:
+                            context_data.append("Top Current Yields:")
+                            context_data.extend(top_yields)
+            except Exception as e:
+                context_data.append("Yields: Live data temporarily unavailable")
+            
+            # Add timestamp
+            timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC')
+            context_data.append(f"Data as of: {timestamp}")
+            
+            return "\n".join(context_data) if context_data else "Live market data temporarily unavailable - providing general guidance."
+            
         except Exception as e:
-            return "Current yield data temporarily unavailable."
+            return "Live market data temporarily unavailable - providing general guidance based on StableYield methodology."
 
     async def process_query(self, message: str, session_id: str) -> ChatResponse:
         """Process user query and return AI response"""
