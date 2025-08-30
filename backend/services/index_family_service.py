@@ -597,7 +597,7 @@ class IndexFamilyService:
                 logger.warning(f"Insufficient strategies for SYC: {len(eligible_strategies)}")
                 return IndexValue(
                     date=date,
-                    index_code=IndexCode.SY100,
+                    index_code=IndexCode.SYC,
                     value=0.0,
                     mode=mode,
                     confidence=0.0,
