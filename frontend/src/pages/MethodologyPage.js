@@ -64,8 +64,8 @@ const MethodologyPage = () => {
 
   const indexConstruction = [
     {
-      name: "StableYield 100 Index",
-      description: "Top 100 risk-adjusted stablecoin yield strategies",
+      name: "StableYield Composite Index",
+      description: "Risk-adjusted composite benchmark across all stablecoin yield sources",
       methodology: "Equal-risk weighted, monthly reconstitution, daily rebalancing"
     },
     {
