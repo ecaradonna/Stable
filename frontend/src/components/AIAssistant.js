@@ -124,18 +124,33 @@ const AIAssistant = ({ className = "", onAnalyticsEvent }) => {
         session_id: sessionId
       });
       
-      console.log('AI Response received:', response);
+      console.log('=== AI RESPONSE DEBUG ===');
+      console.log('Full response object:', response);
+      console.log('Response data:', response?.data);
+      console.log('Response.response field:', response?.data?.response);
 
-      // Add AI response
-      const aiMessage = {
-        id: response.message_id || `ai_${Date.now()}`,
-        type: 'ai',
-        text: response.response,
-        timestamp: new Date().toISOString(),
-        isError: false
-      };
-      
-      setMessages(prev => [...prev, aiMessage]);
+      if (response && response.data && response.data.response) {
+        console.log('SUCCESS: Valid response received');
+        const aiMessage = {
+          id: `ai_${Date.now()}`,
+          type: 'ai',
+          text: response.data.response,
+          timestamp: new Date().toISOString(),
+          isError: false
+        };
+        setMessages(prev => [...prev, aiMessage]);
+        
+        // Track analytics
+        onAnalyticsEvent?.('bot_message_sent', {
+          message_length: message.length,
+          response_length: response.data.response.length,
+          session_id: sessionId
+        });
+      } else {
+        console.error('ERROR: Invalid response structure');
+        console.error('Expected response.data.response, got:', response);
+        throw new Error('Invalid response format from AI service');
+      }
 
     } catch (error) {
       console.error('=== AI CHAT ERROR ===');
