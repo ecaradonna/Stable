@@ -84,13 +84,8 @@ const HeroSection = ({ onJoinWaitlist, onDownloadWhitepaper }) => {
               <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
             
-            {/* Mobile-optimized API Access Button - Force Visibility */}
+            {/* Mobile-optimized API Access Button - Force Orange Visibility */}
             <div 
-              className="inline-flex items-center justify-center cursor-pointer min-w-[200px] touch-manipulation select-none"
-              onClick={onJoinWaitlist}
-              onTouchStart={() => {}}
-              role="button"
-              tabIndex={0}
               style={{ 
                 border: '2px solid #E47C3C',
                 backgroundColor: 'white',
@@ -103,16 +98,24 @@ const HeroSection = ({ onJoinWaitlist, onDownloadWhitepaper }) => {
                 display: 'inline-flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                transition: 'all 0.3s ease'
+                transition: 'all 0.3s ease',
+                cursor: 'pointer',
+                userSelect: 'none',
+                touchAction: 'manipulation'
               }}
+              onClick={onJoinWaitlist}
+              onTouchStart={() => {}}
+              role="button"
+              tabIndex={0}
             >
               <span 
                 style={{ 
-                  color: '#E47C3C',
+                  color: '#E47C3C !important',
                   fontWeight: '600',
                   fontSize: '18px',
-                  display: 'inline',
-                  visibility: 'visible'
+                  display: 'inline !important',
+                  visibility: 'visible !important',
+                  opacity: '1 !important'
                 }}
               >
                 Request API Access
