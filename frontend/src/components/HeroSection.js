@@ -74,8 +74,8 @@ const HeroSection = ({ onJoinWaitlist, onDownloadWhitepaper }) => {
             </div>
           </div>
 
-          {/* Primary CTAs */}
-          <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-6">
+          {/* Primary CTA */}
+          <div className="flex flex-col sm:flex-row items-center justify-center">
             <Button 
               className="bg-[#1F4FFF] hover:bg-[#1F4FFF]/90 text-white font-semibold px-8 py-4 text-lg rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
               onClick={() => window.location.href = '/index-dashboard'}
@@ -83,48 +83,6 @@ const HeroSection = ({ onJoinWaitlist, onDownloadWhitepaper }) => {
               Explore Live Index
               <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
-            
-            {/* Mobile Safari Compatible API Access Button */}
-            <button 
-              className="force-orange-button-mobile"
-              style={{ 
-                border: '2px solid #E47C3C !important',
-                backgroundColor: '#FFFFFF !important',
-                color: '#E47C3C !important',
-                fontWeight: '600 !important',
-                fontSize: '18px !important',
-                padding: '16px 32px !important',
-                borderRadius: '12px !important',
-                minWidth: '200px !important',
-                display: 'inline-flex !important',
-                alignItems: 'center !important',
-                justifyContent: 'center !important',
-                transition: 'all 0.3s ease !important',
-                cursor: 'pointer !important',
-                userSelect: 'none !important',
-                touchAction: 'manipulation !important',
-                WebkitAppearance: 'none !important',
-                outline: 'none !important'
-              }}
-              onClick={onJoinWaitlist}
-              onTouchStart={() => {}}
-              type="button"
-            >
-              <span 
-                style={{ 
-                  color: '#E47C3C !important',
-                  fontWeight: '600 !important',
-                  fontSize: '18px !important',
-                  display: 'inline-block !important',
-                  visibility: 'visible !important',
-                  opacity: '1 !important',
-                  textDecoration: 'none !important',
-                  lineHeight: '1 !important'
-                }}
-              >
-                Request API Access
-              </span>
-            </button>
           </div>
         </div>
       </div>
