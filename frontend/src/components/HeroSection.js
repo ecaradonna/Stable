@@ -84,43 +84,47 @@ const HeroSection = ({ onJoinWaitlist, onDownloadWhitepaper }) => {
               <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
             
-            {/* Mobile-optimized API Access Button - Force Orange Visibility */}
-            <div 
+            {/* Mobile Safari Compatible API Access Button */}
+            <button 
+              className="force-orange-button-mobile"
               style={{ 
-                border: '2px solid #E47C3C',
-                backgroundColor: 'white',
-                color: '#E47C3C',
-                fontWeight: '600',
-                fontSize: '18px',
-                padding: '16px 32px',
-                borderRadius: '12px',
-                minWidth: '200px',
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                transition: 'all 0.3s ease',
-                cursor: 'pointer',
-                userSelect: 'none',
-                touchAction: 'manipulation'
+                border: '2px solid #E47C3C !important',
+                backgroundColor: '#FFFFFF !important',
+                color: '#E47C3C !important',
+                fontWeight: '600 !important',
+                fontSize: '18px !important',
+                padding: '16px 32px !important',
+                borderRadius: '12px !important',
+                minWidth: '200px !important',
+                display: 'inline-flex !important',
+                alignItems: 'center !important',
+                justifyContent: 'center !important',
+                transition: 'all 0.3s ease !important',
+                cursor: 'pointer !important',
+                userSelect: 'none !important',
+                touchAction: 'manipulation !important',
+                WebkitAppearance: 'none !important',
+                outline: 'none !important'
               }}
               onClick={onJoinWaitlist}
               onTouchStart={() => {}}
-              role="button"
-              tabIndex={0}
+              type="button"
             >
               <span 
                 style={{ 
                   color: '#E47C3C !important',
-                  fontWeight: '600',
-                  fontSize: '18px',
-                  display: 'inline !important',
+                  fontWeight: '600 !important',
+                  fontSize: '18px !important',
+                  display: 'inline-block !important',
                   visibility: 'visible !important',
-                  opacity: '1 !important'
+                  opacity: '1 !important',
+                  textDecoration: 'none !important',
+                  lineHeight: '1 !important'
                 }}
               >
                 Request API Access
               </span>
-            </div>
+            </button>
           </div>
         </div>
       </div>
