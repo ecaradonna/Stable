@@ -363,8 +363,8 @@ const AIAssistant = ({ className = "", onAnalyticsEvent }) => {
                 </div>
               )}
 
-              {/* Input Area */}
-              <div className="p-4 border-t border-[#E5E7EB] bg-white">
+              {/* Input Area - Mobile Optimized */}
+              <div className="p-4 border-t border-[#E5E7EB] bg-white touch-manipulation">
                 <div className="flex space-x-2">
                   <input
                     ref={inputRef}
@@ -372,21 +372,27 @@ const AIAssistant = ({ className = "", onAnalyticsEvent }) => {
                     onChange={(e) => setCurrentMessage(e.target.value)}
                     onKeyPress={handleKeyPress}
                     placeholder="Ask me about stablecoin yields..."
-                    className="flex-1 px-3 py-2 text-sm border border-[#E5E7EB] rounded-md focus:outline-none focus:border-[#1F4FFF] focus:ring-1 focus:ring-[#1F4FFF]"
+                    className="flex-1 px-3 py-3 text-sm border border-[#E5E7EB] rounded-md focus:outline-none focus:border-[#1F4FFF] focus:ring-1 focus:ring-[#1F4FFF] touch-manipulation"
                     disabled={isLoading}
+                    style={{
+                      fontSize: '16px', // Prevents zoom on iOS
+                      WebkitAppearance: 'none',
+                      borderRadius: '6px'
+                    }}
                   />
                   <button
                     onClick={() => handleSendMessage()}
+                    onTouchStart={() => {}}
                     disabled={!currentMessage.trim() || isLoading}
-                    className="bg-[#E47C3C] hover:bg-[#E47C3C]/90 text-white px-3 py-2 rounded-md disabled:opacity-50"
+                    className="bg-[#E47C3C] hover:bg-[#E47C3C]/90 text-white px-4 py-3 rounded-md disabled:opacity-50 touch-manipulation active:scale-95 flex items-center justify-center min-w-[48px]"
                   >
                     <Send className="w-4 h-4" />
                   </button>
                 </div>
                 
                 {/* Footer Disclaimer */}
-                <div className="mt-2 flex items-center justify-between">
-                  <p className="text-xs text-[#9FA6B2]">
+                <div className="mt-2 flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                  <p className="text-xs text-[#9FA6B2] mb-1 sm:mb-0">
                     AI responses are informational only and not financial advice.
                   </p>
                   <a 
