@@ -112,10 +112,23 @@ const AIAssistant = ({ className = "", onAnalyticsEvent }) => {
     setMessages(prev => [...prev, userMessage]);
 
     try {
+      console.log('=== AI CHAT DEBUG ===');
+      console.log('Message:', message);
+      console.log('Session ID:', sessionId);
+      
+      // Debug: Check what backend URL we're using
+      const backendUrl = import.meta?.env?.REACT_APP_BACKEND_URL || 
+                        process.env?.REACT_APP_BACKEND_URL || 
+                        'http://localhost:8001';
+      console.log('Backend URL:', backendUrl);
+      console.log('Full API URL:', `${backendUrl}/api/ai/chat`);
+
       const response = await aiApi.chat({
         message,
         session_id: sessionId
       });
+      
+      console.log('AI Response received:', response);
 
       // Add AI response
       const aiMessage = {
@@ -129,14 +142,17 @@ const AIAssistant = ({ className = "", onAnalyticsEvent }) => {
       setMessages(prev => [...prev, aiMessage]);
 
     } catch (error) {
-      console.error('AI chat error:', error);
+      console.error('=== AI CHAT ERROR ===');
+      console.error('Error object:', error);
+      console.error('Error message:', error.message);
+      console.error('Error stack:', error.stack);
       
-      // Add error message with more details for debugging
+      // Add detailed error message for debugging
       let errorText = "I apologize, but I'm experiencing technical difficulties. Please try again later or contact support for assistance.\n\n⚠️ *AI responses are for informational purposes only and do not constitute financial advice.*";
       
-      // Add debug info in development
+      // Add debug info for localhost
       if (window.location.hostname === 'localhost') {
-        errorText += `\n\nDebug: ${error.message || error}`;
+        errorText += `\n\n🔧 Debug Info:\n- Error: ${error.message}\n- Backend: ${import.meta?.env?.REACT_APP_BACKEND_URL || 'localhost:8001'}\n- Network: Check console for details`;
       }
       
       const errorMessage = {
