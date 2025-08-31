@@ -1,22 +1,58 @@
 import axios from 'axios';
 
-// Dynamic backend URL detection
+// Mobile Safari compatible backend URL detection
 const getBackendURL = () => {
-  // Always use environment variable if available (works for all environments)
-  const envBackendUrl = process.env.REACT_APP_BACKEND_URL || import.meta?.env?.REACT_APP_BACKEND_URL;
-  if (envBackendUrl) {
+  // Try multiple methods to get environment variable (mobile Safari compatible)
+  let envBackendUrl;
+  
+  try {
+    // Method 1: Check if process exists (Node.js environments)
+    if (typeof process !== 'undefined' && process.env) {
+      envBackendUrl = process.env.REACT_APP_BACKEND_URL;
+    }
+  } catch (e) {
+    // Process not available in mobile Safari
+  }
+  
+  try {
+    // Method 2: Vite/modern bundlers
+    if (typeof import.meta !== 'undefined' && import.meta.env) {
+      envBackendUrl = envBackendUrl || import.meta.env.REACT_APP_BACKEND_URL;
+    }
+  } catch (e) {
+    // import.meta not available
+  }
+  
+  try {
+    // Method 3: Check window object for injected env vars (mobile Safari fallback)
+    if (typeof window !== 'undefined' && window.__ENV) {
+      envBackendUrl = envBackendUrl || window.__ENV.REACT_APP_BACKEND_URL;
+    }
+  } catch (e) {
+    // Window env not available
+  }
+  
+  // If environment variable found, use it
+  if (envBackendUrl && envBackendUrl !== 'undefined') {
+    console.log('Using environment backend URL:', envBackendUrl);
     return envBackendUrl;
   }
   
+  // Mobile Safari fallback: construct from current location
+  const currentProtocol = typeof window !== 'undefined' ? window.location.protocol : 'http:';
+  const currentHost = typeof window !== 'undefined' ? window.location.hostname : 'localhost';
+  
   // Check if we're in development (localhost)
-  if (window.location.hostname === 'localhost') {
-    return 'http://localhost:8001';
+  if (currentHost === 'localhost' || currentHost === '127.0.0.1') {
+    const backendUrl = 'http://localhost:8001';
+    console.log('Using localhost backend URL:', backendUrl);
+    return backendUrl;
   }
   
-  // Fallback: construct backend URL from current window location (always use HTTPS in production)
-  const protocol = window.location.protocol === 'https:' ? 'https:' : window.location.protocol;
-  const hostname = window.location.hostname;
-  return `${protocol}//${hostname}`;
+  // Production fallback: same domain with HTTPS
+  const backendUrl = `${currentProtocol}//${currentHost}`;
+  console.log('Using production backend URL:', backendUrl);
+  return backendUrl;
 };
 
 const BACKEND_URL = getBackendURL();
