@@ -247,6 +247,29 @@
     }
 }
 
+/* Force Mobile Safari button visibility */
+.force-orange-button-mobile,
+.force-orange-button-mobile * {
+    border: 2px solid #E47C3C !important;
+    background-color: #FFFFFF !important;
+    color: #E47C3C !important;
+    font-weight: 600 !important;
+    font-size: 18px !important;
+    text-decoration: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+}
+
+.force-orange-button-mobile span {
+    color: #E47C3C !important;
+    display: inline-block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    font-weight: 600 !important;
+    font-size: 18px !important;
+}
+
 /* Force display of API Access button text */
 div[class*="border-2"][class*="border-[#E47C3C]"] span,
 button[class*="border-2"][class*="border-[#E47C3C]"] span {
