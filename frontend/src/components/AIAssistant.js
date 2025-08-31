@@ -131,11 +131,18 @@ const AIAssistant = ({ className = "", onAnalyticsEvent }) => {
     } catch (error) {
       console.error('AI chat error:', error);
       
-      // Add error message
+      // Add error message with more details for debugging
+      let errorText = "I apologize, but I'm experiencing technical difficulties. Please try again later or contact support for assistance.\n\n⚠️ *AI responses are for informational purposes only and do not constitute financial advice.*";
+      
+      // Add debug info in development
+      if (window.location.hostname === 'localhost') {
+        errorText += `\n\nDebug: ${error.message || error}`;
+      }
+      
       const errorMessage = {
         id: `error_${Date.now()}`,
         type: 'ai',
-        text: "I apologize, but I'm experiencing technical difficulties. Please try again later or contact support for assistance.\n\n⚠️ *AI responses are for informational purposes only and do not constitute financial advice.*",
+        text: errorText,
         timestamp: new Date().toISOString(),
         isError: true
       };
