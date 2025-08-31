@@ -83,26 +83,17 @@ const HeroSection = ({ onJoinWaitlist, onDownloadWhitepaper }) => {
               Explore Live Index
               <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
-            <button 
-              className="inline-flex items-center justify-center border-2 border-[#E47C3C] bg-white text-[#E47C3C] hover:bg-[#E47C3C] hover:text-white font-semibold px-8 py-4 text-lg rounded-xl transition-all duration-300 cursor-pointer gap-2 min-w-[200px]"
+            
+            {/* Mobile-optimized API Access Button */}
+            <div 
+              className="inline-flex items-center justify-center border-2 border-[#E47C3C] bg-white text-[#E47C3C] hover:bg-[#E47C3C] hover:text-white font-semibold px-8 py-4 text-lg rounded-xl transition-all duration-300 cursor-pointer min-w-[200px] touch-manipulation select-none"
               onClick={onJoinWaitlist}
-              type="button"
-              style={{ 
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                border: '2px solid #E47C3C',
-                backgroundColor: 'white',
-                color: '#E47C3C',
-                fontWeight: '600',
-                padding: '16px 32px',
-                fontSize: '18px',
-                borderRadius: '12px',
-                minWidth: '200px'
-              }}
+              onTouchStart={() => {}}
+              role="button"
+              tabIndex={0}
             >
-              Request API Access
-            </button>
+              <span className="text-[#E47C3C] hover:text-white font-semibold text-lg">Request API Access</span>
+            </div>
           </div>
         </div>
       </div>
