@@ -116,12 +116,8 @@ const AIAssistant = ({ className = "", onAnalyticsEvent }) => {
       console.log('Message:', message);
       console.log('Session ID:', sessionId);
       
-      // Debug: Check what backend URL we're using
-      const backendUrl = import.meta?.env?.REACT_APP_BACKEND_URL || 
-                        process.env?.REACT_APP_BACKEND_URL || 
-                        'http://localhost:8001';
-      console.log('Backend URL:', backendUrl);
-      console.log('Full API URL:', `${backendUrl}/api/ai/chat`);
+      // Use the same backend URL detection as other API calls
+      console.log('Using centralized API service backend URL');
 
       const response = await aiApi.chat({
         message,
