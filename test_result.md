@@ -468,6 +468,28 @@ backend:
           agent: "main"
           comment: "Previous engineer completed integration of 10 Q&A across the StableYield platform: 1) AI chatbot knowledge base with all 10 Q&A and quick-prompt suggestions, 2) Market Insights page (BlogPage.js) with full accordion of 10 Q&A, 3) Homepage with shortened 3-4 key Q&A in WhyStableYield component. Need to verify all integrations are working properly across bot and web pages."
         - working: true
+  - task: "Mobile Safari Button Visibility Fix - Request API Access"
+    implemented: false
+    working: false
+    file: "/app/frontend/src/components/HeroSection.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: false
+          agent: "testing"
+          comment: "❌ CRITICAL MOBILE SAFARI ISSUE CONFIRMED: 'Request API Access' button text is WHITE (rgb(255, 255, 255)) making it completely INVISIBLE on white background. Button also has gray border (rgb(229, 229, 229)) instead of expected orange border (#E47C3C). User reports accurate - button appears blank/invisible on mobile Safari. Located in HeroSection.js lines 87-120. IMMEDIATE FIX NEEDED: Change span color from white to orange #E47C3C and fix border color."
+  - task: "Mobile Safari AI Assistant Environment Variable Fix"
+    implemented: false
+    working: false
+    file: "/app/frontend/src/components/AIAssistant.js, /app/frontend/src/services/api.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: false
+          agent: "testing"
+          comment: "❌ CRITICAL MOBILE SAFARI ISSUE CONFIRMED: AI Assistant frontend has JavaScript error 'process is not defined' preventing environment variable access on mobile Safari. Backend AI API works perfectly (returns 200 OK with proper responses), but frontend cannot connect due to environment variable compatibility issue. Located in api.js getBackendURL() function. IMMEDIATE FIX NEEDED: Replace process.env access with mobile Safari compatible approach for environment variables."
           agent: "testing"
           comment: "✅ Q&A INTEGRATION TESTING COMPLETE with 100% success rate. All Q&A properly integrated across AI chatbot, Homepage (4 Q&A), Market Insights (10 Q&A), with proper functionality, professional UI, and mobile responsiveness confirmed."
   - task: "Enhanced PegCheck Data Sources - Chainlink & Uniswap v3 TWAP (Phase 2)"
