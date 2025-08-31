@@ -212,20 +212,21 @@ const AIAssistant = ({ className = "", onAnalyticsEvent }) => {
         </button>
       </div>
 
-      {/* AI Panel Modal */}
+      {/* AI Panel Modal - Mobile Optimized */}
       {isOpen && (
-        <div className="fixed inset-0 z-[9999] flex items-end justify-end p-6">
+        <div className="fixed inset-0 z-[9999] flex items-end justify-end p-4 md:p-6">
           {/* Backdrop */}
           <div 
             className="absolute inset-0 bg-black/20" 
             onClick={() => setIsOpen(false)}
+            onTouchStart={() => setIsOpen(false)}
           />
           
-          {/* Modal */}
-          <div className="relative w-full max-w-[420px] h-[500px] bg-white rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.08)] border border-[#E5E7EB] overflow-hidden mb-20">
+          {/* Modal - Mobile First Design */}
+          <div className="relative w-full max-w-[420px] h-[500px] bg-white rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.08)] border border-[#E5E7EB] overflow-hidden mb-16 md:mb-20 touch-manipulation">
             
             {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-[#E5E7EB] bg-[#F9FAFB]">
+            <div className="flex items-center justify-between p-4 border-b border-[#E5E7EB] bg-[#F9FAFB] touch-manipulation">
               <div className="flex-1">
                 <div className="text-sm font-semibold text-[#1A1A1A] flex items-center space-x-2">
                   <div className="w-6 h-6 bg-[#1F4FFF] rounded-full flex items-center justify-center">
@@ -236,22 +237,23 @@ const AIAssistant = ({ className = "", onAnalyticsEvent }) => {
                 <p className="text-xs text-[#6B7280] mt-0.5">Institutional Market Assistant</p>
               </div>
               
-              {/* Header CTAs */}
+              {/* Header CTAs - Mobile Optimized */}
               <div className="flex items-center space-x-2 ml-4">
                 <button
-                  className="text-xs border border-[#1F4FFF] text-[#1F4FFF] hover:bg-[#1F4FFF] hover:text-white h-7 px-2 rounded flex items-center"
+                  className="text-xs border border-[#1F4FFF] text-[#1F4FFF] hover:bg-[#1F4FFF] hover:text-white h-7 px-2 rounded flex items-center touch-manipulation active:scale-95"
                   onClick={() => {
                     onAnalyticsEvent?.('bot_alert_subscribe_click');
                     setIsOpen(false);
                     window.location.href = '/risk-analytics';
                   }}
+                  onTouchStart={() => {}}
                 >
                   <Bell className="w-3 h-3 mr-1" />
-                  Alerts
+                  <span>Alerts</span>
                 </button>
                 
                 <button
-                  className="text-xs bg-[#E47C3C] hover:bg-[#E47C3C]/90 text-white h-7 px-2 rounded"
+                  className="text-xs bg-[#E47C3C] hover:bg-[#E47C3C]/90 text-white h-7 px-2 rounded touch-manipulation active:scale-95"
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
@@ -263,13 +265,15 @@ const AIAssistant = ({ className = "", onAnalyticsEvent }) => {
                       window.dispatchEvent(event);
                     }, 100);
                   }}
+                  onTouchStart={() => {}}
                 >
-                  API Access
+                  <span>API Access</span>
                 </button>
                 
                 <button
                   onClick={() => setIsOpen(false)}
-                  className="text-[#9FA6B2] hover:text-[#6B7280] p-1"
+                  onTouchStart={() => setIsOpen(false)}
+                  className="text-[#9FA6B2] hover:text-[#6B7280] p-1 touch-manipulation active:scale-95"
                   aria-label="Close AI Assistant"
                   type="button"
                 >
