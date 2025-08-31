@@ -775,12 +775,9 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Mobile Safari Button Visibility Fix - Request API Access"
-    - "Mobile Safari AI Assistant Environment Variable Fix"
+    - "Mobile Safari Compatibility Fixes - COMPLETED"
   stuck_tasks:
     - "IndexFamilyOverview Component"
-    - "Mobile Safari Button Visibility Fix - Request API Access"
-    - "Mobile Safari AI Assistant Environment Variable Fix"
   test_all: false
   test_priority: "high_first"
 
