@@ -199,3 +199,61 @@
         max-width: calc(100vw - 32px);
     }
 }
+
+/* Mobile-specific button fixes */
+@media (max-width: 640px) {
+    /* Ensure button text is visible on mobile */
+    button[class*="border-2"][class*="border-[#E47C3C]"] {
+        font-size: 16px !important;
+        font-weight: 600 !important;
+        color: #E47C3C !important;
+        background-color: white !important;
+        border: 2px solid #E47C3C !important;
+        padding: 16px 24px !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        min-width: 180px !important;
+        text-align: center !important;
+        -webkit-appearance: none !important;
+        -moz-appearance: none !important;
+        appearance: none !important;
+        user-select: none !important;
+        -webkit-user-select: none !important;
+        -webkit-tap-highlight-color: transparent !important;
+        outline: none !important;
+    }
+    
+    /* Mobile touch optimization */
+    .touch-manipulation {
+        touch-action: manipulation !important;
+        -webkit-touch-callout: none !important;
+        -webkit-user-select: none !important;
+        user-select: none !important;
+    }
+    
+    /* Mobile input optimization */
+    input[type="text"], input[placeholder*="Ask me"] {
+        font-size: 16px !important;
+        -webkit-appearance: none !important;
+        border-radius: 6px !important;
+        padding: 12px !important;
+    }
+    
+    /* Mobile button press feedback */
+    .active\:scale-95:active {
+        transform: scale(0.95) !important;
+        transition: transform 0.1s ease !important;
+    }
+}
+
+/* Force display of API Access button text */
+div[class*="border-2"][class*="border-[#E47C3C]"] span,
+button[class*="border-2"][class*="border-[#E47C3C]"] span {
+    display: inline !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    font-size: 18px !important;
+    font-weight: 600 !important;
+    color: #E47C3C !important;
+}
