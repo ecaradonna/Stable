@@ -113,7 +113,7 @@ async def health_check():
         "timestamp": datetime.utcnow().isoformat(),
         "database": db_status,
         "cryptocompare_api": cc_key_status,
-        "openai_api": "configured" if os.getenv('OPENAI_API_KEY') else "not_configured",
+        "openai_api": "configured" if (os.getenv('EMERGENT_LLM_KEY') or os.getenv('OPENAI_API_KEY')) else "not_configured",
         "version": "2.0.0",
         "capabilities": [
             "Real-time yield aggregation",
